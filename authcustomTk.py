@@ -39,7 +39,8 @@ class Auth(CTk):
         self.logo = CTkImage(light_image=Image.open("logo//whiteBGLogo.png"),dark_image=Image.open("logo//blackBGLogo.png"),size=(330,105)) 
         self.logoPanel = CTkLabel(self.frameLogin,text="",image=self.logo)
         
-        self.entryEmail = CTkEntry(self.frameLogin,font=(globalFontName,25),width=400,placeholder_text="email",corner_radius=15)
+        
+        self.entryEmail = CTkEntry(self.frameLogin,font=("Consolas",25),width=400,placeholder_text="email",corner_radius=15)
         self.entryPassword = CTkEntry(self.frameLogin,font=(globalFontName,25),width=400,placeholder_text="password",show="*",corner_radius=15)
         self.lblEmail = CTkLabel(self.frameLogin,font=emojiFont,text="✉️")
         self.lblPassword = CTkLabel(self.frameLogin,font=emojiFont,text="🔒")
@@ -48,9 +49,9 @@ class Auth(CTk):
         self.btnShowPassword = CTkButton(self.frameLogin,image=self.imgShowPassword,text="",width=1,command=self.showHide,corner_radius=15)
         self.imgHidePassword = CTkImage(Image.open("eyeIconOff.png"),size=(30,30))
         self.btnHidePassword = CTkButton(self.frameLogin,image=self.imgHidePassword,text="",width=1,command=self.showHide,corner_radius=15)
-        self.btnRegister = CTkButton(self.frameLogin,text="register",font=buttonFont,corner_radius=15)
-        self.btnSignIn = CTkButton(self.frameLogin,text="sign in",font=buttonFont,corner_radius=15,command=self.signInClicked)
-        self.btnRegisterConfirm = CTkButton(self.frameLogin,text="confirm",font=buttonFont,corner_radius=15,command=self.signInClicked)
+        self.btnRegister = CTkButton(self.frameLogin,text="register",font=buttonFont,corner_radius=15,text_color="black",border_color="black",fg_color="white",border_width=5)
+        self.btnSignIn = CTkButton(self.frameLogin,text="sign in",font=buttonFont,corner_radius=15,command=self.signInClicked,text_color="black",border_color="black",fg_color="white",border_width=5)
+        self.btnRegisterConfirm = CTkButton(self.frameLogin,text="confirm",font=buttonFont,corner_radius=15,command=self.signInClicked,text_color="black",border_color="black",fg_color="white",border_width=5)
 
         self.messageVar = StringVar()
         self.lblMessage = CTkLabel(self.frameLogin,font=(globalFontName,30),textvariable=self.messageVar)
@@ -198,6 +199,8 @@ class Auth(CTk):
         
         self.lblEmail.focus_set()
 
+    def btnRegisterConfirmClicked(self):
+        pass
 
     def signInClicked(self):
         print("Hello")
@@ -239,13 +242,21 @@ class Auth(CTk):
                     self.setMessage("Incorrect password.","red")
                     self.resetEntry(["entryPassword"])
 
-    def signIn(self,userDetails):
-        self.loggedInEmail = userDetails[0]
+    def rememberMeConfirmClicked(self):
         self.setMessage(f"Login successful as\n{self.loggedInEmail}","green")
         self.loggedIn = True
-        
-
         self.after(1000,self.destroy)
+    
+    def rememberMeDeniedClicked(self):
+        self.lblMessage.place_forget()
+        self.btnRegisterConfirm.configure(command=self.btnRegisterConfirmClicked)
+        self.btnRegisterConfirm.place_forget()
+
+    def signIn(self,userDetails):
+        self.loggedInEmail = userDetails[0]
+        self.setMessage(f"Would you like to login automatically as\n{self.loggedInEmail}?")
+        self.btnRegisterConfirm.configure(command=self.rememberMeConfirmClicked)
+
 
 
     def userLoginSequence(self):
