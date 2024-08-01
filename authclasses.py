@@ -211,16 +211,16 @@ class Auth(Tk):
             elements["btnHidePassword"].place_forget()
             elements["btnShowPassword"].place(in_=entryPassword,x=460,y=-2) 
 
-    def bindingEventListeners(self):
-        elements = self.elements
-        for each in elements:
-            elements[each].bind("<Enter>",lambda event,element=each:self.elementMouseEnter(element))
-            elements[each].bind("<Leave>",lambda event,element=each:self.elementMouseLeave(element))
+        def bindingEventListeners(self):
+            elements = self.elements
+            for each in elements:
+                elements[each].bind("<Enter>",lambda event,element=each:self.elementMouseEnter(element))
+                elements[each].bind("<Leave>",lambda event,element=each:self.elementMouseLeave(element))
 
-        self.entryEmail.bind("<FocusIn>",self.emailFocusIn)
-        self.entryEmail.bind("<FocusOut>",self.emailFocusOut)
-        self.entryPassword.bind("<FocusIn>",self.passwordFocusIn)
-        self.entryPassword.bind("<FocusOut>",self.passwordFocusOut)
+            self.entryEmail.bind("<FocusIn>",self.emailFocusIn)
+            self.entryEmail.bind("<FocusOut>",self.emailFocusOut)
+            self.entryPassword.bind("<FocusIn>",self.passwordFocusIn)
+            self.entryPassword.bind("<FocusOut>",self.passwordFocusOut)
         
     def elementMouseEnter(self,element):
         if "btn" in element or "entry" in element:
