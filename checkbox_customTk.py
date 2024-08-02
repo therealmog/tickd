@@ -1,24 +1,24 @@
 # Amogh NG
 # Nice looking checkbox
 
-from tkinter import *
+from customtkinter import *
 from PIL import ImageTk, Image
 
 """root = Tk()
 root.geometry("600x400")"""
 
 class Checkbox():
-    def __init__(self,parent:Tk,x,y,relWidget,size:tuple):
+    def __init__(self,parent:CTk,x,y,relWidget,size:tuple):
         self.x = x
         self.y = y
         self.parent = parent
         self.relWidget = relWidget
 
-        self.emptyImg = ImageTk.PhotoImage(Image.open("checkbox//empty.png").resize(size))
-        self.emptyImgPanel = Label(parent,image=self.emptyImg,cursor="hand2")
+        self.emptyImg = CTkImage(Image.open("checkbox//empty.png"),size=size)
+        self.emptyImgPanel = CTkLabel(parent,image=self.emptyImg,cursor="hand2")
 
-        self.checkedImg = ImageTk.PhotoImage(Image.open("checkbox//checked.png").resize(size))
-        self.checkedImgPanel = Label(parent,image=self.checkedImg,cursor="hand2")
+        self.checkedImg = CTkImage(Image.open("checkbox//checked.png"),size=size)
+        self.checkedImgPanel = CTkLabel(parent,image=self.checkedImg,cursor="hand2")
 
         
         #self.emptyImgPanel.bind("<Enter>",self.setChecked)
