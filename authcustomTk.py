@@ -10,14 +10,18 @@ class Auth(CTk):
     globalFontName = "Bahnschrift"
     buttonFont = (globalFontName,25)
     emojiFont = ("Segoe UI Emoji",30)
-    globalColour = "white"
+    globalColour = ("black","white")
+    accent = "dodgerblue2"
 
     def __init__(self):
         super().__init__()
 
-        self.geometry("850x570")
-        self.minsize(850,570)
-        self.maxsize(850,570)
+        self.dimensions = [950,670]
+        x=self.dimensions[0]
+        y=self.dimensions[1]
+        self.geometry(f"{x}x{y}")
+        self.minsize(x,y)
+        self.maxsize(1280,800)
         self.title("Log in - Tickd")
 
         self.loggedIn = False
@@ -36,10 +40,13 @@ class Auth(CTk):
         emojiFont = self.emojiFont
         buttonFont = self.buttonFont
 
-        self.frameLogin = CTkFrame(self,width=850,height=570,corner_radius=20)
+        self.imgBG = CTkImage(Image.open("wavy.jpg"),size=(1280,800))
+        self.panelImgBG = CTkLabel(self,text="",image=self.imgBG)
+        self.frameLogin = CTkFrame(self,width=850,height=570,corner_radius=20,border_color="gray7",border_width=5,fg_color=None)
+        
 
         self.imgMode = CTkImage(light_image=Image.open("logo//moon.png"),dark_image=Image.open("logo//sun.png"),size=(40,40))
-        self.btnMode = CTkButton(self.frameLogin,image=self.imgMode,text="",command=self.changeMode,width=1,fg_color="#252425",hover_color="royalblue1",corner_radius=50)
+        self.btnMode = CTkButton(self.frameLogin,image=self.imgMode,text="",command=self.changeMode,width=1,fg_color="#252425",hover_color=self.accent,corner_radius=50)
         
         self.logo = CTkImage(light_image=Image.open("logo//whiteBGLogo.png"),dark_image=Image.open("logo//blackBGLogo.png"),size=(330,105)) 
         self.logoPanel = CTkLabel(self.frameLogin,text="",image=self.logo)
@@ -51,15 +58,21 @@ class Auth(CTk):
         self.lblPassword = CTkLabel(self.frameLogin,font=emojiFont,text="🔒")
         
         self.imgShowPassword = CTkImage(Image.open("eyeIcon.png"),size=(30,30))
-        self.btnShowPassword = CTkButton(self.frameLogin,image=self.imgShowPassword,text="",width=1,command=self.showHide,corner_radius=15)
+        self.btnShowPassword = CTkButton(self.frameLogin,image=self.imgShowPassword,text="",width=1,command=self.showHide,corner_radius=15,fg_color=self.accent)
         self.imgHidePassword = CTkImage(Image.open("eyeIconOff.png"),size=(30,30))
         self.btnHidePassword = CTkButton(self.frameLogin,image=self.imgHidePassword,text="",width=1,command=self.showHide,corner_radius=15)
-        self.btnRegister = CTkButton(self.frameLogin,text="register",font=buttonFont,corner_radius=15,text_color="black",border_color="black",fg_color="white",border_width=5)
-        self.btnSignIn = CTkButton(self.frameLogin,text="sign in",font=buttonFont,corner_radius=15,command=self.signInClicked,text_color="black",border_color="black",fg_color="white",border_width=5)
-        self.btnRegisterConfirm = CTkButton(self.frameLogin,text="confirm",font=buttonFont,corner_radius=15,command=self.signInClicked,text_color="black",border_color="black",fg_color="white",border_width=5)
+        self.btnRegister = CTkButton(self.frameLogin,text="register",font=buttonFont,corner_radius=15,text_color=self.globalColour,border_color=("black","gray12"),fg_color=self.accent,border_width=2)
+        self.btnSignIn = CTkButton(self.frameLogin,text="sign in",font=buttonFont,corner_radius=15,command=self.signInClicked,text_color=self.globalColour,border_color=("black","gray12"),fg_color=self.accent,border_width=2)
+        self.btnConfirm = CTkButton(self.frameLogin,text="confirm",font=buttonFont,corner_radius=15,command=self.signInClicked,text_color=self.globalColour,border_color=("black","gray12"),fg_color=self.accent,border_width=2)
+        self.btnDeny = CTkButton(self.frameLogin,text="deny",font=buttonFont,corner_radius=15,command=self.rememberMeDeniedClicked,text_color=self.globalColour,border_color=("black","gray12"),fg_color=self.accent,border_width=2)
         self.checkboxRememberMe = Checkbox(self.frameLogin,x=0,y=50,size=(35,35),relWidget=self.entryPassword)
         self.messageVar = StringVar()
         self.lblMessage = CTkLabel(self.frameLogin,font=(globalFontName,30),textvariable=self.messageVar)
+        
+
+        self.lblRememberMe = CTkLabel(self.frameLogin,text="Remember me",font=(globalFontName,25),text_color=self.globalColour,cursor="hand2")
+        self.lblRememberMe.bind("<Button-1>",lambda event: self.checkboxRememberMe.boxClicked(event))
+
 
         self.elements = {
             "lblEmail":self.lblEmail,
@@ -76,6 +89,7 @@ class Auth(CTk):
         
 
     def placeWidgets(self):
+        self.panelImgBG.place(x=0,y=0)
         self.frameLogin.place(relx=0.5,rely=0.5,anchor="center")
         self.logoPanel.place(relx=0.3,rely=0.1)
         self.btnMode.place(x=770,y=15)
@@ -87,6 +101,7 @@ class Auth(CTk):
         self.btnRegister.place(in_=self.entryPassword,x=50,y=100)
         self.btnSignIn.place(in_=self.btnRegister,x=150)
         self.checkboxRememberMe.placeWidget()
+        self.lblRememberMe.place(in_=self.entryPassword,x=40,y=52)
         
     def changeMode(self):
         if get_appearance_mode() == "Light":
@@ -178,31 +193,15 @@ class Auth(CTk):
 
         print(repr(message))
         
+        increment=0
+        if length > 45:
+            increment = 150
+        elif length>30:
+            increment = 50 # Used to increase the distance the widget is placed to the right. Used for larger messages.
         
         fontSize = 30
-        print(length)
-        x=150-(7*length)
-        print(x)
-        lblMessage.place(in_=btnRegister,x=x,y=80)
-
-
-        """if length<20:
-            fontSize = 30
-            x=100-(2*length)
-            print(x)
-            lblMessage.place(in_=btnRegister,x=x,y=80)
-        elif length<60 and length>30 and "\n" in message:
-            fontSize = 25
-            lblMessage.place(in_=btnRegister,x=-50,y=85)
-        elif length<47 and length>30:
-            fontSize = 25
-            lblMessage.place(in_=btnRegister,x=-170,y=85)
-        elif length>30:
-            fontSize = 20
-            lblMessage.place(in_=btnRegister,x=-185,y=85)
-        else:
-            fontSize = 30
-            lblMessage.place(in_=btnRegister,x=-95,y=80)"""
+        x=150+increment-(7*length)
+        lblMessage.place(in_=btnRegister,x=x,y=70)
         
         if colour == "black" or colour == "white":
             colour = ("black","white")
@@ -224,7 +223,7 @@ class Auth(CTk):
 
     def signInClicked(self):
         print("Hello")
-        self.btnRegisterConfirm.place_forget()
+        self.btnConfirm.place_forget()
 
         email = self.entryEmail.get()
         password = self.entryPassword.get()
@@ -263,24 +262,31 @@ class Auth(CTk):
                     self.resetEntry(["entryPassword"])
 
     def rememberMeConfirmClicked(self):
-        self.setMessage(f"Login successful as\n{self.loggedInEmail}","green")
+        self.setMessage(f"Logging in as \n{self.loggedInEmail}","limegreen")
         self.loggedIn = True
         self.after(1000,self.destroy)
     
     def rememberMeDeniedClicked(self):
         self.lblMessage.place_forget()
-        self.btnRegisterConfirm.configure(command=self.btnRegisterConfirmClicked)
-        self.btnRegisterConfirm.place_forget()
+        self.btnConfirm.configure(command=self.btnRegisterConfirmClicked)
+        self.btnConfirm.place_forget()
+        self.btnDeny.place_forget()
 
     def signIn(self,userDetails):
         self.loggedInEmail = userDetails[0]
-        self.setMessage(f"Would you like to login automatically as\n{self.loggedInEmail}?")
-        self.btnRegisterConfirm.configure(command=self.rememberMeConfirmClicked)
+        if not self.loggedIn:
+            self.setMessage(f"Would you like to login automatically as\n{self.loggedInEmail}?",self.globalColour)
+            self.btnConfirm.configure(command=self.rememberMeConfirmClicked)
+            self.btnConfirm.place(in_=self.btnRegister,y=150)
+            self.btnDeny.place(in_=self.btnSignIn,y=150)
+
+        else:
+            self.setMessage(f"Logging in as \n{self.loggedInEmail}","limegreen")
 
 
 
     def userLoginSequence(self):
-        rememberMeVal = self.rememberMe.value
+        rememberMeVal = self.checkboxRememberMe.value
         details,_ = self.getDetails()
 
         if rememberMeVal:
@@ -291,6 +297,8 @@ class Auth(CTk):
         newAuthDetails = {"details":details,"rememberMe":userDetailsIndex}
         with open("authDetails.json","w") as f:
             f.write(json.dumps(newAuthDetails))
+        
+        self.loggedIn = True
     
     def checkRememberMe(self):
         print("hello")
