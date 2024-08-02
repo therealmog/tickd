@@ -24,7 +24,11 @@ class Auth(CTk):
         self.widgets()
         self.placeWidgets()
         self.checkRememberMe()
+        
+        
         self.mainloop()
+
+        
 
     def widgets(self):
         globalFontName = self.globalFontName
@@ -40,7 +44,7 @@ class Auth(CTk):
         self.logoPanel = CTkLabel(self.frameLogin,text="",image=self.logo)
         
         
-        self.entryEmail = CTkEntry(self.frameLogin,font=("Consolas",25),width=400,placeholder_text="email",corner_radius=15)
+        self.entryEmail = CTkEntry(self.frameLogin,font=(globalFontName,25),width=400,placeholder_text="email",corner_radius=15)
         self.entryPassword = CTkEntry(self.frameLogin,font=(globalFontName,25),width=400,placeholder_text="password",show="*",corner_radius=15)
         self.lblEmail = CTkLabel(self.frameLogin,font=emojiFont,text="✉️")
         self.lblPassword = CTkLabel(self.frameLogin,font=emojiFont,text="🔒")
@@ -79,7 +83,7 @@ class Auth(CTk):
         self.lblEmail.place(in_=self.entryEmail,x=-50,y=-5)
         self.lblPassword.place(in_=self.entryPassword,x=-50,y=-5)
         self.btnShowPassword.place(in_=self.entryPassword,x=410)
-        self.btnRegister.place(in_=self.entryPassword,x=50,y=75)
+        self.btnRegister.place(in_=self.entryPassword,x=50,y=100)
         self.btnSignIn.place(in_=self.btnRegister,x=150)
         
     def changeMode(self):
@@ -141,13 +145,15 @@ class Auth(CTk):
         emailEmpty = False
         passwordEmpty = False
 
-        if email == "email" and password == "password":
+        email = email.strip()
+
+        if email == "" and password == "":
             emailEmpty = True
             passwordEmpty = True
-        elif email == "email" or email == "":
+        elif email == "":
             self.setMessage("Please enter your email.",self.globalColour)
             emailEmpty = True
-        elif password == "password" or password == "":
+        elif password == "":
             passwordEmpty = True
         
         return emailEmpty, passwordEmpty
@@ -170,9 +176,19 @@ class Auth(CTk):
 
         print(repr(message))
         
-        if length<20:
+        
+        fontSize = 30
+        print(length)
+        x=150-(7*length)
+        print(x)
+        lblMessage.place(in_=btnRegister,x=x,y=80)
+
+
+        """if length<20:
             fontSize = 30
-            lblMessage.place(in_=btnRegister,x=-10,y=80)
+            x=100-(2*length)
+            print(x)
+            lblMessage.place(in_=btnRegister,x=x,y=80)
         elif length<60 and length>30 and "\n" in message:
             fontSize = 25
             lblMessage.place(in_=btnRegister,x=-50,y=85)
@@ -184,8 +200,10 @@ class Auth(CTk):
             lblMessage.place(in_=btnRegister,x=-185,y=85)
         else:
             fontSize = 30
-            lblMessage.place(in_=btnRegister,x=-95,y=80)
+            lblMessage.place(in_=btnRegister,x=-95,y=80)"""
         
+        if colour == "black" or colour == "white":
+            colour = ("black","white")
         
         lblMessage.configure(font=(self.globalFontName,fontSize),text_color=colour)
         self.messageVar.set(message)
