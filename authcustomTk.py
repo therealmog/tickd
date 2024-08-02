@@ -61,7 +61,7 @@ class Auth(CTk):
         self.btnShowPassword = CTkButton(self.frameLogin,image=self.imgShowPassword,text="",width=1,command=self.showHide,corner_radius=15,fg_color=self.accent)
         self.imgHidePassword = CTkImage(Image.open("eyeIconOff.png"),size=(30,30))
         self.btnHidePassword = CTkButton(self.frameLogin,image=self.imgHidePassword,text="",width=1,command=self.showHide,corner_radius=15)
-        self.btnRegister = CTkButton(self.frameLogin,text="register",font=buttonFont,corner_radius=15,text_color=self.globalColour,border_color=("black","gray12"),fg_color=self.accent,border_width=2)
+        self.btnRegister = CTkButton(self.frameLogin,text="register",font=buttonFont,corner_radius=15,text_color=self.globalColour,border_color=("black","gray12"),fg_color=self.accent,border_width=2,command=self.registerClicked)
         self.btnSignIn = CTkButton(self.frameLogin,text="sign in",font=buttonFont,corner_radius=15,command=self.signInClicked,text_color=self.globalColour,border_color=("black","gray12"),fg_color=self.accent,border_width=2)
         self.btnConfirm = CTkButton(self.frameLogin,text="confirm",font=buttonFont,corner_radius=15,command=self.signInClicked,text_color=self.globalColour,border_color=("black","gray12"),fg_color=self.accent,border_width=2)
         self.btnDeny = CTkButton(self.frameLogin,text="deny",font=buttonFont,corner_radius=15,command=self.rememberMeDeniedClicked,text_color=self.globalColour,border_color=("black","gray12"),fg_color=self.accent,border_width=2)
@@ -193,11 +193,13 @@ class Auth(CTk):
 
         print(repr(message))
         
-        increment=0
-        if length > 45:
+        increment=0 # Used to increase the distance the widget is placed to the right. Used for larger messages.
+        if length>=45 and not "\n" in message:
+            increment=20
+        elif length > 45:
             increment = 150
-        elif length>30:
-            increment = 50 # Used to increase the distance the widget is placed to the right. Used for larger messages.
+        elif length>35:
+            increment = 50 
         
         fontSize = 30
         x=150+increment-(7*length)
@@ -218,8 +220,6 @@ class Auth(CTk):
         
         self.lblEmail.focus_set()
 
-    def btnRegisterConfirmClicked(self):
-        pass
 
     def signInClicked(self):
         print("Hello")
@@ -262,7 +262,7 @@ class Auth(CTk):
                     self.resetEntry(["entryPassword"])
 
     def rememberMeConfirmClicked(self):
-        self.setMessage(f"Logging in as \n{self.loggedInEmail}","limegreen")
+        self.setMessage(f"Logging in as {self.loggedInEmail}","limegreen")
         self.loggedIn = True
         self.after(1000,self.destroy)
     
@@ -281,8 +281,50 @@ class Auth(CTk):
             self.btnDeny.place(in_=self.btnSignIn,y=150)
 
         else:
-            self.setMessage(f"Logging in as \n{self.loggedInEmail}","limegreen")
+            self.setMessage(f"Logging in as {self.loggedInEmail}","limegreen")
 
+    def registerClicked(self):
+        setMessage = self.setMessage
+
+        self.btnConfirm.place_forget()
+        newEmail = self.entryEmail.get()
+        newPassword = self.entryPassword.get()
+
+        details,_ = self.getDetails()
+        found,_ = self.checkDetailsFound(newEmail,details)
+        emailEmpty,passwordEmpty = self.checkEmpty(newEmail,newPassword)
+        emailValid = self.checkEmail(newEmail)
+
+        if found:
+            setMessage("Email already registered with another account","black")
+        elif emailEmpty:
+            setMessage("Please enter the email you would like to register with.","black")
+        elif passwordEmpty:
+            setMessage("Please enter a password to use with this account.","black")
+        elif not emailValid:
+            setMessage("Please enter a valid email.","black")
+        else:
+            setMessage("Would you like to register a new account with these details?","black")
+            self.btnConfirm.place(in_=self.btnRegister,x=75,y=150)
+
+    def btnRegisterConfirmClicked(self):
+        self.btnConfirm.place_forget()
+        newEmail = self.entryEmail.get()
+        newPassword = self.entryPassword.get()
+
+        newDetails = [newEmail,newPassword]
+
+        details,rememberMeIndex = self.getDetails()
+        details.append(newDetails)
+        newAuthDetails = {"details":details,"rememberMe":rememberMeIndex}
+
+        print(newAuthDetails)
+        
+        with open("authDetails.json","w") as f:
+            f.write(json.dumps(newAuthDetails))
+        
+        self.resetEntry(["entryEmail","entryPassword"])
+        self.setMessage("Account successfully created. Please log in.","limegreen")
 
 
     def userLoginSequence(self):
