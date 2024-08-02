@@ -7,7 +7,7 @@ from PIL import ImageTk, Image
 """root = Tk()
 root.geometry("600x400")"""
 
-class Checkbox():
+class Checkbox:
     def __init__(self,parent:CTk,x,y,relWidget,size:tuple):
         self.x = x
         self.y = y
