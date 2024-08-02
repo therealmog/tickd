@@ -1,11 +1,17 @@
 from customtkinter import *
 from datetime import date
 
+from PIL import Image
+
 class Today(CTk):
     globalFontName = "Bahnschrift"
     def __init__(self,userName):
         super().__init__()
-        self.geometry("1200x700")
+        
+        self.geometry("1600x900")
+        self.minsize(1600,900)
+        self.maxsize(1920,1080)
+        self.title("Today - Tickd")
 
         self.userName = userName
 
@@ -19,6 +25,8 @@ class Today(CTk):
 
         deactivate_automatic_dpi_awareness()
         self.widgets()
+        self.placeWidgets()
+        self.mainloop()
 
 
     def mode(self):
@@ -26,16 +34,30 @@ class Today(CTk):
     
     def widgets(self):
         globalFontName = self.globalFontName
-        self.title = CTkLabel(self,text=self.todaysDate,font=(globalFontName,40))
+
         
-        self.textVar = f"Welcome {self.userName}"
-        self.lblWelcome = CTkLabel(self,text=self.textVar,font=(globalFontName,30))
-        self.placeWidgets()
-        self.mainloop()
+        self.imgBG = CTkImage(Image.open("wavy.jpg"),size=(1920,1080))
+        self.panelImgBG = CTkLabel(self,text="",image=self.imgBG)
+        self.frameToday = CTkFrame(self,width=1400,height=800,border_color="gray7",border_width=5,corner_radius=20)
+
+        self.lblDate = CTkLabel(self.frameToday,text=self.todaysDate,font=(globalFontName,30))
+        
+        self.textVar = f"Welcome, {self.userName}!"
+        self.lblWelcome = CTkLabel(self.frameToday,text=self.textVar,font=(globalFontName,20))
+        self.logo = CTkImage(light_image=Image.open("logo//whiteBGLogo.png"),dark_image=Image.open("logo//blackBGLogo.png"),size=(165,53)) 
+        self.logoPanel = CTkLabel(self.frameToday,text="",image=self.logo)
+        self.taskEntry = CTkEntry(self.frameToday,placeholder_text="Enter a task...",font=(globalFontName,30),width=650,corner_radius=20)
+        
     
     def placeWidgets(self):
-        self.title.grid(row=0,column=0,padx=(30,0),pady=(20,0))
-        self.lblWelcome.grid(row=0,column=1,padx=(30,0),pady=(30,0))
+        self.frameToday.place(relx=0.5,rely=0.5,anchor="center")
+        self.panelImgBG.place(x=0,y=0)
+        
+        self.lblDate.place(x=25,y=25)
+        self.lblWelcome.place(in_=self.lblDate,x=0,y=40)
+        self.logoPanel.place(relx=0.87,y=20)
+        self.taskEntry.place(in_=self.lblDate,x=400,y=10)
+        
     
     def placeWelcome(self):
         self.welcome
