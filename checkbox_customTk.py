@@ -8,17 +8,17 @@ from PIL import ImageTk, Image
 root.geometry("600x400")"""
 
 class Checkbox:
-    def __init__(self,parent:CTk,x,y,relWidget,size:tuple):
+    def __init__(self,parent:CTk,x,y,size:tuple,relWidget=None):
         self.x = x
         self.y = y
         self.parent = parent
         self.relWidget = relWidget
 
         self.emptyImg = CTkImage(Image.open("checkbox//empty.png"),size=size)
-        self.emptyImgPanel = CTkLabel(parent,image=self.emptyImg,cursor="hand2")
+        self.emptyImgPanel = CTkLabel(parent,image=self.emptyImg,cursor="hand2",text="")
 
         self.checkedImg = CTkImage(Image.open("checkbox//checked.png"),size=size)
-        self.checkedImgPanel = CTkLabel(parent,image=self.checkedImg,cursor="hand2")
+        self.checkedImgPanel = CTkLabel(parent,image=self.checkedImg,cursor="hand2",text="")
 
         
         #self.emptyImgPanel.bind("<Enter>",self.setChecked)
@@ -35,7 +35,7 @@ class Checkbox:
     def setChecked(self,_):
         self.emptyImgPanel.place_forget()
         self.checkedImgPanel.place(in_=self.relWidget,x=self.x,y=self.y)
-    
+
     def setEmpty(self,_):
         self.checkedImgPanel.place_forget()
         self.emptyImgPanel.place(in_=self.relWidget,x=self.x,y=self.y)
