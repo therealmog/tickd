@@ -4,6 +4,7 @@
 from customtkinter import *
 from PIL import ImageTk, Image
 import json
+from checkbox_customTk import Checkbox
 
 class Auth(CTk):
     globalFontName = "Bahnschrift"
@@ -56,7 +57,7 @@ class Auth(CTk):
         self.btnRegister = CTkButton(self.frameLogin,text="register",font=buttonFont,corner_radius=15,text_color="black",border_color="black",fg_color="white",border_width=5)
         self.btnSignIn = CTkButton(self.frameLogin,text="sign in",font=buttonFont,corner_radius=15,command=self.signInClicked,text_color="black",border_color="black",fg_color="white",border_width=5)
         self.btnRegisterConfirm = CTkButton(self.frameLogin,text="confirm",font=buttonFont,corner_radius=15,command=self.signInClicked,text_color="black",border_color="black",fg_color="white",border_width=5)
-
+        self.checkboxRememberMe = Checkbox(self.frameLogin,x=0,y=50,size=(35,35),relWidget=self.entryPassword)
         self.messageVar = StringVar()
         self.lblMessage = CTkLabel(self.frameLogin,font=(globalFontName,30),textvariable=self.messageVar)
 
@@ -85,6 +86,7 @@ class Auth(CTk):
         self.btnShowPassword.place(in_=self.entryPassword,x=410)
         self.btnRegister.place(in_=self.entryPassword,x=50,y=100)
         self.btnSignIn.place(in_=self.btnRegister,x=150)
+        self.checkboxRememberMe.placeWidget()
         
     def changeMode(self):
         if get_appearance_mode() == "Light":
