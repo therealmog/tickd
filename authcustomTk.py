@@ -5,6 +5,9 @@ from customtkinter import *
 from PIL import ImageTk, Image
 import json
 from checkbox_customTk import Checkbox
+from getDetails import getDetails
+
+
 
 class Auth(CTk):
     globalFontName = "Bahnschrift"
@@ -138,13 +141,6 @@ class Auth(CTk):
             self.btnShowPassword.place(in_=self.entryPassword,x=410)
             self.entryPassword.configure(show="*")
 
-    def getDetails(self):
-        with open("authDetails.json","r") as f:
-            detailsDict = json.load(f)
-            details = detailsDict["details"]
-            rememberMeIndex = detailsDict["rememberMe"]
-
-        return details,rememberMeIndex
 
     def checkDetailsFound(self,email,details):
         found = False
@@ -228,7 +224,7 @@ class Auth(CTk):
         email = self.entryEmail.get()
         password = self.entryPassword.get()
         
-        details,_ = self.getDetails()
+        details,_ = getDetails()
         
         emailEmpty, passwordEmpty = self.checkEmpty(email, password)
         emailValid = self.checkEmail(email)
@@ -290,7 +286,7 @@ class Auth(CTk):
         newEmail = self.entryEmail.get()
         newPassword = self.entryPassword.get()
 
-        details,_ = self.getDetails()
+        details,_ = getDetails()
         found,_ = self.checkDetailsFound(newEmail,details)
         emailEmpty,passwordEmpty = self.checkEmpty(newEmail,newPassword)
         emailValid = self.checkEmail(newEmail)
@@ -312,9 +308,9 @@ class Auth(CTk):
         newEmail = self.entryEmail.get()
         newPassword = self.entryPassword.get()
 
-        newDetails = [newEmail,newPassword]
+        newDetails = [newEmail,newPassword,""]
 
-        details,rememberMeIndex = self.getDetails()
+        details,rememberMeIndex = getDetails()
         details.append(newDetails)
         newAuthDetails = {"details":details,"rememberMe":rememberMeIndex}
 
@@ -329,7 +325,7 @@ class Auth(CTk):
 
     def userLoginSequence(self):
         rememberMeVal = self.checkboxRememberMe.value
-        details,_ = self.getDetails()
+        details,_ = getDetails()
 
         if rememberMeVal:
             userDetailsIndex = details.index(self.userDetails)
@@ -344,7 +340,7 @@ class Auth(CTk):
     
     def checkRememberMe(self):
         print("hello")
-        details,rememberMeIndex = self.getDetails()
+        details,rememberMeIndex = getDetails()
         if rememberMeIndex != "False":
             userDetails = details[rememberMeIndex]
             self.signIn(userDetails)

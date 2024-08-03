@@ -1,11 +1,12 @@
 from customtkinter import *
 from datetime import date
+from getDetails import getDetails,getDetailsIndividual
 
 from PIL import Image
 
 class Today(CTk):
     globalFontName = "Bahnschrift"
-    def __init__(self,userName):
+    def __init__(self,email):
         super().__init__()
         
         self.geometry("1600x900")
@@ -13,7 +14,9 @@ class Today(CTk):
         self.maxsize(1920,1080)
         self.title("Today - Tickd")
 
-        self.userName = userName
+        self.userDetails = getDetailsIndividual(email)
+
+        self.userName = self.userDetails[2]
 
         self.today = date.today()
         self.todaysDate = self.today.strftime("%A, %d %B %Y")
@@ -24,8 +27,11 @@ class Today(CTk):
         
 
         deactivate_automatic_dpi_awareness()
+
         self.widgets()
         self.placeWidgets()
+
+        self.checkUserName()
         self.mainloop()
 
 
@@ -59,8 +65,9 @@ class Today(CTk):
         self.taskEntry.place(in_=self.lblDate,x=400,y=10)
         
     
-    def placeWelcome(self):
-        self.welcome
+    def checkUserName(self):
+        if self.userName == "":
+            pass
 
 
-today = Today(userName="amoghng")
+today = Today(email="amoghng")
