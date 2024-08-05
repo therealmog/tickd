@@ -14,10 +14,10 @@ def getDetailsIndividual(email):
     found = False
     userDetails = []
     i = 0 
-    max = len(details)
+    max = len(details)-1
     while not found and max >= i:
         set = details[i]
-        if set[i] == email:
+        if set[0] == email:
             userDetails = set
             found = True
         i += 1
@@ -26,3 +26,4 @@ def getDetailsIndividual(email):
         return userDetails
     else:
         return False
+    
