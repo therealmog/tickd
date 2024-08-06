@@ -1,7 +1,8 @@
 from customtkinter import *
 from datetime import date
-from getDetails import getDetails,getDetailsIndividual
+from getDetails import getAllDetails,getDetailsIndividual,writeToAuthDetails
 from submitBtn import SubmitButton
+
 
 from PIL import Image
 
@@ -15,7 +16,7 @@ class Today(CTk):
         self.maxsize(1920,1080)
         self.title("Today - Tickd")
 
-        self.userDetails = getDetailsIndividual(email)
+        self.userDetails,self.userIndex = getDetailsIndividual(email)
         try:
             self.userName = self.userDetails[2]
         except TypeError:
@@ -52,16 +53,22 @@ class Today(CTk):
 
         self.lblDate = CTkLabel(self.frameToday,text=self.todaysDate,font=(globalFontName,30))
         
-        self.textVar = f"Welcome, {self.userName}!"
-        self.lblWelcome = CTkLabel(self.frameToday,text=self.textVar,font=(globalFontName,20))
+        self.textVar = StringVar()
+        self.textVar.set(f"Welcome, {self.userName}!")
+        self.lblWelcome = CTkLabel(self.frameToday,textvariable=self.textVar,font=(globalFontName,20))
         self.imgLogo = CTkImage(light_image=Image.open("logo//whiteBGLogo.png"),dark_image=Image.open("logo//blackBGLogo.png"),size=(165,53)) 
         self.logoPanel = CTkLabel(self.frameToday,text="",image=self.imgLogo)
         self.entryTask = CTkEntry(self.frameToday,placeholder_text="Enter a task...",font=(globalFontName,30),width=650,corner_radius=20)
         
-        self.lblEnterUsername = CTkLabel(self.frameToday,text="Please enter your username:",font=(globalFontName,22))
-        self.entryUserName = CTkEntry(self.frameToday,placeholder_text="username",font=(globalFontName,22),width=200)
-        self.btnSubmitUsername = SubmitButton(parent=self.frameToday,command=self.submitUsername,colour=self.accent,xSize=40,ySize=40)
-    
+        
+        self.messageVar = StringVar()
+        self.lblMessage = CTkLabel(self.frameToday,textvariable=self.messageVar,font=(globalFontName,25))
+
+        self.lblEnterUsername = CTkLabel(self.frameToday,text="Please enter your new username:",font=(globalFontName,22))
+        self.entryUserName = CTkEntry(self.frameToday,placeholder_text="",font=(globalFontName,22),width=330)
+        self.btnSubmitUsername = SubmitButton(parent=self.frameToday,command=self.checkEnteredUsername,colour=self.accent,buttonSize=(30,30))
+        #self.btnSubmitUsername.bind("<Button-1>",lambda event:self.checkEnteredUsername())
+
     def placeWidgets(self):
         self.frameToday.place(relx=0.5,rely=0.5,anchor="center")
         self.panelImgBG.place(x=0,y=0)
@@ -71,16 +78,44 @@ class Today(CTk):
         self.logoPanel.place(relx=0.87,y=20)
         self.entryTask.place(in_=self.lblDate,x=400,y=10)
         
-        
+    def taskEntryClickedWhileDisabled(self,reason):
+        self.messageVar.set(reason)
+        self.lblMessage.place(in_=self.entryTask,x=5,y=55)
+        self.frameToday.after(3000,self.lblMessage.place_forget)
     
+    def checkEnteredUsername(self):
+        print("hello")
+        userInput = self.entryUserName.get()
+        self.lblMessage.place(in_=self.entryTask,x=5,y=55)
+        if userInput.strip()=="":
+            self.messageVar.set("Please enter a username.")
+        elif len(userInput) > 20 or len(userInput) < 3:
+            self.messageVar.set("Please ensure that username is 3-20 characters long.")
+        elif " " in userInput.strip():
+            self.messageVar.set("Please ensure that there are no spaces in your username.")
+        else:
+            self.userDetails[2] = userInput
+            details,rememberMeIndex = getAllDetails()
+            details[self.userIndex] = self.userDetails
+            authDetails = {"details":details,"rememberMe":rememberMeIndex}
+
+            with open("authDetails.json","w") as f:
+                writeToAuthDetails(authDetails)
+            self.textVar.set(f"Welcome, {self.userDetails[2]}!")
+            self.messageVar.set("Success!")
+
+            self.lblEnterUsername.place_forget()
+            self.entryUserName.place_forget()
+            self.btnSubmitUsername.place_forget()
+
     def checkUserName(self):
         if self.userName == "":
             print("You haven't got a username!")
+            self.entryTask.bind("<Button-1>",lambda event,reason="Please enter your username before entering in a task.":self.taskEntryClickedWhileDisabled(reason))
+            self.entryTask.configure(state="disabled")
             self.lblEnterUsername.place(in_=self.lblWelcome,y=60)
-            self.entryUserName.place(in_=self.lblEnterUsername,x=280)
-            self.btnSubmitUsername.place(in_=self.entryUserName,x=150)
+            self.entryUserName.place(in_=self.lblEnterUsername,x=0,y=35)
+            self.btnSubmitUsername.place(in_=self.entryUserName,x=340,y=-3)
 
-    def submitUsername(self):
-        pass
 
-today = Today(email="omar@gmail.com")
+#today = Today(email="omar@gmail.com")

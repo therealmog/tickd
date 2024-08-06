@@ -5,7 +5,7 @@ from customtkinter import *
 from PIL import ImageTk, Image
 import json
 from checkbox_customTk import Checkbox
-from getDetails import getDetails
+from getDetails import getAllDetails
 
 
 
@@ -224,7 +224,7 @@ class Auth(CTk):
         email = self.entryEmail.get()
         password = self.entryPassword.get()
         
-        details,_ = getDetails()
+        details,_ = getAllDetails()
         
         emailEmpty, passwordEmpty = self.checkEmpty(email, password)
         emailValid = self.checkEmail(email)
@@ -268,6 +268,8 @@ class Auth(CTk):
         self.btnConfirm.place_forget()
         self.btnDeny.place_forget()
 
+        self.loggedInEmail = ""
+
     def signIn(self,userDetails):
         self.loggedInEmail = userDetails[0]
         if not self.loggedIn:
@@ -286,7 +288,7 @@ class Auth(CTk):
         newEmail = self.entryEmail.get()
         newPassword = self.entryPassword.get()
 
-        details,_ = getDetails()
+        details,_ = getAllDetails()
         found,_ = self.checkDetailsFound(newEmail,details)
         emailEmpty,passwordEmpty = self.checkEmpty(newEmail,newPassword)
         emailValid = self.checkEmail(newEmail)
@@ -310,7 +312,7 @@ class Auth(CTk):
 
         newDetails = [newEmail,newPassword,""]
 
-        details,rememberMeIndex = getDetails()
+        details,rememberMeIndex = getAllDetails()
         details.append(newDetails)
         newAuthDetails = {"details":details,"rememberMe":rememberMeIndex}
 
@@ -325,7 +327,7 @@ class Auth(CTk):
 
     def userLoginSequence(self):
         rememberMeVal = self.checkboxRememberMe.value
-        details,_ = getDetails()
+        details,_ = getAllDetails()
 
         if rememberMeVal:
             userDetailsIndex = details.index(self.userDetails)
@@ -340,7 +342,7 @@ class Auth(CTk):
     
     def checkRememberMe(self):
         print("hello")
-        details,rememberMeIndex = getDetails()
+        details,rememberMeIndex = getAllDetails()
         if rememberMeIndex != "False":
             userDetails = details[rememberMeIndex]
             self.signIn(userDetails)
@@ -356,4 +358,4 @@ class Auth(CTk):
         self.entryPassword.bind("<FocusIn>",self.passwordFocusIn)
         self.entryPassword.bind("<FocusOut>",self.passwordFocusOut)"""
 
-auth = Auth()
+#auth = Auth()

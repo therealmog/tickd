@@ -1,6 +1,6 @@
 import json
 
-def getDetails():
+def getAllDetails():
     with open("authDetails.json","r") as f:
         detailsDict = json.load(f)
         details = detailsDict["details"]
@@ -9,7 +9,7 @@ def getDetails():
     return details,rememberMeIndex
 
 def getDetailsIndividual(email):
-    details,_ = getDetails()
+    details,_ = getAllDetails()
 
     found = False
     userDetails = []
@@ -20,10 +20,16 @@ def getDetailsIndividual(email):
         if set[0] == email:
             userDetails = set
             found = True
+            userIndex = i
         i += 1
-    
+
     if found:
-        return userDetails
+        return userDetails,userIndex
     else:
-        return False
+        return False,False
+    
+def writeToAuthDetails(authDetailsDict:dict):
+    """Remember that this will overwrite the details in authDetails.json with whatever you pass in."""
+    with open("authDetails.json","w") as f:
+        f.write(json.dumps(authDetailsDict))
     
