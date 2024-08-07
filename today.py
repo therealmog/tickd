@@ -99,8 +99,7 @@ class Today(CTk):
             details[self.userIndex] = self.userDetails
             authDetails = {"details":details,"rememberMe":rememberMeIndex}
 
-            with open("authDetails.json","w") as f:
-                writeToAuthDetails(authDetails)
+           writeToAuthDetails(authDetails)
             self.textVar.set(f"Welcome, {self.userDetails[2]}!")
             self.messageVar.set("Success!")
 
