@@ -2,20 +2,25 @@ from customtkinter import *
 from datetime import date
 from getDetails import getAllDetails,getDetailsIndividual,writeToAuthDetails
 from submitBtn import SubmitButton
+import getWallpaper
 
 
 from PIL import Image
 
 class Today(CTk):
     globalFontName = "Bahnschrift"
-    def __init__(self,email):
+    def __init__(self,email,imgBGPath):
         super().__init__()
         
         self.geometry("1600x900")
         self.minsize(1600,900)
-        self.maxsize(1920,1080)
+
+        self.maxdims = [1920,1080]
+        self.maxsize(self.maxdims[0],self.maxdims[1])
         self.title("Today - Tickd")
 
+        self.imgBGPath = imgBGPath
+        
         self.userDetails,self.userIndex = getDetailsIndividual(email)
         try:
             self.userName = self.userDetails[2]
@@ -46,8 +51,7 @@ class Today(CTk):
     def widgets(self):
         globalFontName = self.globalFontName
 
-        
-        self.imgBG = CTkImage(Image.open("wavy.jpg"),size=(1920,1080))
+        self.imgBG = getWallpaper.getFromPath(self.imgBGPath,(self.maxdims[0],self.maxdims[1]))
         self.panelImgBG = CTkLabel(self,text="",image=self.imgBG)
         self.frameToday = CTkFrame(self,width=1400,height=800,border_color="gray7",border_width=5,corner_radius=20)
 
@@ -80,13 +84,13 @@ class Today(CTk):
         
     def taskEntryClickedWhileDisabled(self,reason):
         self.messageVar.set(reason)
-        self.lblMessage.place(in_=self.entryTask,x=5,y=55)
+        self.lblMessage.place(in_=self.entryTask,x=5,y=85)
         self.frameToday.after(3000,self.lblMessage.place_forget)
     
     def checkEnteredUsername(self):
         print("hello")
         userInput = self.entryUserName.get()
-        self.lblMessage.place(in_=self.entryTask,x=5,y=55)
+        self.lblMessage.place(in_=self.entryTask,x=5,y=85)
         if userInput.strip()=="":
             self.messageVar.set("Please enter a username.")
         elif len(userInput) > 20 or len(userInput) < 3:
@@ -99,8 +103,7 @@ class Today(CTk):
             details[self.userIndex] = self.userDetails
             authDetails = {"details":details,"rememberMe":rememberMeIndex}
 
-            with open("authDetails.json","w") as f:
-                writeToAuthDetails(authDetails)
+            writeToAuthDetails(authDetails)
             self.textVar.set(f"Welcome, {self.userDetails[2]}!")
             self.messageVar.set("Success!")
 
