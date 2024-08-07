@@ -6,6 +6,7 @@ from PIL import ImageTk, Image
 import json
 from checkbox_customTk import Checkbox
 from getDetails import getAllDetails
+from getWallpaper import getRandom as getWallpaper
 
 
 
@@ -20,11 +21,14 @@ class Auth(CTk):
         super().__init__()
 
         self.dimensions = [950,670]
+        self.maxdimensions = [1280,800]
+
+        maxdims = self.maxdimensions 
         x=self.dimensions[0]
         y=self.dimensions[1]
         self.geometry(f"{x}x{y}")
         self.minsize(x,y)
-        self.maxsize(1280,800)
+        self.maxsize(maxdims[0],maxdims[1])
         self.title("Log in - Tickd")
 
         self.loggedIn = False
@@ -32,6 +36,10 @@ class Auth(CTk):
         self.widgets()
         self.placeWidgets()
         self.checkRememberMe()
+
+        self.frameLogin.bind("<Return>",lambda event:self.signInClicked())
+
+        print(self.btnRegister.cget("state"))
         
         
         self.mainloop()
@@ -43,7 +51,7 @@ class Auth(CTk):
         emojiFont = self.emojiFont
         buttonFont = self.buttonFont
 
-        self.imgBG = CTkImage(Image.open("wavy.jpg"),size=(1280,800))
+        self.imgBG,self.imgBGPath = getWallpaper((self.maxdimensions[0],self.maxdimensions[1]))
         self.panelImgBG = CTkLabel(self,text="",image=self.imgBG)
         self.frameLogin = CTkFrame(self,width=850,height=570,corner_radius=20,border_color="gray7",border_width=5,fg_color=None)
         
@@ -82,11 +90,10 @@ class Auth(CTk):
             "lblPassword":self.lblPassword,
             "entryEmail":self.entryEmail,
             "entryPassword":self.entryPassword,
-            #"btnRegister":self.btnRegister,
-            #"btnSignIn":self.btnSignIn,
-            #"btnShowPassword":self.btnShowPassword,
-            #"btnHidePassword":self.btnHidePassword,
-            #"btnRegisterConfirm":self.btnRegisterConfirm
+            "btnRegister":self.btnRegister,
+            "btnSignIn":self.btnSignIn,
+            "btnShowPassword":self.btnShowPassword,
+            "btnHidePassword":self.btnHidePassword,
             }
         #self.bindingEventListeners()
         
@@ -257,7 +264,22 @@ class Auth(CTk):
                     self.setMessage("Incorrect password.","red")
                     self.resetEntry(["entryPassword"])
 
+    def clickablesOnOff(self):
+        clickables = []
+        elements = self.elements
+        for each in elements:
+            if "entry" in each or "btn" in each:
+                clickables.append(elements[each])
+        
+        for clickable in clickables:
+            if clickable.cget("state") == "normal":
+                clickable.configure(state="disabled")
+            else:
+                clickable.configure(state="normal")
+
+
     def rememberMeConfirmClicked(self):
+        self.loggedInEmail = self.rememberedEmail
         self.setMessage(f"Logging in as {self.loggedInEmail}","limegreen")
         self.loggedIn = True
         self.after(1000,self.destroy)
@@ -269,16 +291,19 @@ class Auth(CTk):
         self.btnDeny.place_forget()
 
         self.loggedInEmail = ""
+        self.clickablesOnOff()
 
     def signIn(self,userDetails):
-        self.loggedInEmail = userDetails[0]
+        self.rememberedEmail = userDetails[0]
         if not self.loggedIn:
-            self.setMessage(f"Would you like to login automatically as\n{self.loggedInEmail}?",self.globalColour)
+            self.setMessage(f"Would you like to login automatically as\n{self.rememberedEmail}?",self.globalColour)
+            self.clickablesOnOff()
             self.btnConfirm.configure(command=self.rememberMeConfirmClicked)
             self.btnConfirm.place(in_=self.btnRegister,y=150)
             self.btnDeny.place(in_=self.btnSignIn,y=150)
 
         else:
+            self.loggedInEmail = self.rememberedEmail
             self.setMessage(f"Logging in as {self.loggedInEmail}","limegreen")
 
     def registerClicked(self):
