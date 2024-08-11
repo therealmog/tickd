@@ -37,7 +37,7 @@ class Auth(CTk):
         self.placeWidgets()
         self.checkRememberMe()
 
-        self.frameLogin.bind("<Return>",lambda event:self.signInClicked())
+        self.bind("<Return>",lambda event:self.signInClicked())
 
         print(self.btnRegister.cget("state"))
         
@@ -123,20 +123,6 @@ class Auth(CTk):
             self.btnMode.configure(fg_color="#eaeaeb")
             self.globalColour = "black"
     
-    def elementMouseEnter(self,element):
-        if "btn" in element or "entry" in element:
-            self.elements[element].configure(relief="solid")
-        else:
-            self.elements[element].configure(fg_color="black")
-    
-    def elementMouseLeave(self,element):
-        if "btn" in element:
-            self.elements[element].configure(relief="raised")
-        elif "entry" in element:
-            self.elements[element].configure(relief="flat")
-        # rewrite
-        else:
-            self.elements[element].configure(fg_color="gray")
 
     def showHide(self):
         if self.btnShowPassword.winfo_ismapped():
@@ -218,7 +204,6 @@ class Auth(CTk):
         elements = self.elements
         for each in entries:
             element = elements[each]
-            element.configure(show="")
             element.delete(0,END)
         
         self.lblEmail.focus_set()

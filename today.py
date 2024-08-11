@@ -38,6 +38,11 @@ class Today(CTk):
 
         deactivate_automatic_dpi_awareness()
 
+        self.elements = {
+            
+        } 
+
+
         self.widgets()
         self.placeWidgets()
 
@@ -107,6 +112,7 @@ class Today(CTk):
             self.textVar.set(f"Welcome, {self.userDetails[2]}!")
             self.messageVar.set("Success!")
 
+            
             self.lblEnterUsername.place_forget()
             self.entryUserName.place_forget()
             self.btnSubmitUsername.place_forget()
@@ -119,6 +125,19 @@ class Today(CTk):
             self.lblEnterUsername.place(in_=self.lblWelcome,y=60)
             self.entryUserName.place(in_=self.lblEnterUsername,x=0,y=35)
             self.btnSubmitUsername.place(in_=self.entryUserName,x=340,y=-3)
+    
+    def clickablesOnOff(self):
+        clickables = []
+        elements = self.elements
+        for each in elements:
+            if "entry" in each or "btn" in each:
+                clickables.append(elements[each])
+        
+        for clickable in clickables:
+            if clickable.cget("state") == "normal":
+                clickable.configure(state="disabled")
+            else:
+                clickable.configure(state="normal")
 
 
 #today = Today(email="omar@gmail.com")
