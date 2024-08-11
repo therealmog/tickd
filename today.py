@@ -1,8 +1,8 @@
 from customtkinter import *
 from datetime import date
 from getDetails import getAllDetails,getDetailsIndividual,writeToAuthDetails
-from submitBtn import SubmitButton
-import getWallpaper
+from lib.submitBtn import SubmitButton
+import lib.getWallpaper as getWallpaper
 
 
 from PIL import Image

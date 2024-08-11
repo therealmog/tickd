@@ -4,9 +4,9 @@
 from customtkinter import *
 from PIL import ImageTk, Image
 import json
-from checkbox_customTk import Checkbox
+from lib.checkbox_customTk import Checkbox
 from getDetails import getAllDetails
-from getWallpaper import getRandom as getWallpaper
+from lib.getWallpaper import getRandom as getWallpaper
 
 
 
