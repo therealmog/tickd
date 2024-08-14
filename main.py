@@ -12,6 +12,6 @@ except:
 if email == "":
     print("No email. Cannot sign in to main program.")
 else:
-    today = Today(email,auth.imgBGPath)
+    today = Today(email,imgBGPath=auth.imgBGPath,userPath=auth.userPath)
 
 

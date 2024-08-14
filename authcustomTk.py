@@ -5,7 +5,7 @@ from customtkinter import *
 from PIL import ImageTk, Image
 import json
 from lib.checkbox_customTk import Checkbox
-from getDetails import getAllDetails
+from lib.getDetails import getAllDetails
 from lib.getWallpaper import getRandom as getWallpaper
 
 
@@ -290,6 +290,7 @@ class Auth(CTk):
         else:
             self.loggedInEmail = self.rememberedEmail
             self.setMessage(f"Logging in as {self.loggedInEmail}","limegreen")
+            self.userPath = f"users//{self.loggedInEmail}"
 
     def registerClicked(self):
         setMessage = self.setMessage

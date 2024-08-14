@@ -1,6 +1,6 @@
 from customtkinter import *
 from datetime import date
-from getDetails import getAllDetails,getDetailsIndividual,writeToAuthDetails
+from lib.getDetails import getAllDetails,getDetailsIndividual,writeToAuthDetails
 from lib.submitBtn import SubmitButton
 import lib.getWallpaper as getWallpaper
 
@@ -8,8 +8,14 @@ import lib.getWallpaper as getWallpaper
 from PIL import Image
 
 class Today(CTk):
+    
     globalFontName = "Bahnschrift"
-    def __init__(self,email,imgBGPath):
+    def __init__(self,email,imgBGPath,userPath):
+        """The class object used to generate the Today view, which is the landing page of the app once the user has logged in.
+    
+    It should only be declared once in the main function, and then the declared object can be called multiple times."""
+        
+        
         super().__init__()
         
         self.geometry("1600x900")
@@ -20,6 +26,7 @@ class Today(CTk):
         self.title("Today - Tickd")
 
         self.imgBGPath = imgBGPath
+        self.userPath = userPath
         
         self.userDetails,self.userIndex = getDetailsIndividual(email)
         try:
@@ -68,15 +75,17 @@ class Today(CTk):
         self.imgLogo = CTkImage(light_image=Image.open("logo//whiteBGLogo.png"),dark_image=Image.open("logo//blackBGLogo.png"),size=(165,53)) 
         self.logoPanel = CTkLabel(self.frameToday,text="",image=self.imgLogo)
         self.entryTask = CTkEntry(self.frameToday,placeholder_text="Enter a task...",font=(globalFontName,30),width=650,corner_radius=20)
-        
+        self.btnTaskSubmit = SubmitButton(self.frameToday,colour=self.accent,buttonSize=(35,35),command=self.taskSubmitted,radius=60)
         
         self.messageVar = StringVar()
         self.lblMessage = CTkLabel(self.frameToday,textvariable=self.messageVar,font=(globalFontName,25))
 
         self.lblEnterUsername = CTkLabel(self.frameToday,text="Please enter your new username:",font=(globalFontName,22))
         self.entryUserName = CTkEntry(self.frameToday,placeholder_text="",font=(globalFontName,22),width=330)
-        self.btnSubmitUsername = SubmitButton(parent=self.frameToday,command=self.checkEnteredUsername,colour=self.accent,buttonSize=(30,30))
+        self.btnSubmitUsername = SubmitButton(parent=self.frameToday,command=self.checkEnteredUsername,colour=self.accent,buttonSize=(30,30),radius=70)
         #self.btnSubmitUsername.bind("<Button-1>",lambda event:self.checkEnteredUsername())
+
+        
 
     def placeWidgets(self):
         self.frameToday.place(relx=0.5,rely=0.5,anchor="center")
@@ -86,7 +95,12 @@ class Today(CTk):
         self.lblWelcome.place(in_=self.lblDate,x=0,y=40)
         self.logoPanel.place(relx=0.87,y=20)
         self.entryTask.place(in_=self.lblDate,x=400,y=10)
-        
+        self.btnTaskSubmit.place(in_=self.entryTask,x=655)
+    
+    def taskSubmitted(self):
+        pass
+
+
     def taskEntryClickedWhileDisabled(self,reason):
         self.messageVar.set(reason)
         self.lblMessage.place(in_=self.entryTask,x=5,y=85)
