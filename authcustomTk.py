@@ -7,6 +7,7 @@ import json
 from lib.checkbox_customTk import Checkbox
 from lib.getDetails import getAllDetails
 from lib.getWallpaper import getRandom as getWallpaper
+from lib.createUserFolder import createUserFolder
 
 
 
@@ -314,10 +315,12 @@ class Auth(CTk):
             setMessage("Please enter a valid email.","black")
         else:
             setMessage("Would you like to register a new account with these details?","black")
+            self.btnConfirm.configure(command=self.btnRegisterConfirmClicked)
             self.btnConfirm.place(in_=self.btnRegister,x=75,y=150)
 
     def btnRegisterConfirmClicked(self):
         self.btnConfirm.place_forget()
+        self.checkboxRememberMe.disableClicks()
         newEmail = self.entryEmail.get()
         newPassword = self.entryPassword.get()
 
@@ -333,7 +336,9 @@ class Auth(CTk):
             f.write(json.dumps(newAuthDetails))
         
         self.resetEntry(["entryEmail","entryPassword"])
+        createUserFolder(userPath=f"users//{newEmail}") # Creates new folder for the new user with one "inbox.json" list
         self.setMessage("Account successfully created. Please log in.","limegreen")
+        self.checkboxRememberMe.enableClicks()
 
 
     def userLoginSequence(self):

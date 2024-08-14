@@ -48,4 +48,12 @@ class Checkbox:
             self.value = False
             self.setEmpty(_)
 
+    def disableClicks(self):
+        if self.value:
+            self.boxClicked()
+        self.emptyImgPanel.unbind_all()
+    
+    def enableClicks(self):
+        self.emptyImgPanel.bind("<Button-1>",lambda event:self.boxClicked(event))
+
 #myBox = Checkbox(parent=root,x=10,y=20,size=(50,50))

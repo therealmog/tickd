@@ -152,6 +152,8 @@ class Today(CTk):
                 clickable.configure(state="disabled")
             else:
                 clickable.configure(state="normal")
+    
+     
 
 
 #today = Today(email="omar@gmail.com")
