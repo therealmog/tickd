@@ -1,4 +1,4 @@
-<img src="logo//blackBGLogo.png">
+<img src="logo//blackBGLogo.png" width=100>
 <h1>Tickd: task management made easy</h1>
 
 <p>This is the repository for all the stuff to do with my A2 Project, Tickd.</p>
@@ -9,4 +9,4 @@
 <br>
 
 <h2>The structure</h2>
-<p>Every 'page' in the app is its own class instance. For example, the authentication screen is first declared in the main program as the object named "auth".<br>This makes it very easy to quickly get values entered in one screen and then pass them onto a another screen.</p>
+<p>Every 'page' in the app is its own class instance.<br>For example, the authentication screen is first declared in the main program as the object named "auth".<br><br>This makes it very easy to quickly get values entered in one screen and then pass them onto a another screen.</p>
