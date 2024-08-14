@@ -14,10 +14,10 @@ class Checkbox:
         self.parent = parent
         self.relWidget = relWidget
 
-        self.emptyImg = CTkImage(Image.open("checkbox//empty.png"),size=size)
+        self.emptyImg = CTkImage(Image.open("lib//checkbox//empty.png"),size=size)
         self.emptyImgPanel = CTkLabel(parent,image=self.emptyImg,cursor="hand2",text="")
 
-        self.checkedImg = CTkImage(Image.open("checkbox//checked.png"),size=size)
+        self.checkedImg = CTkImage(Image.open("lib//checkbox//checked.png"),size=size)
         self.checkedImgPanel = CTkLabel(parent,image=self.checkedImg,cursor="hand2",text="")
 
         
