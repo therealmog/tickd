@@ -53,13 +53,12 @@ class Today(CTk):
         self.widgets()
         self.placeWidgets()
 
+
         self.checkUserName()
+        self.bind("<Return>",lambda event:self.taskSubmitted())
         self.mainloop()
 
-
-    def mode(self):
-        print(f"{self.winfo_width()},{self.winfo_height()}")
-    
+    #------------------------# Widgets and placing #-------------------------#    
     def widgets(self):
         globalFontName = self.globalFontName
 
@@ -95,10 +94,19 @@ class Today(CTk):
         self.lblWelcome.place(in_=self.lblDate,x=0,y=40)
         self.logoPanel.place(relx=0.87,y=20)
         self.entryTask.place(in_=self.lblDate,x=400,y=10)
-        self.btnTaskSubmit.place(in_=self.entryTask,x=655)
+
+
+    #--------------------# Task entry and button functions #------------------#
+    def taskEntryEnterLeave(self):
+        if self.btnTaskSubmit.winfo_ismapped():
+            self.btnTaskSubmit.place_forget()
+            self.btnTaskSubmit.unbind("<Return>")
+        else:
+            self.btnTaskSubmit.place(in_=self.entryTask,x=655)
+            self.btnTaskSubmit.bind("<Return>",self.taskSubmitted)
     
     def taskSubmitted(self):
-        pass
+        print(f"Task: {self.entryTask.get()}")
 
 
     def taskEntryClickedWhileDisabled(self,reason):
@@ -106,6 +114,23 @@ class Today(CTk):
         self.lblMessage.place(in_=self.entryTask,x=5,y=85)
         self.frameToday.after(3000,self.lblMessage.place_forget)
     
+    def clickablesOnOff(self):
+        clickables = []
+        elements = self.elements
+        for each in elements:
+            if "entry" in each or "btn" in each:
+                clickables.append(elements[each])
+        
+        for clickable in clickables:
+            if clickable.cget("state") == "normal":
+                clickable.configure(state="disabled")
+            else:
+                clickable.configure(state="normal")
+
+    def bindTaskEntry(self):
+        self.entryTask.bind("<FocusIn>",lambda event:self.taskEntryEnterLeave())
+        self.entryTask.bind("<FocusOut>",lambda event:self.taskEntryEnterLeave())
+
     def checkEnteredUsername(self):
         print("hello")
         userInput = self.entryUserName.get()
@@ -126,6 +151,9 @@ class Today(CTk):
             self.textVar.set(f"Welcome, {self.userDetails[2]}!")
             self.messageVar.set("Success!")
 
+
+            self.entryTask.configure(state="disabled")
+            self.btnTaskSubmit.configure(state="disabled")
             
             self.lblEnterUsername.place_forget()
             self.entryUserName.place_forget()
@@ -136,22 +164,14 @@ class Today(CTk):
             print("You haven't got a username!")
             self.entryTask.bind("<Button-1>",lambda event,reason="Please enter your username before entering in a task.":self.taskEntryClickedWhileDisabled(reason))
             self.entryTask.configure(state="disabled")
+            self.btnTaskSubmit.configure(state="disabled")
             self.lblEnterUsername.place(in_=self.lblWelcome,y=60)
             self.entryUserName.place(in_=self.lblEnterUsername,x=0,y=35)
             self.btnSubmitUsername.place(in_=self.entryUserName,x=340,y=-3)
+        else:
+            self.bindTaskEntry()
     
-    def clickablesOnOff(self):
-        clickables = []
-        elements = self.elements
-        for each in elements:
-            if "entry" in each or "btn" in each:
-                clickables.append(elements[each])
-        
-        for clickable in clickables:
-            if clickable.cget("state") == "normal":
-                clickable.configure(state="disabled")
-            else:
-                clickable.configure(state="normal")
+    
     
      
 

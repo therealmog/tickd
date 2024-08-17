@@ -266,6 +266,7 @@ class Auth(CTk):
 
     def rememberMeConfirmClicked(self):
         self.loggedInEmail = self.rememberedEmail
+        self.userPath = f"users//{self.loggedInEmail}"
         self.setMessage(f"Logging in as {self.loggedInEmail}","limegreen")
         self.loggedIn = True
         self.after(1000,self.destroy)
@@ -296,6 +297,7 @@ class Auth(CTk):
     def registerClicked(self):
         setMessage = self.setMessage
 
+        self.checkboxRememberMe.disableClicks()
         self.btnConfirm.place_forget()
         newEmail = self.entryEmail.get()
         newPassword = self.entryPassword.get()
@@ -320,7 +322,6 @@ class Auth(CTk):
 
     def btnRegisterConfirmClicked(self):
         self.btnConfirm.place_forget()
-        self.checkboxRememberMe.disableClicks()
         newEmail = self.entryEmail.get()
         newPassword = self.entryPassword.get()
 

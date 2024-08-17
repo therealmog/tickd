@@ -49,9 +49,10 @@ class Checkbox:
             self.setEmpty(_)
 
     def disableClicks(self):
+        print("helloooo")
         if self.value:
             self.boxClicked()
-        self.emptyImgPanel.unbind_all()
+        self.emptyImgPanel.bind("<Button-1>",None)
     
     def enableClicks(self):
         self.emptyImgPanel.bind("<Button-1>",lambda event:self.boxClicked(event))
