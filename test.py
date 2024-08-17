@@ -1,14 +1,13 @@
-elements = {
-            "lblEmail":1,
-            "lblPassword":2,
-            "entryEmail":3,
-            "entryPassword":4,
-            "btnRegister":5,
-            "btnSignIn":6,
-            "btnShowPassword":7,
-            "btnHidePassword":8,
-            "btnConfirm":9
-            }
+from customtkinter import *
+from lib.checkbox_customTk import Checkbox
+from task import Task
 
-for each in elements:
-    print(each)
+root = CTk()
+
+myTask = Task(root,"Make a sandwich","asjoda","","Bahnschrift")
+myTask.place(x=0,y=0)
+
+root.mainloop()
+
+
+
