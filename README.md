@@ -1,4 +1,4 @@
-<img src="logo//blackBGLogo.png" width=500 padx=50>
+<img src="logo//blackBGLogo.png" width=500 padx=500>
 <h1>tickd. task management made easy.</h1>
 
 <p>This is the repository for all the stuff to do with my A2 Project, Tickd.</p>
