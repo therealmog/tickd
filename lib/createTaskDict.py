@@ -1,7 +1,7 @@
 from random import choice
 from string import ascii_letters,ascii_lowercase,ascii_uppercase
 
-def createTaskDict(title,date,attributes:dict=None):
+def createTaskDict(title,date=None,attributes:dict=None):
     chars = ascii_letters+ascii_uppercase+ascii_lowercase
     taskID = ""
     for each in range(6):
@@ -9,9 +9,11 @@ def createTaskDict(title,date,attributes:dict=None):
         taskID+=char
 
     taskDict = {"title":title,
-                "date":date,
+                "date":"",
                 "taskID":taskID}
 
+    if date is not None:
+        taskDict["date"] = date
     if attributes is not None:
         for each in attributes:
             item = attributes[each]

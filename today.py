@@ -3,6 +3,7 @@ from datetime import date
 from lib.getDetails import getAllDetails,getDetailsIndividual,writeToAuthDetails
 from lib.submitBtn import SubmitButton
 import lib.getWallpaper as getWallpaper
+from lib.createTaskDict import createTaskDict
 
 
 from PIL import Image
@@ -84,7 +85,9 @@ class Today(CTk):
         self.btnSubmitUsername = SubmitButton(parent=self.frameToday,command=self.checkEnteredUsername,colour=self.accent,buttonSize=(30,30),radius=70)
         #self.btnSubmitUsername.bind("<Button-1>",lambda event:self.checkEnteredUsername())
 
-        
+        self.entryDate = CTkEntry(self.frameToday,placeholder_text="date",font=(globalFontName,20),corner_radius=20)
+        self.entryTime = CTkEntry(self.frameToday,placeholder_text="time",font=(globalFontName,20),corner_radius=20)
+        self.entryPriority = CTkEntry(self.frameToday,placeholder_text="priority",font=(globalFontName,20),corner_radius=20)
 
     def placeWidgets(self):
         self.frameToday.place(relx=0.5,rely=0.5,anchor="center")
@@ -98,6 +101,7 @@ class Today(CTk):
 
     #--------------------# Task entry and button functions #------------------#
     def taskEntryEnterLeave(self):
+        self.placeAttributeEntries()
         if self.btnTaskSubmit.winfo_ismapped():
             self.btnTaskSubmit.place_forget()
             self.btnTaskSubmit.unbind("<Return>")
@@ -106,7 +110,15 @@ class Today(CTk):
             self.btnTaskSubmit.bind("<Return>",self.taskSubmitted)
     
     def taskSubmitted(self):
-        print(f"Task: {self.entryTask.get()}")
+        title = self.entryTask.get()
+        
+        if title == "":
+            self.lblMessage.place(in_=self.entryTask,x=5,y=85)
+            self.messageVar.set("Please enter a task title before submitting.")
+        else:
+            self.messageVar.set("")
+            taskDict = createTaskDict(self.entryTask.get())
+            print(taskDict)
 
 
     def taskEntryClickedWhileDisabled(self,reason):
@@ -114,6 +126,14 @@ class Today(CTk):
         self.lblMessage.place(in_=self.entryTask,x=5,y=85)
         self.frameToday.after(3000,self.lblMessage.place_forget)
     
+    def placeAttributeEntries(self):
+        entries = [self.entryDate,self.entryTime,self.entryPriority]
+        entries[0].place(in_=self.entryTask,y=50)
+        for each in range(1,len(entries)):
+            entries[each].place(in_=entries[each-1],x=150)
+            
+        
+
     def clickablesOnOff(self):
         clickables = []
         elements = self.elements
