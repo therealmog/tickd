@@ -42,6 +42,7 @@ class Checkbox(CTkBaseClass):
         self.emptyImgPanel.place(in_=self.relWidget,x=self.x,y=self.y)
     
     def boxClicked(self,_):
+        self.checkedImgPanel.focus()
         if self.value == False:
             self.value = True
             self.setChecked(_)

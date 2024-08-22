@@ -4,6 +4,7 @@ from lib.getDetails import getAllDetails,getDetailsIndividual,writeToAuthDetails
 from lib.submitBtn import SubmitButton
 import lib.getWallpaper as getWallpaper
 from lib.createTaskDict import createTaskDict
+from lib.checkDate import checkDate
 from task import Task
 
 
@@ -55,9 +56,8 @@ class Today(CTk):
         self.widgets()
         self.placeWidgets()
 
-
-        self.checkUserName()
         self.bind("<Return>",lambda event:self.checkEnteredUsername())
+        self.checkUserName()
         self.mainloop()
 
     #------------------------# Widgets and placing #-------------------------#    
@@ -66,7 +66,7 @@ class Today(CTk):
 
         self.imgBG = getWallpaper.getFromPath(self.imgBGPath,(self.maxdims[0],self.maxdims[1]))
         self.panelImgBG = CTkLabel(self,text="",image=self.imgBG)
-        self.frameToday = CTkFrame(self,width=1400,height=800,border_color="gray7",border_width=5,corner_radius=20)
+        self.frameToday = CTkFrame(self,width=1400,height=800,fg_color=("white","gray9"),border_color="gray7",border_width=5,corner_radius=20)
 
         self.lblDate = CTkLabel(self.frameToday,text=self.todaysDate,font=(globalFontName,30))
         
@@ -85,13 +85,14 @@ class Today(CTk):
         self.entryUserName = CTkEntry(self.frameToday,placeholder_text="",font=(globalFontName,22),width=330)
         self.btnSubmitUsername = SubmitButton(parent=self.frameToday,command=self.checkEnteredUsername,colour=self.accent,buttonSize=(30,30),radius=70)
 
-        self.entryDate = CTkEntry(self.frameToday,placeholder_text="date",font=(globalFontName,20),corner_radius=20)
-        self.entryTime = CTkEntry(self.frameToday,placeholder_text="time",font=(globalFontName,20),corner_radius=20)
-        self.entryPriority = CTkEntry(self.frameToday,placeholder_text="priority",font=(globalFontName,20),corner_radius=20)
+        self.entryDate = CTkEntry(self.frameToday,placeholder_text="date",font=(globalFontName,22),corner_radius=20,border_width=0)
+        self.entryTime = CTkEntry(self.frameToday,placeholder_text="time",font=(globalFontName,22),corner_radius=20,border_width=0)
+        self.dropdownPriority = CTkOptionMenu(self.frameToday,values=["priority","P1","P2","P3"],font=(globalFontName,22),dropdown_font=(globalFontName,20),corner_radius=20,fg_color="#353639",button_color="#353639",text_color="#9e9f9f",command=self.priorityCallback)
         self.btnTaskSubmit = SubmitButton(self.frameToday,colour=self.accent,buttonSize=(35,35),command=self.taskSubmitted,radius=60)
+        
 
         self.myTask = Task(self.frameToday,{"title":""},size=30)
-        self.entries = [self.entryDate,self.entryPriority,self.entryTime]
+        self.entries = [self.entryDate,self.dropdownPriority,self.entryTime]
 
     def placeWidgets(self):
         self.frameToday.place(relx=0.5,rely=0.5,anchor="center")
@@ -123,8 +124,9 @@ class Today(CTk):
         If none of them are filled then all are removed. This is called whenever the entry is left"""
         filled = False
         for each in self.entries:
-            if each.get() != "":
+            if each.get() != "" and each.get() !="priority":
                 filled = True
+
         if filled == False:
             self.removeAttributeEntries()
 
@@ -136,88 +138,46 @@ class Today(CTk):
             self.lblMessage.place(in_=self.entryTask,x=5,y=85)
             self.messageVar.set("Please enter a task title before submitting.")
         else:
-            self.messageVar.set("")
-            taskDict = createTaskDict(self.entryTask.get())
-            print(taskDict)
+            date,message = checkDate(userInput=self.entryDate.get())
+            if date == False:
+                self.messageVar.set(message)
+            else:
+                time,message = checkTime(userInput=self.entryTime.get())
+                self.messageVar.set("")
+                attributes = {}
+                if self.dropdownPriority != "priority":
+                    attributes["priority"] = self.dropdownPriority.get()
+                
+
+                taskDict = createTaskDict(self.entryTask.get(),date)
+                print(taskDict)
+                
         
-    
-        self.checkDate()
-
-    def checkDate(self):
-        userInput = self.entryDate.get().lower()
-
-        if userInput == "today":
-            date = self.today.strftime("%d/%m/%Y")
-            return date
-        elif userInput == "tomorrow":
-            tomorrow = self.today + timedelta(days=1)
-            date = tomorrow.strftime("%d/%m/%Y")
+    def priorityCallback(self,event):
+        if self.dropdownPriority.get() == "priority":
+            self.dropdownPriority.configure(text_color="#9e9f9f")
         else:
-            try:
-                dateSections = userInput.split("/")
-            except:
-                self.messageVar.set("Invalid date entered")
-                return False
-            
-            day = dateSections[0]
-            month = dateSections[1]
-            year = dateSections[2]
-
-            # Checking year #
-            if len(year)<=2:
-                if steyear<24:
-                    self.messageVar("Your date cannot be in the past.")
-                    return False
-                else:
-                    year = "20"+year
-            elif len(year)==3:
-                self.messageVar.set("Invalid year.")
-                return False
-            else:
-                if year <2024:
-                    self.messageVar.set("Your date cannot be in the past.")
-                    return False
-            
-            # Checking day #
-            if day>31:
-                self.messageVar.set("Invalid date")
-                return False
-            elif day>28 and month != "2":
-                self.messageVar.set("Invalid date")
-                return False
-            else:
-
-
-
+            self.dropdownPriority.configure(text_color="white")
 
     def taskEntryClickedWhileDisabled(self,reason):
         self.messageVar.set(reason)
         self.lblMessage.place(in_=self.entryTask,x=5,y=85)
         self.frameToday.after(3000,self.lblMessage.place_forget)
-    
-    def checkEntry(self):
-        print("checking")
-        if len(self.entryTask.get()) >0:
-            self.placeAttributeEntries()
-        else:
-            self.removeAttributeEntries()
 
     def placeAttributeEntries(self):
-        print("placing")
         self.btnTaskSubmit.place(in_=self.entryTask,x=655)
         self.btnTaskSubmit.bind("<Return>",self.taskSubmitted)
 
-        entries = [self.entryDate,self.entryTime,self.entryPriority]
+        entries = [self.entryDate,self.entryTime,self.dropdownPriority]
         entries[0].place(in_=self.entryTask,y=50)
         for each in range(1,len(entries)):
             entries[each].place(in_=entries[each-1],x=150)
     
     def removeAttributeEntries(self):
-        print("removing")
         self.btnTaskSubmit.place_forget()
         self.btnTaskSubmit.unbind("<Return>")
 
-        entries = [self.entryDate,self.entryTime,self.entryPriority,self.btnTaskSubmit]
+        entries = [self.entryDate,self.entryTime,self.dropdownPriority,self.btnTaskSubmit]
         for each in range(0,len(entries)):
             entries[each].place_forget()
             
@@ -286,6 +246,7 @@ class Today(CTk):
             self.btnSubmitUsername.place(in_=self.entryUserName,x=340,y=-3)
             self.bindTaskEntry()
         else:
+            self.unbind("<Return>")
             self.bind("<Return>",lambda event:self.taskSubmitted())
             self.bindTaskEntry()
     
