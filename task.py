@@ -9,25 +9,45 @@ class Task(CTkFrame):
         super().__init__(master=master,width=300,height=50)
 
         self.font = font
+        self.size = size
+        self.attributes = attributes
 
-
+        self.getAttributes()
         self.widgets()
         self.placeWidgets()
+        
 
     def getAttributes(self):
         attributes = self.attributes
 
         self.title = attributes["title"]
-        self.description = attributes["description"]
-        self.date = attributes["date"]
+        if self.title == "":
+            self.title = "(no title)"
+        
+        #---- Possible attributes ----#
+        self.date = ""
+        self.time = ""
+        self.priority = ""
+        self.description = ""
 
+        possibleAttributes = {"date":self.date,
+                              "time":self.time,
+                              "priority":self.priority,
+                              "description":self.description}
+        for each in attributes:
+            try:
+                possibleAttributes[each] = attributes[each]
+            except:
+                pass
 
     def widgets(self):
-        self.lblTitle = CTkLabel(self,text=self.title,font=(self.font,20))
-        self.checkbox = Checkbox(self,x=-35,y=0,size=(25,25),relWidget=self.lblTitle)
+        self.lblTitle = CTkLabel(self,text=self.title,font=(self.font,self.size))
+        self.lblTitle.bind("<Button-1>",lambda event: self.lblTitle.focus())
+
+        self.checkbox = Checkbox(self,x=-35,y=0,size=(self.size,self.size),relWidget=self.lblTitle)
 
     def placeWidgets(self):
-        self.lblTitle.place(x=35)
+        self.lblTitle.place(x=35)#This should stay as it is, since it is the frame that will be placed inside the actual app.
         self.checkbox.placeWidget()
 
 
