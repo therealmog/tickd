@@ -221,7 +221,7 @@ class Today(CTk):
             if "dropdown" in each:
                 valuesList = entriesDict[each]._values 
                 entriesDict[each].set(valuesList[0])
-                each.configure(text_color=self.textgrey)
+                entriesDict[each].configure(text_color=self.textgrey)
             else:
                 entriesDict[each].delete(0,"end")
 
