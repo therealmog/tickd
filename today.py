@@ -5,6 +5,7 @@ from lib.submitBtn import SubmitButton
 import lib.getWallpaper as getWallpaper
 from lib.createTaskDict import createTaskDict
 from lib.checkDate import checkDate
+from lib.checkTime import checkTime
 from task import Task
 
 
@@ -133,23 +134,41 @@ class Today(CTk):
     
     def taskSubmitted(self):
         title = self.entryTask.get()
-        
+        attributes = {}
+
         if title == "":
             self.lblMessage.place(in_=self.entryTask,x=5,y=85)
             self.messageVar.set("Please enter a task title before submitting.")
-        else:
-            date,message = checkDate(userInput=self.entryDate.get())
+        else: # Start to interpret attributes
+            dateInput = self.entryDate.get()
+            if dateInput == "":
+                date = ""
+            else:
+                date,message = checkDate(userInput=dateInput)
+
             if date == False:
                 self.messageVar.set(message)
             else:
-                time,message = checkTime(userInput=self.entryTime.get())
-                self.messageVar.set("")
-                attributes = {}
-                if self.dropdownPriority != "priority":
+                attributes["date"] = date
+
+                timeInput = self.entryTime.get()
+                if timeInput == "":
+                    time = ""
+                else:
+                    time,message = checkTime(userInput=timeInput)
+
+                if time == False:
+                    self.messageVar.set(message)
+                else:
+                    attributes["time"] = time                
+                
+                if self.dropdownPriority.get() != "priority":
                     attributes["priority"] = self.dropdownPriority.get()
+                else:
+                    attributes["priority"] = ""
                 
 
-                taskDict = createTaskDict(self.entryTask.get(),date)
+                taskDict = createTaskDict(self.entryTask.get(),date,attributes)
                 print(taskDict)
                 
         
