@@ -14,7 +14,15 @@ def checkTime(userInput):
     elif len(userInput) == 4:
         hour = userInput[0:2]
         minute = userInput[2:]
-        time = f"{hour}:{minute}"
+        
+        if int(hour) > 23:
+            message = "Invalid time"
+            return False,message
+        elif int(minute) > 59:
+            message = "Invalid time"
+            return False, message
+        else:
+            time = f"{hour}:{minute}"
         return time,None
     else:
         message = "Invalid time entered."

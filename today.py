@@ -14,6 +14,7 @@ from PIL import Image
 class Today(CTk):
     
     globalFontName = "Bahnschrift"
+    textgrey="#9e9f9f"
     def __init__(self,email,imgBGPath,userPath):
         """The class object used to generate the Today view, which is the landing page of the app once the user has logged in.
     
@@ -53,9 +54,17 @@ class Today(CTk):
             
         } 
 
-
         self.widgets()
         self.placeWidgets()
+
+        self.entriesDict = {
+            "entryTask":self.entryTask,
+            "entryDate":self.entryDate,
+            "entryTime":self.entryTime,
+            "dropdownPriority":self.dropdownPriority
+        }
+
+
 
         self.bind("<Return>",lambda event:self.checkEnteredUsername())
         self.checkUserName()
@@ -88,7 +97,7 @@ class Today(CTk):
 
         self.entryDate = CTkEntry(self.frameToday,placeholder_text="date",font=(globalFontName,22),corner_radius=20,border_width=0)
         self.entryTime = CTkEntry(self.frameToday,placeholder_text="time",font=(globalFontName,22),corner_radius=20,border_width=0)
-        self.dropdownPriority = CTkOptionMenu(self.frameToday,values=["priority","P1","P2","P3"],font=(globalFontName,22),dropdown_font=(globalFontName,20),corner_radius=20,fg_color="#353639",button_color="#353639",text_color="#9e9f9f",command=self.priorityCallback)
+        self.dropdownPriority = CTkOptionMenu(self.frameToday,values=["priority","P1","P2","P3"],font=(globalFontName,22),dropdown_font=(globalFontName,20),corner_radius=20,fg_color="#353639",button_color="#353639",text_color=self.textgrey,command=self.priorityCallback)
         self.btnTaskSubmit = SubmitButton(self.frameToday,colour=self.accent,buttonSize=(35,35),command=self.taskSubmitted,radius=60)
         
 
@@ -162,26 +171,31 @@ class Today(CTk):
                 else:
                     attributes["time"] = time                
                 
-                if self.dropdownPriority.get() != "priority":
-                    attributes["priority"] = self.dropdownPriority.get()
-                else:
-                    attributes["priority"] = ""
-                
+                    if self.dropdownPriority.get() != "priority":
+                        attributes["priority"] = self.dropdownPriority.get()
+                    else:
+                        attributes["priority"] = ""
+                    
 
-                taskDict = createTaskDict(self.entryTask.get(),date,attributes)
-                print(taskDict)
+                    taskDict = createTaskDict(title,date,attributes)
+                    self.resetEntry(["entryTask","entryDate","entryTime","dropdownPriority"])
+                    print(taskDict)
                 
         
+    
+
+    def taskEntryClickedWhileDisabled(self,reason):
+        self.messageVar.set(reason)
+        self.lblMessage.place(in_=self.entryTask,x=5,y=85)
+        self.frameToday.after(3000,self.lblMessage.place_forget)
+
+
     def priorityCallback(self,event):
         if self.dropdownPriority.get() == "priority":
             self.dropdownPriority.configure(text_color="#9e9f9f")
         else:
             self.dropdownPriority.configure(text_color="white")
 
-    def taskEntryClickedWhileDisabled(self,reason):
-        self.messageVar.set(reason)
-        self.lblMessage.place(in_=self.entryTask,x=5,y=85)
-        self.frameToday.after(3000,self.lblMessage.place_forget)
 
     def placeAttributeEntries(self):
         self.btnTaskSubmit.place(in_=self.entryTask,x=655)
@@ -199,8 +213,18 @@ class Today(CTk):
         entries = [self.entryDate,self.entryTime,self.dropdownPriority,self.btnTaskSubmit]
         for each in range(0,len(entries)):
             entries[each].place_forget()
+        self.messageVar.set("")
             
-        
+    def resetEntry(self,entries:list):
+        entriesDict = self.entriesDict
+        for each in entries:
+            if "dropdown" in each:
+                valuesList = entriesDict[each]._values 
+                entriesDict[each].set(valuesList[0])
+                each.configure(text_color=self.textgrey)
+            else:
+                entriesDict[each].delete(0,"end")
+
     def clickablesOnOff(self):
         clickables = []
         elements = self.elements
