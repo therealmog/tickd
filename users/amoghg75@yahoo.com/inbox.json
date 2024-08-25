@@ -1,1 +1,15 @@
-{"shared": "no"}
+{
+    "shared":"no",
+    "tasks":{
+        "isj1A":{
+            "title":"Wash the dishes",
+            "date":"25/08/2024",
+            "taskID":"isj1A"    
+        },
+        "PA21d":{
+            "title":"Watch TV",
+            "date":"25/08/2024",
+            "taskID":"PA21d"    
+        }
+    }
+}

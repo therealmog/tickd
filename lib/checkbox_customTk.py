@@ -53,7 +53,7 @@ class Checkbox(CTkBaseClass):
     def disableClicks(self):
         print("helloooo")
         if self.value:
-            self.boxClicked()
+            self.boxClicked(None)
         self.emptyImgPanel.bind("<Button-1>",None)
     
     def enableClicks(self):

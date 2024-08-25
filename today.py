@@ -7,6 +7,7 @@ from lib.createTaskDict import createTaskDict
 from lib.checkDate import checkDate
 from lib.checkTime import checkTime
 from task import Task
+from lib.getTasks import getTasks
 
 
 from PIL import Image
@@ -68,6 +69,8 @@ class Today(CTk):
 
         self.bind("<Return>",lambda event:self.checkEnteredUsername())
         self.checkUserName()
+
+        self.loadTasks()
         self.mainloop()
 
     #------------------------# Widgets and placing #-------------------------#    
@@ -116,6 +119,14 @@ class Today(CTk):
         self.myTask.place(in_=self.lblWelcome,y=150)
 
         self.currentAttribute = ""
+
+    def loadTasks(self):
+        self.taskList = getTasks(self.frameToday,self.userPath,"inbox")
+    
+        if self.taskList != False:
+            self.taskList[0].place(in_=self.lblWelcome,y=150)
+            for each in range(1,len(self.taskList)): # Starts with second item
+                self.taskList[each].place(in_=self.taskList[each-1],y=75)
 
     #--------------------# Task entry and button functions #------------------#
     def taskEntryEnter(self):
@@ -224,6 +235,9 @@ class Today(CTk):
                 entriesDict[each].configure(text_color=self.textgrey)
             else:
                 entriesDict[each].delete(0,"end")
+
+         
+
 
     def clickablesOnOff(self):
         clickables = []

@@ -15,7 +15,18 @@ class Task(CTkFrame):
         self.getAttributes()
         self.widgets()
         self.placeWidgets()
+
+        self.bind("<Enter>",lambda event:self.onmouseEnter())
+        self.bind("<Leave>",lambda event:self.onmouseLeave())
+        self.lblTitle.bind("<Enter>",lambda event:self.onmouseEnter())
+        self.lblTitle.bind("<Leave>",lambda event:self.onmouseLeave())
+
         
+    def onmouseEnter(self):
+        self.lblTitle.configure(text_color="dodgerblue")
+
+    def onmouseLeave(self):
+        self.lblTitle.configure(text_color=("black","white"))
 
     def getAttributes(self):
         attributes = self.attributes
