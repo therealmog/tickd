@@ -8,6 +8,7 @@ from lib.checkDate import checkDate
 from lib.checkTime import checkTime
 from task import Task
 from lib.getTasks import getTasks
+from lib.uploadTask import uploadTask
 
 
 from PIL import Image
@@ -105,7 +106,7 @@ class Today(CTk):
         self.btnTaskSubmit = SubmitButton(self.frameToday,colour=self.accent,buttonSize=(35,35),command=self.taskSubmitted,radius=60)
         
 
-        self.myTask = Task(self.frameToday,{"title":""},size=30)
+        #self.myTask = Task(self.frameToday,{"title":""},size=30)
         self.entries = [self.entryDate,self.dropdownPriority,self.entryTime]
 
     def placeWidgets(self):
@@ -117,7 +118,7 @@ class Today(CTk):
         self.logoPanel.place(relx=0.87,y=20)
         self.entryTask.place(in_=self.lblDate,x=400,y=10)
 
-        self.myTask.place(in_=self.lblWelcome,y=150)
+        #self.myTask.place(in_=self.lblWelcome,y=150)
 
         self.currentAttribute = ""
 
@@ -192,9 +193,15 @@ class Today(CTk):
                     taskDict = createTaskDict(title,date,attributes)
                     self.resetEntry(["entryTask","entryDate","entryTime","dropdownPriority"])
                     print(taskDict)
+                    uploadTask(self.userPath,taskDict,listName="inbox")
+                    
+                    self.loadTasks()
+
                 
         
     
+
+
 
     def taskEntryClickedWhileDisabled(self,reason):
         self.messageVar.set(reason)

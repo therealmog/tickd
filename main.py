@@ -4,6 +4,7 @@
 from authcustomTk import Auth
 from today import Today
 
+
 auth = Auth()
 try:
     email = auth.loggedInEmail

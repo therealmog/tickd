@@ -1,15 +1,1 @@
-{
-    "shared":"no",
-    "tasks":{
-        "isj1A":{
-            "title":"Wash the dishes",
-            "date":"25/08/2024",
-            "taskID":"isj1A"    
-        },
-        "PA21d":{
-            "title":"Watch TV",
-            "date":"25/08/2024",
-            "taskID":"PA21d"    
-        }
-    }
-}
+{"shared": "no", "tasks": {"isj1A": {"title": "Wash the dishes", "date": "26/08/2024", "taskID": "isj1A"}, "PA21d": {"title": "Watch TV", "date": "27/08/2024", "taskID": "PA21d"}, "SgQinl": {"title": "Bonjour", "date": "26/08/2024", "taskID": "SgQinl", "time": "11:59", "priority": ""}, "xiUmdp": {"title": "New task!", "date": "26/08/2024", "taskID": "xiUmdp", "time": "", "priority": ""}, "zQKaSI": {"title": "Go to bed", "date": "26/08/2024", "taskID": "zQKaSI", "time": "21:00", "priority": "P1"}}}
