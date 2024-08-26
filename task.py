@@ -5,11 +5,12 @@ from lib.checkbox_customTk import Checkbox
 
 class Task(CTkFrame):
 
-    def __init__(self,master,attributes:dict,font="Bahnschrift",size=25):
+    def __init__(self,master,attributes:dict,accent="dodgerblue2",font="Bahnschrift",size=25):
         super().__init__(master=master,width=1300,height=50,fg_color=("white","gray13"),border_color="gray15",border_width=5)
 
         self.font = font
         self.size = size
+        self.accent = accent
         self.attributes = attributes
 
         self.getAttributes()
@@ -23,7 +24,7 @@ class Task(CTkFrame):
 
         
     def onmouseEnter(self):
-        self.lblTitle.configure(text_color="dodgerblue")
+        self.lblTitle.configure(text_color=self.accent)
 
     def onmouseLeave(self):
         self.lblTitle.configure(text_color=("black","white"))

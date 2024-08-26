@@ -1,7 +1,7 @@
 import json
 from task import Task
 
-def getTasks(master,userPath,listName):
+def getTasks(master,userPath,listName,accent):
         path = f"{userPath}//{listName}.json"
         
         with open(path,"r") as f:
@@ -14,7 +14,7 @@ def getTasks(master,userPath,listName):
 
             # Returning a list of task objects
             for each in taskDict:
-                taskObj = Task(master,attributes=taskDict[each])
+                taskObj = Task(master,accent=accent,attributes=taskDict[each])
                 taskList.append(taskObj)
             return taskList
 

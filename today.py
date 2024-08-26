@@ -26,6 +26,7 @@ class Today(CTk):
         
         self.geometry("1600x900")
         #self.minsize(1600,900)
+        
 
         self.maxdims = [1920,1080]
         self.maxsize(self.maxdims[0],self.maxdims[1])
@@ -121,7 +122,7 @@ class Today(CTk):
         self.currentAttribute = ""
 
     def loadTasks(self):
-        self.taskList = getTasks(self.frameToday,self.userPath,"inbox")
+        self.taskList = getTasks(self.frameToday,self.userPath,"inbox",self.accent)
     
         if self.taskList != False:
             self.taskList[0].place(in_=self.lblWelcome,y=150)
