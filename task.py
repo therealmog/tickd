@@ -6,13 +6,14 @@ from datetime import date,timedelta
 
 class Task(CTkFrame):
 
-    def __init__(self,master,attributes:dict,accent="dodgerblue2",font="Bahnschrift",size=25):
+    def __init__(self,master,attributes:dict,accent="dodgerblue2",font="Bahnschrift",size=25,command=None):
         super().__init__(master=master,width=1300,height=50,fg_color=("white","gray13"),border_color="gray15",border_width=5)
 
         self.font = font
         self.size = size
         self.accent = accent
         self.attributes = attributes
+        self.command = command
 
         self.getAttributes()
         self.widgets()
@@ -80,7 +81,7 @@ class Task(CTkFrame):
         self.taskDate = self.getDate()
         self.lblDate = CTkLabel(self,text=self.taskDate,font=(self.font,18*0.95))
 
-        self.checkbox = Checkbox(self,x=-35,y=5,size=(self.size,self.size),relWidget=self.lblTitle)
+        self.checkbox = Checkbox(self,x=-35,y=5,size=(self.size,self.size),relWidget=self.lblTitle,command=self.command,commandArgs={"taskID":self.attributes["taskID"]})
 
     def placeWidgets(self):
         self.lblTitle.place(x=40,y=5)#This should stay as it is, since it is the frame that will be placed inside the actual app.

@@ -1,32 +1,13 @@
 {
   "shared": "no",
   "tasks": {
-    "isj1A": {
-      "title": "Wash the dishes",
-      "date": "26/08/2024",
-      "taskID": "isj1A"
-    },
-
-    "SgQinl": {
-      "title": "Bonjour",
-      "date": "26/08/2024",
-      "taskID": "SgQinl",
-      "time": "11:59",
+    "kppcRu": {
+      "title": "Bonjour!",
+      "date": "28/08/2024",
+      "taskID": "kppcRu",
+      "completed": "False",
+      "time": "12:10",
       "priority": ""
-    },
-    "xiUmdp": {
-      "title": "New task!",
-      "date": "26/08/2024",
-      "taskID": "xiUmdp",
-      "time": "",
-      "priority": ""
-    },
-    "zQKaSI": {
-      "title": "Go to bed",
-      "date": "26/08/2024",
-      "taskID": "zQKaSI",
-      "time": "21:00",
-      "priority": "P1"
     }
   }
 }

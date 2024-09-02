@@ -106,7 +106,6 @@ class Today(CTk):
         self.btnTaskSubmit = SubmitButton(self.frameToday,colour=self.accent,buttonSize=(35,35),command=self.taskSubmitted,radius=60)
         
 
-        #self.myTask = Task(self.frameToday,{"title":""},size=30)
         self.entries = [self.entryDate,self.dropdownPriority,self.entryTime]
 
     def placeWidgets(self):
@@ -118,17 +117,18 @@ class Today(CTk):
         self.logoPanel.place(relx=0.87,y=20)
         self.entryTask.place(in_=self.lblDate,x=400,y=10)
 
-        #self.myTask.place(in_=self.lblWelcome,y=150)
-
         self.currentAttribute = ""
 
     def loadTasks(self):
-        self.taskList = getTasks(self.frameToday,self.userPath,"inbox",self.accent)
+        self.taskList = getTasks(self.frameToday,self.userPath,"inbox",self.accent,command=self.taskCompleted)
     
         if self.taskList != False:
             self.taskList[0].place(in_=self.lblWelcome,y=150)
             for each in range(1,len(self.taskList)): # Starts with second item
-                self.taskList[each].place(in_=self.taskList[each-1],y=75)
+                if self.taskList[each].attributes["completed"] == "True":
+                    self.taskList.pop(each)
+                else:
+                    self.taskList[each].place(in_=self.taskList[each-1],y=75)
 
     #--------------------# Task entry and button functions #------------------#
     def taskEntryEnter(self):
@@ -197,9 +197,18 @@ class Today(CTk):
                     
                     self.loadTasks()
 
-                
-        
-    
+    def taskCompleted(self,taskID):
+        taskList = getTasks()
+        for each in taskList:
+            if each.attributes["taskID"] == taskID:
+                taskDict = each.attributes
+
+        taskDict["completed"] = "True"
+        print(taskDict)
+
+        uploadTask(self.userPath,taskDict,listName="inbox")
+        self.loadTasks()
+
 
 
 

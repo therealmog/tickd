@@ -8,12 +8,14 @@ from PIL import ImageTk, Image
 root.geometry("600x400")"""
 
 class Checkbox(CTkBaseClass):
-    def __init__(self,parent:CTk,x,y,size:tuple,relWidget=None):
+    def __init__(self,parent:CTk,x,y,size:tuple,relWidget=None,command=None,commandArgs=None):
         super().__init__(master=parent)
         self.x = x
         self.y = y
         self.parent = parent
         self.relWidget = relWidget
+        self.command = command
+        self.commandArgs = commandArgs
 
         self.emptyImg = CTkImage(Image.open("lib//checkbox//empty.png"),size=size)
         self.emptyImgPanel = CTkLabel(parent,image=self.emptyImg,cursor="hand2",text="")
@@ -36,6 +38,9 @@ class Checkbox(CTkBaseClass):
     def setChecked(self,_):
         self.emptyImgPanel.place_forget()
         self.checkedImgPanel.place(in_=self.relWidget,x=self.x,y=self.y)
+        
+        if self.command != None:
+            self.command(**self.commandArgs)
 
     def setEmpty(self,_):
         self.checkedImgPanel.place_forget()
@@ -46,6 +51,7 @@ class Checkbox(CTkBaseClass):
         if self.value == False:
             self.value = True
             self.setChecked(_)
+            
         else:
             self.value = False
             self.setEmpty(_)

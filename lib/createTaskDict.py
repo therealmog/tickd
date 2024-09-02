@@ -10,7 +10,8 @@ def createTaskDict(title,date=None,attributes:dict=None):
 
     taskDict = {"title":title,
                 "date":"",
-                "taskID":taskID}
+                "taskID":taskID,
+                "completed":"False"}
 
     if date is not None:
         taskDict["date"] = date
