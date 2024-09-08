@@ -1,5 +1,5 @@
 import json
-from task import Task
+from lib.task import Task
 
 def getTasks(master,userPath,listName,accent,command):
         path = f"{userPath}//{listName}.json"
@@ -14,10 +14,17 @@ def getTasks(master,userPath,listName,accent,command):
 
             # Returning a list of task objects
             for each in taskDict:
-                taskObj = Task(master,accent=accent,attributes=taskDict[each],command=command)
-                taskList.append(taskObj)
-            return taskList
+                if taskDict[each]["completed"] == "False":
+                    taskObj = Task(master,accent=accent,attributes=taskDict[each],command=command)
+                    taskList.append(taskObj)
+            
 
+            if len(taskList) == 0:
+                print("No tasks found.")
+                return False
+            else:
+                return taskList
+        
         except:
             print("No tasks found.")
             return False

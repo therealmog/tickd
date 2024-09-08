@@ -6,7 +6,8 @@ import lib.getWallpaper as getWallpaper
 from lib.createTaskDict import createTaskDict
 from lib.checkDate import checkDate
 from lib.checkTime import checkTime
-from task import Task
+from lib.task import Task
+from lib.loadTaskList import loadTaskList
 from lib.getTasks import getTasks
 from lib.uploadTask import uploadTask
 
@@ -105,6 +106,7 @@ class Today(CTk):
         self.dropdownPriority = CTkOptionMenu(self.frameToday,values=["priority","P1","P2","P3"],font=(globalFontName,22),dropdown_font=(globalFontName,20),corner_radius=20,fg_color="#353639",button_color="#353639",text_color=self.textgrey,command=self.priorityCallback)
         self.btnTaskSubmit = SubmitButton(self.frameToday,colour=self.accent,buttonSize=(35,35),command=self.taskSubmitted,radius=60)
         
+        self.lblNoTasks = CTkLabel(self.frameToday,text="You have no tasks.",font=(globalFontName,40))
 
         self.entries = [self.entryDate,self.dropdownPriority,self.entryTime]
 
@@ -115,20 +117,37 @@ class Today(CTk):
         self.lblDate.place(x=25,y=25)
         self.lblWelcome.place(in_=self.lblDate,x=0,y=40)
         self.logoPanel.place(relx=0.87,y=20)
-        self.entryTask.place(in_=self.lblDate,x=400,y=10)
+        self.entryTask.place(in_=self.lblDate,x=450,y=10)
 
         self.currentAttribute = ""
 
-    def loadTasks(self):
-        self.taskList = getTasks(self.frameToday,self.userPath,"inbox",self.accent,command=self.taskCompleted)
-    
-        if self.taskList != False:
+    def removeIfCompleted(self):
+        for each in self.taskList:
+            each.place_forget()
+            if each.attributes["completed"] == "True":
+                self.taskList.remove(each)
+        
+        if len(self.taskList) != 0:
             self.taskList[0].place(in_=self.lblWelcome,y=150)
             for each in range(1,len(self.taskList)): # Starts with second item
-                if self.taskList[each].attributes["completed"] == "True":
-                    self.taskList.pop(each)
-                else:
-                    self.taskList[each].place(in_=self.taskList[each-1],y=75)
+                self.taskList[each].place(in_=self.taskList[each-1],y=75)
+        else:
+            self.lblNoTasks.place(in_=self.lblWelcome,y=150)
+        
+
+    def loadTasks(self):
+        self.taskList = getTasks(self.frameToday,self.userPath,"inbox",self.accent,command=self.taskCompleted)
+        
+        if self.taskList != False:
+            self.lblNoTasks.place_forget()
+            self.taskList[0].place(in_=self.lblWelcome,y=150)
+            for each in range(1,len(self.taskList)): # Starts with second item
+                self.taskList[each].place(in_=self.taskList[each-1],y=75)
+        else:
+            self.lblNoTasks.place(in_=self.lblWelcome,y=150)
+    
+            
+        
 
     #--------------------# Task entry and button functions #------------------#
     def taskEntryEnter(self):
@@ -192,22 +211,29 @@ class Today(CTk):
 
                     taskDict = createTaskDict(title,date,attributes)
                     self.resetEntry(["entryTask","entryDate","entryTime","dropdownPriority"])
-                    print(taskDict)
+
                     uploadTask(self.userPath,taskDict,listName="inbox")
                     
                     self.loadTasks()
 
     def taskCompleted(self,taskID):
-        taskList = getTasks()
-        for each in taskList:
-            if each.attributes["taskID"] == taskID:
-                taskDict = each.attributes
+        taskList = loadTaskList(self.userPath,"inbox")
+        allTasksDict = taskList["tasks"]
+        
+    
+        for each in allTasksDict:
+            if each == taskID: # Dictionary key for each task in allTasksDict is the taskID
+                taskDict = allTasksDict[each]
 
         taskDict["completed"] = "True"
-        print(taskDict)
+        
+
+        for each in self.taskList:
+            if each.attributes["taskID"] == taskID:
+                each.attributes["completed"] = "True"
 
         uploadTask(self.userPath,taskDict,listName="inbox")
-        self.loadTasks()
+        self.removeIfCompleted()
 
 
 
@@ -308,6 +334,16 @@ class Today(CTk):
             self.lblEnterUsername.place_forget()
             self.entryUserName.place_forget()
             self.btnSubmitUsername.place_forget()
+
+            # Adding 'welcome' task
+
+            welcomeTaskDict = {"title":"Welcome to Tickd!",
+                               "date":f"{date.today().strftime("%d/%m/%Y")}",
+                               "description":"Welcome to a simpler life with Tickd.\nSimply add tasks with the 'Add a task' box at the top, and use keywords such as 'today' and 'tomorrow' in the date, or for other dates simply add the date using the DD/MM/YY format.\ne.g. for the 31st December 2025, you would put 31/12/25.",
+                               "completed":"False",
+                               "taskID":"welcome"}
+            uploadTask(self.userPath,welcomeTaskDict,"inbox")
+            self.loadTasks()
 
     def checkUserName(self):
         if self.userName == "":

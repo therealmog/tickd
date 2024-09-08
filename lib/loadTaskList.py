@@ -1,7 +1,7 @@
 import json
 
 
-def loadTasks(self,userPath,listName):
+def loadTaskList(userPath,listName):
         listPath = f"{userPath}//{listName}.json"
 
         try:

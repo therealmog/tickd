@@ -1,6 +1,6 @@
 from customtkinter import *
 from lib.checkbox_customTk import Checkbox
-from task import Task
+from lib.task import Task
 from random import choice,randint
 from string import ascii_letters, ascii_lowercase, ascii_uppercase
 
