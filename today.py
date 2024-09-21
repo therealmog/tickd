@@ -338,7 +338,7 @@ class Today(CTk):
             # Adding 'welcome' task
 
             welcomeTaskDict = {"title":"Welcome to Tickd!",
-                               "date":f"{date.today().strftime("%d/%m/%Y")}",
+                               "date":f"{date.today().strftime('%d/%m/%Y')}",
                                "description":"Welcome to a simpler life with Tickd.\nSimply add tasks with the 'Add a task' box at the top, and use keywords such as 'today' and 'tomorrow' in the date, or for other dates simply add the date using the DD/MM/YY format.\ne.g. for the 31st December 2025, you would put 31/12/25.",
                                "completed":"False",
                                "taskID":"welcome"}
