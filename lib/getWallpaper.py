@@ -4,11 +4,16 @@ from random import choice
 from PIL import Image
 
 def getRandom(dimensions:tuple):
-    wallpapers = glob("wallpapers//*.png")
-    path = choice(wallpapers)
+    darkWallpapers = glob("wallpapers//dark*.png")
+    darkPath = choice(darkWallpapers)
+
+    lightWallpapers = glob("wallpapers//light*.png")
+    lightPath = choice(lightWallpapers)
     
-    wallpaperImg = CTkImage(Image.open(path),size=dimensions)
-    return wallpaperImg,path
+    darkWallpaperImg = CTkImage(Image.open(darkPath),size=dimensions)
+    lightWallpaperImg = CTkImage(Image.open(lightPath),size=dimensions)
+
+    return darkWallpaperImg,lightWallpaperImg,darkPath,lightPath
 
 def getFromPath(path,dimensions:tuple):
     wallpaperImg = CTkImage(Image.open(path),size=dimensions)

@@ -1,0 +1,8 @@
+max chars = 50
+
+A message of 42 chars needed 60 extra x
+
+therefore 8 chars needed 60 
+round up to 10 chars need 60 extra
+
+therefore 1 char = 6 extra x

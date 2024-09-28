@@ -18,7 +18,7 @@ class Today(CTk):
     
     globalFontName = "Bahnschrift"
     textgrey="#9e9f9f"
-    def __init__(self,email,imgBGPath,userPath):
+    def __init__(self,email,imgBGPath,userPath,theme):
         """The class object used to generate the Today view, which is the landing page of the app once the user has logged in.
     
     It should only be declared once in the main function, and then the declared object can be called multiple times."""
@@ -34,8 +34,10 @@ class Today(CTk):
         self.maxsize(self.maxdims[0],self.maxdims[1])
         self.title("Today - Tickd")
 
-        self.imgBGPath = imgBGPath
+        self.darkImgBGPath = imgBGPath[0]
+        self.lightImgBGPath = imgBGPath[1]
         self.userPath = userPath
+        self.theme = theme
         
         self.userDetails,self.userIndex = getDetailsIndividual(email)
         try:
@@ -47,7 +49,10 @@ class Today(CTk):
         self.todaysDate = self.today.strftime("%A, %d %B %Y")
         print(self.todaysDate)
 
-        set_appearance_mode("Dark")
+        if theme == "dark":
+            set_appearance_mode("Dark")
+        else:
+            set_appearance_mode("Light")
         self.accent = "dodgerblue2"
         #self.bind("<Configure>",lambda event:self.mode())
         
@@ -80,8 +85,12 @@ class Today(CTk):
     def widgets(self):
         globalFontName = self.globalFontName
 
-        self.imgBG = getWallpaper.getFromPath(self.imgBGPath,(self.maxdims[0],self.maxdims[1]))
-        self.panelImgBG = CTkLabel(self,text="",image=self.imgBG)
+        self.darkImgBG = getWallpaper.getFromPath(self.darkImgBGPath,(self.maxdims[0],self.maxdims[1]))
+        self.lightImgBG = getWallpaper.getFromPath(self.lightImgBGPath,(self.maxdims[0],self.maxdims[1]))
+        if self.theme == "dark":
+            self.panelImgBG = CTkLabel(self,text="",image=self.darkImgBG)
+        else:
+            self.panelImgBG = CTkLabel(self,text="",image=self.lightImgBG)
         self.frameToday = CTkFrame(self,width=1400,height=800,fg_color=("white","gray9"),border_color="gray7",border_width=5,corner_radius=20)
 
         self.lblDate = CTkLabel(self.frameToday,text=self.todaysDate,font=(globalFontName,30))
@@ -365,4 +374,4 @@ class Today(CTk):
      
 
 
-today = Today(email="amoghg75@yahoo.com",imgBGPath="wallpapers//wallpaper1.png",userPath="users//amoghg75@yahoo.com")
+today = Today(email="omar@gmail.com",imgBGPath="wallpapers//wallpaper1.png",userPath="users//omar@gmail.com",theme="dark")

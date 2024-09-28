@@ -1,1 +1,53 @@
-{"shared": "no", "tasks": {"ucyitN": {"title": "Walk to school", "date": "07/09/2024", "taskID": "ucyitN", "completed": "True", "time": "", "priority": ""}, "BJnQmN": {"title": "hello", "date": "", "taskID": "BJnQmN", "completed": "True", "time": "", "priority": ""}, "uTAXcE": {"title": "bonjour", "date": "", "taskID": "uTAXcE", "completed": "True", "time": "", "priority": ""}}}
+{
+  "shared": "no",
+  "tasks": {
+    "ucyitN": {
+      "title": "Walk to school",
+      "date": "07/09/2024",
+      "taskID": "ucyitN",
+      "completed": "True",
+      "time": "",
+      "priority": ""
+    },
+    "BJnQmN": {
+      "title": "hello",
+      "date": "",
+      "taskID": "BJnQmN",
+      "completed": "True",
+      "time": "",
+      "priority": ""
+    },
+    "uTAXcE": {
+      "title": "bonjour",
+      "date": "",
+      "taskID": "uTAXcE",
+      "completed": "True",
+      "time": "",
+      "priority": ""
+    },
+    "tEdOdg": {
+      "title": "asdasd",
+      "date": "",
+      "taskID": "tEdOdg",
+      "completed": "True",
+      "time": "",
+      "priority": ""
+    },
+    "SKpzsS": {
+      "title": "Walk to school",
+      "date": "",
+      "taskID": "SKpzsS",
+      "completed": "True",
+      "time": "",
+      "priority": ""
+    },
+    "ChtJfL": {
+      "title": "walk to school",
+      "date": "27/09/2024",
+      "taskID": "ChtJfL",
+      "completed": "True",
+      "time": "",
+      "priority": ""
+    }
+  }
+}
