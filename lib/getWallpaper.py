@@ -6,9 +6,11 @@ from PIL import Image
 def getRandom(dimensions:tuple):
     darkWallpapers = glob("wallpapers//dark*.png")
     darkPath = choice(darkWallpapers)
+    print(darkPath)
 
     lightWallpapers = glob("wallpapers//light*.png")
     lightPath = choice(lightWallpapers)
+    print(lightPath)
     
     darkWallpaperImg = CTkImage(Image.open(darkPath),size=dimensions)
     lightWallpaperImg = CTkImage(Image.open(lightPath),size=dimensions)

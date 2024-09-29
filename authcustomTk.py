@@ -57,7 +57,7 @@ class Auth(CTk):
         self.darkImgBG,self.lightImgBG,self.darkImgBGPath,self.lightImgBGPath = getWallpaper((1280,800))
         
         self.panelImgBG = CTkLabel(self,text="",image=self.darkImgBG)
-        self.frameLogin = CTkFrame(self,width=575,height=570,corner_radius=20,border_color="gray7",border_width=5,fg_color=("#daeff6","#171616"))
+        self.frameLogin = CTkFrame(self,width=575,height=570,corner_radius=20,border_color="gray7",border_width=5,fg_color=("white","#171616"))
         
 
         self.imgMode = CTkImage(light_image=Image.open("logo//moon.png"),dark_image=Image.open("logo//sun.png"),size=(35,35))
@@ -125,11 +125,13 @@ class Auth(CTk):
         if get_appearance_mode() == "Light":
             self.theme = "dark"
             set_appearance_mode("Dark")
+            self.panelImgBG.configure(image=self.darkImgBG)
             self.btnMode.configure(fg_color="#252425")
             self.globalColour = "white"
         else:
             self.theme = "light"
             set_appearance_mode("Light")
+            self.panelImgBG.configure(image=self.lightImgBG)
             self.btnMode.configure(fg_color="#eaeaeb")
             self.globalColour = "black"
     
