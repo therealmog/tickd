@@ -35,6 +35,8 @@ class Auth(CTk):
 
         self.loggedIn = False
 
+        
+
         self.widgets()
         self.placeWidgets()
         self.checkRememberMe()
@@ -55,7 +57,7 @@ class Auth(CTk):
         buttonFont = self.buttonFont
 
         self.darkImgBG,self.lightImgBG,self.darkImgBGPath,self.lightImgBGPath = getWallpaper((1280,800))
-        
+        self.imgBGPath = self.darkImgBGPath # Can be changed in changeMode() function - to be passed into next window (register or main display)
         self.panelImgBG = CTkLabel(self,text="",image=self.darkImgBG)
         self.frameLogin = CTkFrame(self,width=575,height=570,corner_radius=20,border_color="gray7",border_width=5,fg_color=("white","#171616"))
         
@@ -126,12 +128,14 @@ class Auth(CTk):
             self.theme = "dark"
             set_appearance_mode("Dark")
             self.panelImgBG.configure(image=self.darkImgBG)
+            self.imgBGPath = self.darkImgBGPath
             self.btnMode.configure(fg_color="#252425")
             self.globalColour = "white"
         else:
             self.theme = "light"
             set_appearance_mode("Light")
             self.panelImgBG.configure(image=self.lightImgBG)
+            self.imgBGPath = self.lightImgBGPath
             self.btnMode.configure(fg_color="#eaeaeb")
             self.globalColour = "black"
     
@@ -191,6 +195,9 @@ class Auth(CTk):
         lblMessage = self.lblMessage
         btnRegister = self.btnRegister
         fontSize = 25
+
+        if colour == "white" or colour == "black":
+            colour = ("black","white")
 
         if "\n" in message:
             splitMsg = message.split("\n")
@@ -333,10 +340,12 @@ class Auth(CTk):
     def createRegisterWindow(self):
         if self.registerWinOpen:
             self.setMessage("Register window already active.","white")
-            self.after(2000,lambda: Register.grabWin)
         else:
             self.registerWinOpen = True
-            self.registerWindow = Register(self.imgBGPath,self.accent)
+            self.registerWindow = Register()
+            self.registerWindow.initialise(self.imgBGPath,self.accent,origin=self)
+            self.registerWinOpen = False
+
         
         
         """if self.registerWindow.state() == "normal":

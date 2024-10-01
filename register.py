@@ -6,7 +6,8 @@ import json
 from lib.createUserFolder import createUserFolder
 
 class Register(CTkToplevel):
-    def __init__(self,imgBGPath=None,accent="dodgerblue2"):
+    # This class doesn't have an __init__ function, to allow it to be stored in the Auth window.
+    def initialise(self,imgBGPath=None,accent="dodgerblue2",origin=None):
         super().__init__()
         self.geometry("650x600")
         self.maxdims = [650,600]
@@ -14,6 +15,11 @@ class Register(CTkToplevel):
         self.minsize(self.maxdims[0],self.maxdims[1])
         self.maxsize(self.maxdims[0],self.maxdims[1])
         self.title("Register - Tickd")
+        
+        self.origin = origin
+        # This is to access the attributes of the Auth window class.
+
+        self.protocol("WM_DELETE_WINDOW",lambda:self.close_window())
 
         set_appearance_mode("dark")
 
@@ -21,6 +27,7 @@ class Register(CTkToplevel):
         self.imgBGPath = imgBGPath
         self.accent = accent
 
+        
         self.widgets()
         self.placeWidgets()
 
@@ -38,6 +45,10 @@ class Register(CTkToplevel):
         
 
         self.mainloop()
+
+    def close_window(self):
+        self.origin.registerWinOpen = False
+        self.destroy()
 
     def widgets(self):
         globalFontName = "Bahnschrift"
@@ -71,7 +82,7 @@ class Register(CTkToplevel):
         self.messageVar.set("hello")
         self.lblMessage = CTkLabel(self.frameRegister,textvariable=self.messageVar,font=(globalFontName,25))
 
-        self.btnCancel = CTkButton(self.frameRegister,text="cancel",font=(globalFontName,30),corner_radius=15,hover_color="red",text_color="white",border_color=("black","gray12"),fg_color=self.accent,border_width=2,command=self.destroy)
+        self.btnCancel = CTkButton(self.frameRegister,text="cancel",font=(globalFontName,30),corner_radius=15,hover_color="red",text_color="white",border_color=("black","gray12"),fg_color=self.accent,border_width=2,command=self.close_window)
 
     def placeWidgets(self):
         self.panelImgBG.place(x=0,y=0)
