@@ -26,9 +26,10 @@ class Today(CTk):
         
         super().__init__()
         
-        self.geometry("1600x900")
-        #self.minsize(1600,900)
+        self.geometry(f"{self.winfo_screenwidth()}x{self.winfo_screenheight()}")
+        self.minsize(850,900)
         
+        print(self.winfo_screenwidth(),"by",self.winfo_screenheight())
 
         self.maxdims = [1920,1080]
         self.maxsize(self.maxdims[0],self.maxdims[1])
@@ -57,7 +58,7 @@ class Today(CTk):
         #self.bind("<Configure>",lambda event:self.mode())
         
 
-        deactivate_automatic_dpi_awareness()
+        #deactivate_automatic_dpi_awareness()
 
         self.elements = {
             
@@ -79,6 +80,8 @@ class Today(CTk):
         self.checkUserName()
 
         self.loadTasks()
+
+        self.bind("<Configure>",lambda event:self.resizeFrame())
         self.mainloop()
 
     #------------------------# Widgets and placing #-------------------------#    
@@ -91,16 +94,18 @@ class Today(CTk):
             self.panelImgBG = CTkLabel(self,text="",image=self.darkImgBG)
         else:
             self.panelImgBG = CTkLabel(self,text="",image=self.lightImgBG)
-        self.frameToday = CTkFrame(self,width=1400,height=800,fg_color=("white","gray9"),border_color="gray7",border_width=5,corner_radius=20)
+        
+        frameX,frameY = self.frameDimensions()
+        self.frameToday = CTkFrame(self,width=frameX,height=frameY,fg_color=("white","gray9"),border_color="gray7",border_width=5,corner_radius=20)
 
         self.lblDate = CTkLabel(self.frameToday,text=self.todaysDate,font=(globalFontName,30))
         
         self.textVar = StringVar()
         self.textVar.set(f"Welcome, {self.userName}!")
-        self.lblWelcome = CTkLabel(self.frameToday,textvariable=self.textVar,font=(globalFontName,20))
-        self.imgLogo = CTkImage(light_image=Image.open("logo//whiteBGLogo.png"),dark_image=Image.open("logo//blackBGLogo.png"),size=(165,53)) 
+        self.lblWelcome = CTkLabel(self.frameToday,textvariable=self.textVar,font=(globalFontName,18))
+        self.imgLogo = CTkImage(light_image=Image.open("logo//whiteBGLogo.png"),dark_image=Image.open("logo//blackBGLogo.png"),size=(155,49)) 
         self.logoPanel = CTkLabel(self.frameToday,text="",image=self.imgLogo)
-        self.entryTask = CTkEntry(self.frameToday,placeholder_text="Enter a task...",font=(globalFontName,30),width=650,corner_radius=20)
+        self.entryTask = CTkEntry(self.frameToday,placeholder_text="Enter a task...",font=(globalFontName,30),width=550,corner_radius=20)
         
         
         self.messageVar = StringVar()
@@ -112,7 +117,7 @@ class Today(CTk):
 
         self.entryDate = CTkEntry(self.frameToday,placeholder_text="date",font=(globalFontName,22),corner_radius=20,border_width=0)
         self.entryTime = CTkEntry(self.frameToday,placeholder_text="time",font=(globalFontName,22),corner_radius=20,border_width=0)
-        self.dropdownPriority = CTkOptionMenu(self.frameToday,values=["priority","P1","P2","P3"],font=(globalFontName,22),dropdown_font=(globalFontName,20),corner_radius=20,fg_color="#353639",button_color="#353639",text_color=self.textgrey,command=self.priorityCallback)
+        self.dropdownPriority = CTkOptionMenu(self.frameToday,values=["priority","P1","P2","P3"],font=(globalFontName,22),dropdown_font=(globalFontName,20),corner_radius=20,fg_color=("#f9f9fa","#353639"),button_color=("#f9f9fa","#353639"),text_color=self.textgrey,command=self.priorityCallback)
         self.btnTaskSubmit = SubmitButton(self.frameToday,colour=self.accent,buttonSize=(35,35),command=self.taskSubmitted,radius=60)
         
         self.lblNoTasks = CTkLabel(self.frameToday,text="You have no tasks.",font=(globalFontName,40))
@@ -123,37 +128,48 @@ class Today(CTk):
         self.frameToday.place(relx=0.5,rely=0.5,anchor="center")
         self.panelImgBG.place(x=0,y=0)
         
-        self.lblDate.place(x=25,y=25)
-        self.lblWelcome.place(in_=self.lblDate,x=0,y=40)
-        self.logoPanel.place(relx=0.87,y=20)
-        self.entryTask.place(in_=self.lblDate,x=450,y=10)
+        self.lblDate.place(x=25,y=50)
+        self.lblWelcome.place(in_=self.lblDate,x=0,y=-30)
+        self.logoPanel.place(relx=0.98,y=40,anchor=E)
+        self.entryTask.place(in_=self.lblDate,x=450,y=-20)
 
         self.currentAttribute = ""
 
-    def removeIfCompleted(self):
-        for each in self.taskList:
-            each.place_forget()
-            if each.attributes["completed"] == "True":
-                self.taskList.remove(each)
+    def frameDimensions(self):
+        frameX = 0.68 * self.winfo_screenwidth()
+        frameY = 0.68 * self.winfo_screenheight()
+
+        return frameX, frameY
         
-        if len(self.taskList) != 0:
-            self.taskList[0].place(in_=self.lblWelcome,y=150)
-            for each in range(1,len(self.taskList)): # Starts with second item
-                self.taskList[each].place(in_=self.taskList[each-1],y=75)
-        else:
-            self.lblNoTasks.place(in_=self.lblWelcome,y=150)
+    def resizeFrame(self):
+        #print(self.winfo_width(),"by",self.winfo_height())
+        frameX = 0.68 * self.winfo_width()
+        frameY = 0.68 * self.winfo_height()
+        self.frameToday.configure(width=frameX,height=frameY)
+        #self.panelImgBG._image
+
+        if self.winfo_width() < 1505:
+            self.entryTask.place_forget()
         
+        if self.winfo_width() > 1505:
+            self.entryTask.place(in_=self.logoPanel,x=-650,y=10)
 
     def loadTasks(self):
+        """try:
+            for each in self.taskList:
+                each.place_forget()
+        except:
+            pass"""
+        
         self.taskList = getTasks(self.frameToday,self.userPath,"inbox",self.accent,command=self.taskCompleted)
         
         if self.taskList != False:
             self.lblNoTasks.place_forget()
-            self.taskList[0].place(in_=self.lblWelcome,y=150)
+            self.taskList[0].place(x=25,y=150)
             for each in range(1,len(self.taskList)): # Starts with second item
                 self.taskList[each].place(in_=self.taskList[each-1],y=75)
         else:
-            self.lblNoTasks.place(in_=self.lblWelcome,y=150)
+            self.lblNoTasks.place(x=25,y=150)
     
             
         
@@ -222,10 +238,40 @@ class Today(CTk):
                     self.resetEntry(["entryTask","entryDate","entryTime","dropdownPriority"])
 
                     uploadTask(self.userPath,taskDict,listName="inbox")
-                    
-                    self.loadTasks()
+                    self.placeNewTask(taskDict)
+
+                    print([x.attributes["title"] for x in self.taskList])
+
+    def placeNewTask(self,taskDict):
+        newTask = Task(self.frameToday,taskDict,self.accent,command=self.taskCompleted)
+        
+        if self.taskList == False:
+            self.lblNoTasks.place_forget()
+            self.taskList = []
+            newTask.place(x=25,y=150)
+        else:
+            newTask.place(in_=self.taskList[-1],y=75)
+        self.taskList.append(newTask)
+        
+
+
+    def ataskCompleted(self,taskID):
+        for each in self.taskList:
+            print(each.attributes["title"])
+            each.place_forget()
+        print(self.taskList)
+    
 
     def taskCompleted(self,taskID):
+        """print(self.taskList)
+        listTitles = [x.attributes["title"] for x in self.taskList]
+        print(listTitles)"""
+        if len(self.taskList) != 0:
+            for each in self.taskList:
+                each.place_forget()
+                if each.attributes["taskID"] == taskID:
+                    self.taskList.remove(each)
+
         taskList = loadTaskList(self.userPath,"inbox")
         allTasksDict = taskList["tasks"]
         
@@ -235,16 +281,45 @@ class Today(CTk):
                 taskDict = allTasksDict[each]
 
         taskDict["completed"] = "True"
-        
-
-        for each in self.taskList:
-            if each.attributes["taskID"] == taskID:
-                each.attributes["completed"] = "True"
 
         uploadTask(self.userPath,taskDict,listName="inbox")
+        
+        self.loadTasks()
+        """for each in self.taskList:
+            if each.attributes["taskID"] == taskID:
+                each.attributes["completed"] = "True"
+                
         self.removeIfCompleted()
 
+        print(self.taskList)"""
+        
 
+    def removeIfCompleted(self):
+        for each in self.taskList:
+            if each.attributes["completed"] == "True":
+                each.place_forget()
+                self.taskList.remove(each)
+        
+        if len(self.taskList) == 0:
+            self.lblNoTasks.place(in_=self.lblDate,y=150)
+        else:
+            self.placeTasks()
+
+    def placeTasks(self):
+        self.taskList[0].place(x=25,y=150)
+        if len(self.taskList)>1:
+            for i in range(1,len(self.taskList)):
+                self.taskList[i].place(in_=self.taskList[i-1],y=75)
+
+        """try:
+            for each in self.taskList:
+                each.place_forget()
+            
+            
+        except IndexError:
+            print("list is empty!")"""
+        
+        
 
 
     def taskEntryClickedWhileDisabled(self,reason):
@@ -257,11 +332,11 @@ class Today(CTk):
         if self.dropdownPriority.get() == "priority":
             self.dropdownPriority.configure(text_color="#9e9f9f")
         else:
-            self.dropdownPriority.configure(text_color="white")
+            self.dropdownPriority.configure(text_color=("black","white"))
 
 
     def placeAttributeEntries(self):
-        self.btnTaskSubmit.place(in_=self.entryTask,x=655)
+        self.btnTaskSubmit.place(in_=self.entryTask,x=555)
         self.btnTaskSubmit.bind("<Return>",self.taskSubmitted)
 
         entries = [self.entryDate,self.entryTime,self.dropdownPriority]
@@ -374,4 +449,4 @@ class Today(CTk):
      
 
 
-today = Today(email="omar@gmail.com",imgBGPath="wallpapers//wallpaper1.png",userPath="users//omar@gmail.com",theme="dark")
+today = Today(email="omar@gmail.com",imgBGPath=["wallpapers//dark1.png","wallpapers//light1.png"],userPath="users//omar@gmail.com",theme="dark")

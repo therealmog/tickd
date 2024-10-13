@@ -201,7 +201,7 @@ class Auth(CTk):
 
         if "\n" in message:
             splitMsg = message.split("\n")
-            msgRef = max(splitMsg)
+            msgRef = min(splitMsg)
         else:
             msgRef = message
         
@@ -320,7 +320,6 @@ class Auth(CTk):
         self.loggedInEmail = ""
         self.clickablesOnOff()
 
-        self.setMessage("This message is ~~thirty chars")
 
     def signIn(self,userDetails):
         self.rememberedEmail = userDetails[0]
@@ -344,7 +343,7 @@ class Auth(CTk):
             self.registerWinOpen = True
             self.registerWindow = Register()
             self.registerWindow.initialise(self.imgBGPath,self.accent,origin=self)
-            self.registerWinOpen = False
+        
 
         
         

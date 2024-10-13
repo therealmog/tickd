@@ -7,7 +7,7 @@ def loadTaskList(userPath,listName):
         try:
             with open(listPath,"r") as f:
                 requestedList = json.load(f)
-            print(requestedList)
+            #print(requestedList)
             return requestedList
                 
         except FileNotFoundError:

@@ -7,7 +7,7 @@ from datetime import date,timedelta
 class Task(CTkFrame):
 
     def __init__(self,master,attributes:dict,accent="dodgerblue2",font="Bahnschrift",size=25,command=None):
-        super().__init__(master=master,width=1300,height=50,fg_color=("white","gray13"),border_color="gray15",border_width=5)
+        super().__init__(master=master,width=400,height=50,fg_color=("white","gray13"),border_color="gray15",border_width=5)
 
         self.font = font
         self.size = size
