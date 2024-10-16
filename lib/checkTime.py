@@ -1,5 +1,8 @@
 
 def checkTime(userInput):
+    userInput = userInput.strip()
+    print(userInput)
+    
     if len(userInput) == 5:
         timeSections = userInput.split(userInput[2])
         if len(timeSections) !=2:

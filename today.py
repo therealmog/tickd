@@ -235,10 +235,12 @@ class Today(CTk):
                     else:
                         attributes["priority"] = ""
                     
-
+                    attributes["description"] = ""
+                    
                     taskDict = createTaskDict(title,date,attributes)
                     self.resetEntry(["entryTask","entryDate","entryTime","dropdownPriority"])
 
+                    
                     uploadTask(self.userPath,taskDict,listName="inbox")
                     self.placeNewTask(taskDict)
 

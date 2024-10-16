@@ -2,6 +2,9 @@
 import datetime
 
 def checkDate(userInput):
+        userInput = userInput.strip()
+        userInput = userInput.lower()
+        print(userInput)
         today = datetime.date.today()
 
 
