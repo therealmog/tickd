@@ -10,6 +10,8 @@ from lib.task import Task
 from lib.loadTaskList import loadTaskList
 from lib.getTasks import getTasks
 from lib.uploadTask import uploadTask
+from lib.updateTaskData import updateTaskData
+from copy import copy
 
 
 from PIL import Image
@@ -27,7 +29,7 @@ class Today(CTk):
         super().__init__()
         
         self.geometry(f"{self.winfo_screenwidth()}x{self.winfo_screenheight()}")
-        self.minsize(850,900)
+        self.minsize(750,800)
         
         print(self.winfo_screenwidth(),"by",self.winfo_screenheight())
 
@@ -143,8 +145,8 @@ class Today(CTk):
         
     def resizeFrame(self):
         #print(self.winfo_width(),"by",self.winfo_height())
-        frameX = 0.68 * self.winfo_width()
-        frameY = 0.68 * self.winfo_height()
+        frameX = 0.78 * self.winfo_width()
+        frameY = 0.78 * self.winfo_height()
         self.frameToday.configure(width=frameX,height=frameY)
         #self.panelImgBG._image
 
@@ -245,7 +247,7 @@ class Today(CTk):
     def placeNewTask(self,taskDict):
         newTask = Task(self.frameToday,taskDict,self.accent,command=self.taskCompleted)
         
-        if self.taskList == False:
+        if self.taskList == False or len(self.taskList) == 0:
             self.lblNoTasks.place_forget()
             self.taskList = []
             newTask.place(x=25,y=150)
@@ -263,35 +265,43 @@ class Today(CTk):
     
 
     def taskCompleted(self,taskID):
-        """print(self.taskList)
-        listTitles = [x.attributes["title"] for x in self.taskList]
-        print(listTitles)"""
-        if len(self.taskList) != 0:
-            for each in self.taskList:
-                each.place_forget()
-                if each.attributes["taskID"] == taskID:
-                    self.taskList.remove(each)
+        taskListData = loadTaskList(self.userPath,"inbox")
 
-        taskList = loadTaskList(self.userPath,"inbox")
-        allTasksDict = taskList["tasks"]
+        allTasksDict = taskListData["tasks"]
+        try:
+            completedTasksDict = taskListData["completed"]
+        except:
+            taskListData["completed"] = {}
+            completedTasksDict = taskListData["completed"]
         
+                
     
-        for each in allTasksDict:
+        for each in allTasksDict.copy():
             if each == taskID: # Dictionary key for each task in allTasksDict is the taskID
                 taskDict = allTasksDict[each]
+                allTasksDict.pop(each)
 
         taskDict["completed"] = "True"
 
-        uploadTask(self.userPath,taskDict,listName="inbox")
+        completedTasksDict[taskID] = taskDict
+
+        taskListData["tasks"] = allTasksDict
+        taskListData["completed"] = completedTasksDict
+
+        updateTaskData(taskListData,self.userPath,"inbox")
+
+
         
-        self.loadTasks()
-        """for each in self.taskList:
+
+        #uploadTask(self.userPath,taskDict,listName="inbox")
+        
+        for each in self.taskList:
             if each.attributes["taskID"] == taskID:
                 each.attributes["completed"] = "True"
                 
         self.removeIfCompleted()
 
-        print(self.taskList)"""
+        #print(self.taskList)
         
 
     def removeIfCompleted(self):
