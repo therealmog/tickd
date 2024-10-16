@@ -21,18 +21,24 @@ class EditingWin(CTkToplevel):
     
     def widgets(self):
         globalFontName = self.fontName
-        titleText = textwrap.fill(f"Change the {self.attributeName} for '{self.taskAttributes["title"]}'")
-        print(titleText)
-        self.lblTitle = CTkLabel(self,text=titleText,font=(globalFontName,20))
+        self.titleText = textwrap.fill(f"Change the {self.attributeName} for '{self.taskAttributes["title"]}'",50)
+        print(self.titleText)
+        self.lblTitle = CTkLabel(self,text=self.titleText,font=(globalFontName,20),anchor=W)
         self.entryAttribute = CTkEntry(self,font=(globalFontName,20),placeholder_text=f"{self.attributeName}")
     
     def placeWidgets(self):
         self.lblTitle.place(x=15,y=25)
-        self.entryAttribute.place(in_=self.lblTitle,y=30)
+        
+        if len(self.titleText) > 50:
+            entryAttrY = 60
+        else:
+            entryAttrY = 30
+
+        self.entryAttribute.place(in_=self.lblTitle,y=entryAttrY)
     
 
 root = CTk()
-myWin = EditingWin("date",{"title":"Do your A Level Maths revision"},"","")
+myWin = EditingWin("date",{"title":"Do your revision"},"","")
 myWin.grab_set()
-#myWin.grab_release()
+root.after(1000,lambda: myWin.grab_release())
 root.mainloop()
