@@ -10,8 +10,9 @@ from lib.task import Task
 from lib.loadTaskList import loadTaskList
 from lib.getTasks import getTasks
 from lib.uploadTask import uploadTask
-from lib.updateTaskData import updateTaskData
+from lib.updateTaskListData import updateTaskListData
 from copy import copy
+from lib.detailsPanel import DetailsPanel
 
 
 from PIL import Image
@@ -124,6 +125,8 @@ class Today(CTk):
         
         self.lblNoTasks = CTkLabel(self.frameToday,text="You have no tasks.",font=(globalFontName,40))
 
+        self.sampleDetailsPanel = DetailsPanel(self.frameToday,{"title": "Welcome!", "date": "16/10/2024", "taskID": "TjAiDX", "completed": "False", "time": "", "priority": "", "description": ""},
+                                               self.taskCompleted,{"taskID":"TjAiDX"})
         self.entries = [self.entryDate,self.dropdownPriority,self.entryTime]
 
     def placeWidgets(self):
@@ -134,6 +137,8 @@ class Today(CTk):
         self.lblWelcome.place(in_=self.lblDate,x=0,y=-30)
         self.logoPanel.place(relx=0.98,y=40,anchor=E)
         self.entryTask.place(in_=self.lblDate,x=450,y=-20)
+
+        #self.sampleDetailsPanel.place(in_=self.entryTask,x=50,y=100)
 
         self.currentAttribute = ""
 
@@ -147,16 +152,26 @@ class Today(CTk):
         #print(self.winfo_width(),"by",self.winfo_height())
         frameX = 0.78 * self.winfo_width()
         frameY = 0.78 * self.winfo_height()
-        self.frameToday.configure(width=frameX,height=frameY)
+
+        try:
+            self.frameToday.configure(width=frameX,height=frameY)
+        except:
+            print("IT doesn't exist")
         #self.panelImgBG._image
 
-        if self.winfo_width() < 1505:
-            self.entryTask.place_forget()
+        try:
+            if self.winfo_width() < 1505:
+                self.entryTask.place_forget()
+        except:
+            print("No entry task.")
         
-        if self.winfo_width() > 1505:
-            self.entryTask.place(in_=self.logoPanel,x=-650,y=10)
+        try:
+            if self.winfo_width() > 1505:
+                self.entryTask.place(in_=self.logoPanel,x=-650,y=10)
+        except:
+            print("No entry task")
 
-    def loadTasks(self):
+    def loadTasks(self): # Should only be run at the start of the program
         """try:
             for each in self.taskList:
                 each.place_forget()
@@ -165,11 +180,25 @@ class Today(CTk):
         
         self.taskList = getTasks(self.frameToday,self.userPath,"inbox",self.accent,command=self.taskCompleted)
         
+        self.detailPanels = {} # taskID:detailPanelObj
+
+
+
         if self.taskList != False:
             self.lblNoTasks.place_forget()
-            self.taskList[0].place(x=25,y=150)
+            self.taskList[0].place(x=25,y=200)
+            
+            taskID = self.taskList[0].attributes["taskID"]
+            self.detailPanels[taskID] = DetailsPanel(self.frameToday,self.taskList[0].attributes,self.taskCompleted,{"taskID":taskID},self.globalFontName,self.accent)
+
             for each in range(1,len(self.taskList)): # Starts with second item
-                self.taskList[each].place(in_=self.taskList[each-1],y=75)
+                task = self.taskList[each]
+                task.place(in_=self.taskList[each-1],y=75)
+                
+                taskID = task.attributes["taskID"]
+                self.detailPanels[taskID] = DetailsPanel(self.frameToday,task.attributes,self.taskCompleted,{"taskID":taskID},self.globalFontName,self.accent)
+                task.bind("<Button-1>",lambda event,taskID=taskID:self.showDetailsPanel(taskID))
+
         else:
             self.lblNoTasks.place(x=25,y=150)
     
@@ -249,22 +278,28 @@ class Today(CTk):
     def placeNewTask(self,taskDict):
         newTask = Task(self.frameToday,taskDict,self.accent,command=self.taskCompleted)
         
-        if self.taskList == False or len(self.taskList) == 0:
+        if bool(self.taskList) == False:
             self.lblNoTasks.place_forget()
             self.taskList = []
-            newTask.place(x=25,y=150)
+            newTask.place(x=25,y=200)
         else:
             newTask.place(in_=self.taskList[-1],y=75)
+
+        taskID = newTask.attributes["taskID"]
+        self.detailPanels[taskID] = DetailsPanel(self.frameToday,newTask.attributes,self.taskCompleted,{"taskID":taskID},self.globalFontName,self.accent)
         self.taskList.append(newTask)
-        
-
-
-    def ataskCompleted(self,taskID):
-        for each in self.taskList:
-            print(each.attributes["title"])
-            each.place_forget()
-        print(self.taskList)
     
+    def showDetailsPanel(self,taskID):
+        print("you clicked me")
+        taskDetailsPanel = self.detailPanels[taskID]
+
+        task = ""
+        for each in self.taskList:
+            if each.attributes["taskID"] == taskID:
+                task = each
+        
+        taskDetailsPanel.place(in_=self.entryTask,x=50,y=150)
+
 
     def taskCompleted(self,taskID):
         taskListData = loadTaskList(self.userPath,"inbox")
@@ -290,7 +325,7 @@ class Today(CTk):
         taskListData["tasks"] = allTasksDict
         taskListData["completed"] = completedTasksDict
 
-        updateTaskData(taskListData,self.userPath,"inbox")
+        updateTaskListData(taskListData,self.userPath,"inbox")
 
 
         
@@ -308,16 +343,19 @@ class Today(CTk):
 
     def removeIfCompleted(self):
         for each in self.taskList:
+            each.place_forget()
             if each.attributes["completed"] == "True":
-                each.place_forget()
                 self.taskList.remove(each)
         
         if len(self.taskList) == 0:
             self.lblNoTasks.place(in_=self.lblDate,y=150)
         else:
+            print(self.taskList)
             self.placeTasks()
 
     def placeTasks(self):
+        print("hello")
+        self.taskList[0].place_forget()
         self.taskList[0].place(x=25,y=150)
         if len(self.taskList)>1:
             for i in range(1,len(self.taskList)):

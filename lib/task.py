@@ -7,7 +7,7 @@ from datetime import date,timedelta
 class Task(CTkFrame):
 
     def __init__(self,master,attributes:dict,accent="dodgerblue2",font="Bahnschrift",size=25,command=None):
-        super().__init__(master=master,width=400,height=50,fg_color=("white","gray13"),border_color="gray15",border_width=5)
+        super().__init__(master=master,width=400,height=50,fg_color=("white","gray13"),border_color="gray15",border_width=5,cursor="hand2")
 
         self.font = font
         self.size = size
@@ -76,7 +76,7 @@ class Task(CTkFrame):
 
     
     def widgets(self):
-        self.lblTitle = CTkLabel(self,text=self.title,font=(self.font,self.size*0.95))
+        self.lblTitle = CTkLabel(self,text=self.title,font=(self.font,self.size*0.95),cursor="hand2")
         self.lblTitle.bind("<Button-1>",lambda event: self.lblTitle.focus())
         self.taskDate = self.getDate()
         self.lblDate = CTkLabel(self,text=self.taskDate,font=(self.font,18*0.95))

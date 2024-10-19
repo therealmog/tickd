@@ -1,11 +1,11 @@
 # Details panel for tasks
 from customtkinter import *
+from lib.checkbox_customTk import Checkbox
 
 
 class DetailsPanel(CTkFrame):
-    def __init__(self,master,taskAttributes,taskButton,fontName="Bahnschrift",accent="dodgerblue2"):
-        super().__init__(master,width=500,height=350,border_width=3,border_color="white")
-        self.option_add("*CTkLabel*text_color","green")
+    def __init__(self,master,taskAttributes,taskButtonCommand,commandArgs,fontName="Bahnschrift",accent="dodgerblue2"):
+        super().__init__(master,width=600,height=350,border_width=3,border_color="white")
 
         self.taskAttributes = taskAttributes
         self.taskName = taskAttributes["title"]
@@ -15,6 +15,9 @@ class DetailsPanel(CTkFrame):
         self.taskID = taskAttributes["taskID"]
         self.fontName = fontName
         self.accent = accent
+
+        self.taskButtonCommand = taskButtonCommand
+        self.commandArgs = commandArgs
 
         try:
             self.taskDescription = taskAttributes["description"]
@@ -34,6 +37,7 @@ class DetailsPanel(CTkFrame):
         
         self.checkTitleLength()
         
+        self.taskButton = self.getTaskButton()
         self.lblDate = CTkLabel(self,text=self.taskDate,font=(globalFontName,20),cursor="hand2")
         self.lblTime = CTkLabel(self,text=self.taskTime,font=(globalFontName,20),cursor="hand2")
         self.lblDescription = CTkLabel(self,text="description:",font=(globalFontName,20))
@@ -54,7 +58,12 @@ class DetailsPanel(CTkFrame):
         self.lblTime.place(in_=self.lblDate,x=12*(len(self.lblDate.cget("text"))))
         self.lblDescription.place(x=25,y=100)
         self.entryDescription.place(in_=self.lblDescription,y=30)
-        
+        self.taskButton.placeWidget()
+    
+    def getTaskButton(self):
+        taskButton = Checkbox(self,x=20,y=20,size=(50,50),command=self.taskButtonCommand,commandArgs=self.commandArgs)
+        return taskButton
+
     def checkAttributes(self):
         if self.taskDate == "":
             self.lblDate.configure(text="no date")
@@ -80,37 +89,35 @@ class DetailsPanel(CTkFrame):
     def bindEventListeners(self):
         for each in self.hoverWidgets:
             print(each)
-            widget = self.hoverWidgets[each]
-            widget.bind("<Enter>",lambda event:self.onhover(widget))
-            widget.bind("<Leave>",lambda event:self.onhoverexit(widget))
+            self.hoverWidgets[each].bind("<Enter>",lambda event,widgetName=each:self.onhover(widgetName))
+            self.hoverWidgets[each].bind("<Leave>",lambda event,widgetName=each:self.onhoverexit(widgetName))
 
-    def onhover(self,widget):
-        print("hello?")
+    def onhover(self,widgetName):
+        widget = self.hoverWidgets[widgetName]
         try:
-            font = self.hoverWidgetFonts[widget]
+            widgetFont = self.hoverWidgetFonts[widgetName]
         except:
-            font = widget._font
-            self.hoverWidgetFonts[widget] = font
+            widgetFont = widget._font
+            self.hoverWidgetFonts[widgetName] = widgetFont
         
-        print(font)
-        
-        newFont = (font[0],font[1],"underline")
+        newFont = (widgetFont[0],widgetFont[1],"underline")
         widget.configure(font=newFont,text_color=self.accent)
     
-    def onhoverexit(self,widget):
-        widget.configure(font=self.hoverWidgetFonts[widget])
+    def onhoverexit(self,widgetName):
+        widget = self.hoverWidgets[widgetName]
+        widget.configure(font=self.hoverWidgetFonts[widgetName],text_color="white")
         
     
 
         
     
-root = CTk()
+"""root = CTk()
 root.geometry("1920x1080")
 
 myPanel = DetailsPanel(root,{"title":"Revise","date":"16/10/2024","description":"You have to finish all of your homework first","time":"","priority":"","taskID":"2ks90a"},"hello")
 myPanel.pack()
 
-root.mainloop()
+root.mainloop()"""
         
 
 
