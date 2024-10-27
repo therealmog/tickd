@@ -41,7 +41,7 @@ class DetailsPanel(CTkFrame):
         self.lblDate = CTkLabel(self,text=self.taskDate,font=(globalFontName,20),cursor="hand2")
         self.lblTime = CTkLabel(self,text=self.taskTime,font=(globalFontName,20),cursor="hand2")
         self.lblDescription = CTkLabel(self,text="description:",font=(globalFontName,20))
-        self.entryDescription = CTkTextbox(self,width=450,height=180,font=(globalFontName,20),wrap=WORD,activate_scrollbars=True)
+        self.entryDescription = CTkTextbox(self,width=550,height=180,font=(globalFontName,20),wrap=WORD,activate_scrollbars=True)
         self.entryDescription.insert("1.0",self.taskDescription)
 
         self.checkAttributes()
@@ -51,6 +51,8 @@ class DetailsPanel(CTkFrame):
                         "lblTime":self.lblTime,
                         }
         self.hoverWidgetFonts = {}
+
+        self.btnSaveDescription = CTkButton(self,text="save",font=(globalFontName,25))
 
     def placeWidgets(self):
         self.lblTaskName.place(x=75,y=20)
@@ -106,8 +108,12 @@ class DetailsPanel(CTkFrame):
     def onhoverexit(self,widgetName):
         widget = self.hoverWidgets[widgetName]
         widget.configure(font=self.hoverWidgetFonts[widgetName],text_color="white")
-        
     
+    def descriptionBoxEnter(self):
+        pass
+
+    def descriptionBoxExit(self):
+        pass
 
         
     

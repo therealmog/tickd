@@ -1,7 +1,7 @@
 import json
 from lib.task import Task
 
-def getTasks(master,userPath,listName,accent,command):
+def getTasks(master,userPath,listName,accent,command,fontName="Bahnschrift"):
         path = f"{userPath}//{listName}.json"
         
         with open(path,"r") as f:
@@ -15,7 +15,7 @@ def getTasks(master,userPath,listName,accent,command):
             # Returning a list of task objects
             for each in taskDict:
                 if taskDict[each]["completed"] == "False":
-                    taskObj = Task(master,accent=accent,attributes=taskDict[each],command=command)
+                    taskObj = Task(master,accent=accent,attributes=taskDict[each],font=fontName,command=command)
                     taskList.append(taskObj)
             
 

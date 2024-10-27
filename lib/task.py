@@ -24,7 +24,21 @@ class Task(CTkFrame):
         self.lblTitle.bind("<Enter>",lambda event:self.onmouseEnter())
         self.lblTitle.bind("<Leave>",lambda event:self.onmouseLeave())
 
-        
+    def widgets(self):
+        self.lblTitle = CTkLabel(self,text=self.title,font=(self.font,self.size*0.95),cursor="hand2")
+        self.lblTitle.bind("<Button-1>",lambda event: self.lblTitle.focus())
+        self.taskDate = self.getDate()
+        self.lblDate = CTkLabel(self,text=self.taskDate,font=(self.font,18*0.95))
+
+        self.checkbox = Checkbox(self,x=-35,y=5,size=(self.size,self.size),relWidget=self.lblTitle,command=self.command,commandArgs={"taskID":self.attributes["taskID"]})
+
+    def placeWidgets(self):
+        self.lblTitle.place(x=40,y=5)#This should stay as it is, since it is the frame that will be placed inside the actual app.
+        self.checkbox.placeWidget()
+        if self.lblDate != "":
+            self.configure(height=65)
+            self.lblDate.place(in_=self.lblTitle,x=0,y=25)
+
     def onmouseEnter(self):
         self.lblTitle.configure(text_color=self.accent)
 
@@ -75,20 +89,7 @@ class Task(CTkFrame):
         return taskDate
 
     
-    def widgets(self):
-        self.lblTitle = CTkLabel(self,text=self.title,font=(self.font,self.size*0.95),cursor="hand2")
-        self.lblTitle.bind("<Button-1>",lambda event: self.lblTitle.focus())
-        self.taskDate = self.getDate()
-        self.lblDate = CTkLabel(self,text=self.taskDate,font=(self.font,18*0.95))
-
-        self.checkbox = Checkbox(self,x=-35,y=5,size=(self.size,self.size),relWidget=self.lblTitle,command=self.command,commandArgs={"taskID":self.attributes["taskID"]})
-
-    def placeWidgets(self):
-        self.lblTitle.place(x=40,y=5)#This should stay as it is, since it is the frame that will be placed inside the actual app.
-        self.checkbox.placeWidget()
-        if self.lblDate != "":
-            self.configure(height=65)
-            self.lblDate.place(in_=self.lblTitle,x=0,y=25)
+    
 
 
     

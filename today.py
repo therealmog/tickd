@@ -19,7 +19,7 @@ from PIL import Image
 
 class Today(CTk):
     
-    globalFontName = "Bahnschrift"
+    globalFontName = "Wingdings"
     textgrey="#9e9f9f"
     def __init__(self,email,imgBGPath,userPath,theme):
         """The class object used to generate the Today view, which is the landing page of the app once the user has logged in.
@@ -153,23 +153,14 @@ class Today(CTk):
         frameX = 0.78 * self.winfo_width()
         frameY = 0.78 * self.winfo_height()
 
-        try:
-            self.frameToday.configure(width=frameX,height=frameY)
-        except:
-            print("IT doesn't exist")
+        self.frameToday.configure(width=frameX,height=frameY)
         #self.panelImgBG._image
 
-        try:
-            if self.winfo_width() < 1505:
-                self.entryTask.place_forget()
-        except:
-            print("No entry task.")
+        if self.winfo_width() < 1505:
+            self.entryTask.place_forget()
         
-        try:
-            if self.winfo_width() > 1505:
-                self.entryTask.place(in_=self.logoPanel,x=-650,y=10)
-        except:
-            print("No entry task")
+        if self.winfo_width() > 1505:
+            self.entryTask.place(in_=self.logoPanel,x=-650,y=10)
 
     def loadTasks(self): # Should only be run at the start of the program
         """try:
@@ -178,10 +169,10 @@ class Today(CTk):
         except:
             pass"""
         
-        self.taskList = getTasks(self.frameToday,self.userPath,"inbox",self.accent,command=self.taskCompleted)
+        self.taskList = getTasks(self.frameToday,self.userPath,"inbox",self.accent,command=self.taskCompleted,fontName=self.globalFontName)
         
         self.detailPanels = {} # taskID:detailPanelObj
-
+        self.currentDisplayed = "" # stores taskID of task with details panel displayed.
 
 
         if self.taskList != False:
@@ -189,15 +180,14 @@ class Today(CTk):
             self.taskList[0].place(x=25,y=200)
             
             taskID = self.taskList[0].attributes["taskID"]
-            self.detailPanels[taskID] = DetailsPanel(self.frameToday,self.taskList[0].attributes,self.taskCompleted,{"taskID":taskID},self.globalFontName,self.accent)
+            self.setDetailsPanel(self.taskList[0],taskID)
 
             for each in range(1,len(self.taskList)): # Starts with second item
                 task = self.taskList[each]
                 task.place(in_=self.taskList[each-1],y=75)
                 
                 taskID = task.attributes["taskID"]
-                self.detailPanels[taskID] = DetailsPanel(self.frameToday,task.attributes,self.taskCompleted,{"taskID":taskID},self.globalFontName,self.accent)
-                task.bind("<Button-1>",lambda event,taskID=taskID:self.showDetailsPanel(taskID))
+                self.setDetailsPanel(task,taskID)
 
         else:
             self.lblNoTasks.place(x=25,y=150)
@@ -276,7 +266,7 @@ class Today(CTk):
                     print([x.attributes["title"] for x in self.taskList])
 
     def placeNewTask(self,taskDict):
-        newTask = Task(self.frameToday,taskDict,self.accent,command=self.taskCompleted)
+        newTask = Task(self.frameToday,taskDict,self.accent,command=self.taskCompleted,font=self.globalFontName)
         
         if bool(self.taskList) == False:
             self.lblNoTasks.place_forget()
@@ -286,19 +276,21 @@ class Today(CTk):
             newTask.place(in_=self.taskList[-1],y=75)
 
         taskID = newTask.attributes["taskID"]
-        self.detailPanels[taskID] = DetailsPanel(self.frameToday,newTask.attributes,self.taskCompleted,{"taskID":taskID},self.globalFontName,self.accent)
+        self.setDetailsPanel(newTask,taskID)
         self.taskList.append(newTask)
     
+    def setDetailsPanel(self,task,taskID):
+        self.detailPanels[taskID] = DetailsPanel(self.frameToday,task.attributes,self.taskCompleted,{"taskID":taskID},self.globalFontName,self.accent)
+        task.bind("<Button-1>",lambda event,taskID=taskID:self.showDetailsPanel(taskID))
+
     def showDetailsPanel(self,taskID):
+        if self.currentDisplayed != "":
+            self.detailPanels[self.currentDisplayed].place_forget() # Removes current display panel.
         print("you clicked me")
         taskDetailsPanel = self.detailPanels[taskID]
+        self.currentDisplayed = taskID
 
-        task = ""
-        for each in self.taskList:
-            if each.attributes["taskID"] == taskID:
-                task = each
-        
-        taskDetailsPanel.place(in_=self.entryTask,x=50,y=150)
+        taskDetailsPanel.place(in_=self.entryTask,y=150)
 
 
     def taskCompleted(self,taskID):
@@ -335,7 +327,9 @@ class Today(CTk):
         for each in self.taskList:
             if each.attributes["taskID"] == taskID:
                 each.attributes["completed"] = "True"
-                
+        
+        self.detailPanels[taskID].place_forget()
+        self.detailPanels.pop(taskID)
         self.removeIfCompleted()
 
         #print(self.taskList)
@@ -356,7 +350,7 @@ class Today(CTk):
     def placeTasks(self):
         print("hello")
         self.taskList[0].place_forget()
-        self.taskList[0].place(x=25,y=150)
+        self.taskList[0].place(x=25,y=200)
         if len(self.taskList)>1:
             for i in range(1,len(self.taskList)):
                 self.taskList[i].place(in_=self.taskList[i-1],y=75)
