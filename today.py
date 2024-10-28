@@ -19,9 +19,9 @@ from PIL import Image
 
 class Today(CTk):
     
-    globalFontName = "Wingdings"
+    globalFontName = "Bahnschrift"
     textgrey="#9e9f9f"
-    def __init__(self,email,imgBGPath,userPath,theme):
+    def __init__(self,email,imgBGPath,userPath,theme,listName="inbox"):
         """The class object used to generate the Today view, which is the landing page of the app once the user has logged in.
     
     It should only be declared once in the main function, and then the declared object can be called multiple times."""
@@ -42,6 +42,7 @@ class Today(CTk):
         self.lightImgBGPath = imgBGPath[1]
         self.userPath = userPath
         self.theme = theme
+        self.listName = listName
         
         self.userDetails,self.userIndex = getDetailsIndividual(email)
         try:
@@ -125,8 +126,8 @@ class Today(CTk):
         
         self.lblNoTasks = CTkLabel(self.frameToday,text="You have no tasks.",font=(globalFontName,40))
 
-        self.sampleDetailsPanel = DetailsPanel(self.frameToday,{"title": "Welcome!", "date": "16/10/2024", "taskID": "TjAiDX", "completed": "False", "time": "", "priority": "", "description": ""},
-                                               self.taskCompleted,{"taskID":"TjAiDX"})
+        """self.sampleDetailsPanel = DetailsPanel(self.frameToday,{"title": "Welcome!", "date": "16/10/2024", "taskID": "TjAiDX", "completed": "False", "time": "", "priority": "", "description": ""},
+                                               self.taskCompleted,{"taskID":"TjAiDX"})"""
         self.entries = [self.entryDate,self.dropdownPriority,self.entryTime]
 
     def placeWidgets(self):
@@ -255,6 +256,7 @@ class Today(CTk):
                         attributes["priority"] = ""
                     
                     attributes["description"] = ""
+                    attributes["listName"] = self.listName
                     
                     taskDict = createTaskDict(title,date,attributes)
                     self.resetEntry(["entryTask","entryDate","entryTime","dropdownPriority"])
@@ -280,7 +282,7 @@ class Today(CTk):
         self.taskList.append(newTask)
     
     def setDetailsPanel(self,task,taskID):
-        self.detailPanels[taskID] = DetailsPanel(self.frameToday,task.attributes,self.taskCompleted,{"taskID":taskID},self.globalFontName,self.accent)
+        self.detailPanels[taskID] = DetailsPanel(self.frameToday,self.userPath,task.attributes,self.taskCompleted,{"taskID":taskID},self.globalFontName,self.accent)
         task.bind("<Button-1>",lambda event,taskID=taskID:self.showDetailsPanel(taskID))
 
     def showDetailsPanel(self,taskID):
@@ -330,6 +332,7 @@ class Today(CTk):
         
         self.detailPanels[taskID].place_forget()
         self.detailPanels.pop(taskID)
+        self.currentDisplayed = ""
         self.removeIfCompleted()
 
         #print(self.taskList)
@@ -493,4 +496,4 @@ class Today(CTk):
      
 
 
-today = Today(email="omar@gmail.com",imgBGPath=["wallpapers//dark1.png","wallpapers//light1.png"],userPath="users//omar@gmail.com",theme="dark")
+today = Today(email="omar@gmail.com",imgBGPath=["wallpapers//dark1.png","wallpapers//light1.png"],userPath="users//omar@gmail.com",theme="dark",listName="inbox")
