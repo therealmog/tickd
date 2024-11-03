@@ -5,4 +5,4 @@ def updateTaskListData(updatedList,userPath,listName):
     listPath = f"{userPath}//{listName}.json"
     
     with open(listPath,"w") as f:
-        json.dump(updatedList,f)
+        json.dump(updatedList,f,indent=4)

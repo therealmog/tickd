@@ -3,21 +3,19 @@ from PIL import Image
 from lib import getWallpaper
 from lib.getDetails import getAllDetails
 import json
-from lib.createUserFolder import createUserFolder
-import string
-from random import choice
-import hashlib
+import smtplib,ssl
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
-class Register(CTkToplevel):
-    # This class doesn't have an __init__ function, to allow it to be stored in the Auth window.
-    def initialise(self,imgBGPath=None,accent="dodgerblue2",origin=None):
+class ResetPassword(CTkToplevel):
+    def __init__(self,imgBGPath=None,accent="dodgerblue2",origin=None):
         super().__init__()
-        self.geometry("650x600")
-        self.maxdims = [650,600]
+        self.geometry("650x400")
+        self.maxdims = [650,400]
         self.imagedims = [1280,1080]
         self.minsize(self.maxdims[0],self.maxdims[1])
         self.maxsize(self.maxdims[0],self.maxdims[1])
-        self.title("Register - Tickd")
+        self.title("Reset your password - Tickd")
         
         self.origin = origin
         # This is to access the attributes of the Auth window class.
@@ -43,8 +41,9 @@ class Register(CTkToplevel):
         
 
         self.elements = {"entryEmail":self.entryEmail,
-                         "entryPassword":self.entryPassword,
-                         "entryUsername":self.entryUsername}
+                         "entryPassword":self.entryPassword}
+        
+        
         
 
         self.mainloop()
@@ -58,34 +57,29 @@ class Register(CTkToplevel):
         emojiFont = ("Segoe UI Emoji",30)
 
         if self.imgBGPath == None:
-            self.imgBG,_ = getWallpaper.getRandom((self.imagedims[0],self.imagedims[1]))
+            self.darkImgBG,self.lightImgBG,_,_ = getWallpaper.getRandom((self.imagedims[0],self.imagedims[1]))
         else:
             self.imgBG = getWallpaper.getFromPath(self.imgBGPath,(self.imagedims[0],self.imagedims[1]))
-        self.panelImgBG = CTkLabel(self,text="",image=self.imgBG)
+        self.panelImgBG = CTkLabel(self,text="",image=self.darkImgBG)
 
-        self.frameRegister = CTkFrame(self,width=575,height=500,fg_color=("white","gray9"),border_color="gray7",border_width=5,corner_radius=20)
+        self.frameRegister = CTkFrame(self,width=575,height=350,fg_color=("white","gray9"),border_color="gray7",border_width=5,corner_radius=20)
         self.logoImg = CTkImage(dark_image=Image.open("logo//blackBGLogo.png"),light_image=Image.open("logo//whiteBGLogo.png"),size=(140,45))
         self.panelLogo = CTkLabel(self.frameRegister,text="",image=self.logoImg)
-        self.registerLbl = CTkLabel(self.frameRegister,font=(globalFontName,35),text="Create your account.")
+        self.registerLbl = CTkLabel(self.frameRegister,font=(globalFontName,35),text="Reset your password.")
 
-        self.entryEmail = CTkEntry(self.frameRegister,font=(globalFontName,25),width=400,placeholder_text="email",corner_radius=15)
+        self.entryEmail = CTkEntry(self.frameRegister,font=(globalFontName,25),width=375,placeholder_text="email",corner_radius=15)
         self.entryPassword = CTkEntry(self.frameRegister,font=(globalFontName,25),width=400,placeholder_text="password",show="*",corner_radius=15)
         self.lblEmail = CTkLabel(self.frameRegister,font=emojiFont,text="✉️")
         self.lblPassword = CTkLabel(self.frameRegister,font=emojiFont,text="🔒")
-        self.entryUsername = CTkEntry(self.frameRegister,font=(globalFontName,25),width=400,placeholder_text="username",corner_radius=15)
-        self.lblUsername = CTkLabel(self.frameRegister,font=emojiFont,text="🧑")
 
-        self.imgShowPassword = CTkImage(Image.open("eyeIcon.png"),size=(33,24))
-        self.btnShowPassword = CTkButton(self.frameRegister,image=self.imgShowPassword,text="",width=1,command=self.showHide,corner_radius=15,fg_color=self.accent)
-        self.imgHidePassword = CTkImage(Image.open("eyeIconOff.png"),size=(33,24))
-        self.btnHidePassword = CTkButton(self.frameRegister,image=self.imgHidePassword,text="",width=0,command=self.showHide,corner_radius=15,fg_color=self.accent)
+        self.btnVerify = CTkButton(self.frameRegister,text="verify",width=60,corner_radius=15,fg_color=self.accent,font=(globalFontName,25),command=self.checkEmailFormat)
 
-        self.btnRegister = CTkButton(self.frameRegister,text="register",font=(globalFontName,30),corner_radius=15,text_color="white",border_color=("black","gray12"),fg_color=self.accent,border_width=2,command=self.registerClicked)
+        #self.btnRegister = CTkButton(self.frameRegister,text="register",font=(globalFontName,30),corner_radius=15,text_color="white",border_color=("black","gray12"),fg_color=self.accent,border_width=2,command=self.registerClicked)
         self.messageVar = StringVar()
         self.messageVar.set("hello")
         self.lblMessage = CTkLabel(self.frameRegister,textvariable=self.messageVar,font=(globalFontName,25))
 
-        self.btnCancel = CTkButton(self.frameRegister,text="cancel",font=(globalFontName,30),corner_radius=15,hover_color="red",text_color="white",border_color=("black","gray12"),fg_color=self.accent,border_width=2,command=self.close_window)
+        #self.btnCancel = CTkButton(self.frameRegister,text="cancel",font=(globalFontName,30),corner_radius=15,hover_color="red",text_color="white",border_color=("black","gray12"),fg_color=self.accent,border_width=2,command=self.close_window)
 
     def placeWidgets(self):
         self.panelImgBG.place(x=0,y=0)
@@ -95,27 +89,32 @@ class Register(CTkToplevel):
 
         self.entryEmail.place(x=95,y=150)
         self.lblEmail.place(in_=self.entryEmail,x=-50,y=-3)
-        self.entryPassword.place(in_=self.entryEmail,y=70)
-        self.lblPassword.place(in_=self.entryPassword,x=-50,y=-3)
-        self.entryUsername.place(in_=self.entryPassword,y=70)
-        self.lblUsername.place(in_=self.entryUsername,x=-50,y=-3)
+        """self.entryPassword.place(in_=self.entryEmail,y=70)
+        self.lblPassword.place(in_=self.entryPassword,x=-50,y=-3)"""
 
-        self.btnShowPassword.place(in_=self.entryPassword,x=405,y=2)
-        self.btnRegister.place(in_=self.entryUsername,x=45,y=100)
-        self.btnCancel.place(in_=self.btnRegister,x=145)
+        self.btnVerify.place(in_=self.entryEmail,x=380)
+        #self.btnRegister.place(in_=self.entryEmail,x=45,y=100)
+        #self.btnCancel.place(in_=self.btnRegister,x=145)
 
-        self.setMessage("hello!!","limegreen")
+        self.setMessage("Please enter your email to receive a \n6-digit code.","white")
+        
+    def sendEmail(self,receiverEmail):
+        context = ssl.create_default_context()
+        tickdEmail = "tickd.todolist@gmail.com"
+        message = MIMEMultipart()
+        message["From"] = "Tickd. <tickd.todolist@gmail.com>"
+        message["To"] = receiverEmail
+        message["Subject"] = "Your Tickd security code."
+        msgText = f"<html><body><img src='https://tickd-todo.s3.eu-west-2.amazonaws.com/blackBGLogo.png' width=300><h2>Your security code.</h2><p>Someone or you tried to reset your Tickd password.<br><br>Your security code is</p><h2>{self.code}</h2><br><br><p>Thanks,</p><h3>The Tickd security team.</h3></body></html>"
+        msgObj = MIMEText(msgText,"html")
+        message.attach(msgObj)
+
+        with smtplib.SMTP_SSL("smtp.gmail.com",465,context=context) as server:
+            server.login(tickdEmail,"daxn vysr plkb blnv")
+            server.sendmail(tickdEmail,receiverEmail,message.as_string())
+            print("Message sent!")
         
 
-    def showHide(self):
-        if self.btnShowPassword.winfo_ismapped():
-            self.btnShowPassword.place_forget()
-            self.btnHidePassword.place(in_=self.entryPassword,x=405,y=2)
-            self.entryPassword.configure(show="")
-        else:
-            self.btnHidePassword.place_forget()
-            self.btnShowPassword.place(in_=self.entryPassword,x=405,y=2)
-            self.entryPassword.configure(show="*")
     
     def grabWin(self):
         self.grab_set()
@@ -145,8 +144,7 @@ class Register(CTkToplevel):
                 self.entryEmail.focus_set()
                 self.resetEntry(["entryEmail"])
             else:
-                passwordToStore = self.genHash(password)
-                newDetails = [email,passwordToStore,username]
+                newDetails = [email,password,username]
 
                 
                 details.append(newDetails)
@@ -155,12 +153,11 @@ class Register(CTkToplevel):
                 print(newAuthDetails)
                 
                 with open("authDetails.json","w") as f:
-                    json.dump(newAuthDetails,f,indent=4)
+                    f.write(json.dumps(newAuthDetails))
                 
                 self.resetEntry(["entryEmail","entryPassword"])
                 createUserFolder(userPath=f"users//{email}") # Creates new folder for the new user with one "inbox.json" list
                 self.setMessage("Account successfully created. Please log in.","limegreen")
-                self.after(2000,self.destroy)
         
 
 
@@ -202,23 +199,36 @@ class Register(CTkToplevel):
         
         return emailEmpty, passwordEmpty,usernameEmpty
 
-    def checkEmail(self,email):
+    def checkEmailFormat(self):
+        email = self.entryEmail.get()
         if "@" in email:
             splitEmail = email.split("@")
             if "." in splitEmail[1]:
-                return True
+                emailRegistered = self.checkEmailRegistered(email)
+
+                if emailRegistered:
+                    self.setMessage("Email registered.","limegreen")
+                else:
+                    self.setMessage("Email not registered.","red")
             else:
-                return False
+                self.setMessage("Invalid email entered.","red")
         else:
             self.setMessage("Invalid email entered.","red")
             return False
     
+    def checkEmailRegistered(self,emailToCheck):
+        details,_ = getAllDetails()
+        for detailSet in details:
+            if detailSet[0] == emailToCheck:
+                return True
+        return False
+
+    
     def setMessage(self,message,colour = "white"):
         length = len(message)
         lblMessage = self.lblMessage
-        lblUsername = self.lblUsername
 
-        lblMessage.place(in_=lblUsername,x=25,y=60)
+        lblMessage.place(in_=self.lblEmail,x=40,y=60)
         
         if colour == "black" or colour == "white":
             colour = ("black","white")
@@ -234,33 +244,6 @@ class Register(CTkToplevel):
         
         self.lblEmail.focus_set()
 
-    
-    def genSalt(self):
-        chars = string.ascii_letters + "#£%*!" + "0123456789" # Specifically does not include $ sign.
-        salt = ""
-        for each in range(6):
-            salt+=choice(chars)
-        print(salt)
-
-        return salt
-
-    def genPepper(self):
-        chars = string.ascii_letters
-        pepper = choice(chars)
-
-        return pepper
-    
-    def genHash(self,password):
-        salt = self.genSalt()
-        pepper = self.genPepper()
-
-        passwordToHash = salt + password + pepper
-        hash = hashlib.sha256(passwordToHash.encode()).hexdigest()
-
-        passwordToStore = salt+"$"+hash
-
-        return passwordToStore
-
-#register = Register()
+register = ResetPassword()
         
         

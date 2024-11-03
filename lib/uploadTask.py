@@ -15,4 +15,4 @@ def uploadTask(userPath,taskDict,listName):
         listDict["tasks"][taskID] = taskDict
 
         with open(listPath,"w") as f:
-            json.dump(listDict,f)
+            json.dump(listDict,f,indent=4)

@@ -9,6 +9,7 @@ from lib.getDetails import getAllDetails
 from lib.getWallpaper import getRandom as getWallpaper
 from lib.createUserFolder import createUserFolder
 from register import Register
+from lib.checkWithPepper import checkWithPepper
 
 
 
@@ -255,11 +256,11 @@ class Auth(CTk):
         self.btnConfirm.place_forget()
 
         email = self.entryEmail.get()
-        password = self.entryPassword.get()
+        passwordTxt = self.entryPassword.get()
         
         details,_ = getAllDetails()
         
-        emailEmpty, passwordEmpty = self.checkEmpty(email, password)
+        emailEmpty, passwordEmpty = self.checkEmpty(email, passwordTxt)
         emailValid = self.checkEmail(email)
         found,self.userDetails = self.checkDetailsFound(email,details)
         
@@ -278,9 +279,12 @@ class Auth(CTk):
                 self.setMessage("Please enter a valid email.",self.globalColour)
                 self.resetEntry(["entryPassword","entryEmail"])
             else:
-                correctPassword = self.userDetails[1]
-            
-                if password == correctPassword:
+                correctPasswordTxt = self.userDetails[1]
+                correctPWSplit = correctPasswordTxt.split("$")
+                passwordWithSalt = correctPWSplit[0]+passwordTxt
+                correct = checkWithPepper(passwordWithSalt,correctPWSplit[1])             
+
+                if correct:
                     self.resetEntry(["entryEmail","entryPassword"])
                     
                     self.userLoginSequence()
@@ -313,7 +317,6 @@ class Auth(CTk):
     
     def rememberMeDeniedClicked(self):
         self.lblMessage.place_forget()
-        self.btnConfirm.configure(command=self.btnRegisterConfirmClicked)
         self.btnConfirm.place_forget()
         self.btnDeny.place_forget()
 
@@ -360,52 +363,7 @@ class Auth(CTk):
            
 
 
-    def registerClicked(self):
-        setMessage = self.setMessage
-
-        self.checkboxRememberMe.disableClicks()
-        self.btnConfirm.place_forget()
-        newEmail = self.entryEmail.get()
-        newPassword = self.entryPassword.get()
-
-        details,_ = getAllDetails()
-        found,_ = self.checkDetailsFound(newEmail,details)
-        emailEmpty,passwordEmpty = self.checkEmpty(newEmail,newPassword)
-        emailValid = self.checkEmail(newEmail)
-
-        if found:
-            setMessage("Email already registered with another account","black")
-        elif emailEmpty:
-            setMessage("Please enter the email you would like to register with.","black")
-        elif passwordEmpty:
-            setMessage("Please enter a password to use with this account.","black")
-        elif not emailValid:
-            setMessage("Please enter a valid email.","black")
-        else:
-            setMessage("Would you like to register a new account with these details?","black")
-            self.btnConfirm.configure(command=self.btnRegisterConfirmClicked)
-            self.btnConfirm.place(in_=self.btnRegister,x=75,y=150)
-
-    def btnRegisterConfirmClicked(self):
-        self.btnConfirm.place_forget()
-        newEmail = self.entryEmail.get()
-        newPassword = self.entryPassword.get()
-
-        newDetails = [newEmail,newPassword,""]
-
-        details,rememberMeIndex = getAllDetails()
-        details.append(newDetails)
-        newAuthDetails = {"details":details,"rememberMe":rememberMeIndex}
-
-        print(newAuthDetails)
-        
-        with open("authDetails.json","w") as f:
-            f.write(json.dumps(newAuthDetails))
-        
-        self.resetEntry(["entryEmail","entryPassword"])
-        createUserFolder(userPath=f"users//{newEmail}") # Creates new folder for the new user with one "inbox.json" list
-        self.setMessage("Account successfully created. Please log in.","limegreen")
-        self.checkboxRememberMe.enableClicks()
+    
 
 
     def userLoginSequence(self):
@@ -419,7 +377,7 @@ class Auth(CTk):
 
         newAuthDetails = {"details":details,"rememberMe":userDetailsIndex}
         with open("authDetails.json","w") as f:
-            f.write(json.dumps(newAuthDetails))
+            json.dump(newAuthDetails,f,indent=4)
         
         self.loggedIn = True
     

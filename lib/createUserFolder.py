@@ -6,5 +6,5 @@ def createUserFolder(userPath):
 
     os.makedirs(userPath)
     with open(newListPath,"a") as f:
-        json.dump({"shared":"no",},f) # First set attribute
+        json.dump({"shared":"no",},f,indent=4) # First set attribute
         
