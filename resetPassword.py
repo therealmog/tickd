@@ -51,6 +51,7 @@ class ResetPassword(CTkToplevel):
 
     def close_window(self):
         self.origin.resetWinOpen = False
+        self.origin.setMessage("","white")
         self.destroy()
 
     def widgets(self):
@@ -59,9 +60,13 @@ class ResetPassword(CTkToplevel):
 
         if self.imgBGPath == None:
             self.darkImgBG,self.lightImgBG,_,_ = getWallpaper.getRandom((self.imagedims[0],self.imagedims[1]))
+            if get_appearance_mode() == "dark":
+                self.imgBG = self.darkImgBG
+            else:
+                self.imgBG = self.lightImgBG
         else:
             self.imgBG = getWallpaper.getFromPath(self.imgBGPath,(self.imagedims[0],self.imagedims[1]))
-        self.panelImgBG = CTkLabel(self,text="",image=self.darkImgBG)
+        self.panelImgBG = CTkLabel(self,text="",image=self.imgBG)
 
         self.frameRegister = CTkFrame(self,width=575,height=350,fg_color=("white","gray9"),border_color="gray7",border_width=5,corner_radius=20)
         self.logoImg = CTkImage(dark_image=Image.open("logo//blackBGLogo.png"),light_image=Image.open("logo//whiteBGLogo.png"),size=(140,45))
@@ -123,11 +128,11 @@ class ResetPassword(CTkToplevel):
     def showHide(self):
         if self.btnShowPassword.winfo_ismapped():
             self.btnShowPassword.place_forget()
-            self.btnHidePassword.place(in_=self.entryPassword,x=405,y=2)
+            self.btnHidePassword.place(in_=self.entryPassword,x=385,y=2)
             self.entryPassword.configure(show="")
         else:
             self.btnHidePassword.place_forget()
-            self.btnShowPassword.place(in_=self.entryPassword,x=405,y=2)
+            self.btnShowPassword.place(in_=self.entryPassword,x=385,y=2)
             self.entryPassword.configure(show="*")
     
     def grabWin(self):
@@ -168,7 +173,7 @@ class ResetPassword(CTkToplevel):
             
             self.resetEntry(["entryPassword"])
             self.setMessage("Password successfully reset. Please log in.","limegreen")
-            self.close_window()
+            self.after(2000,self.close_window)
         
 
 
@@ -210,6 +215,7 @@ class ResetPassword(CTkToplevel):
                     self.btnVerify.place(in_=self.entryCode,x=155)
                     self.code = self.genCode()
                     self.sendEmail(self.email)
+                    
 
 
                 else:
@@ -237,8 +243,8 @@ class ResetPassword(CTkToplevel):
             self.entryCode.place_forget()
             self.entryPassword.place(x=95,y=150)
             self.lblEntry.place(in_=self.entryPassword,x=-50,y=-3)
-            self.btnReset.place(in_=self.entryPassword,x=125,y=100)
-            self.btnShowPassword.place(in_=self.entryPassword,x=405,y=2)
+            self.btnReset.place(in_=self.entryPassword,x=125,y=125)
+            self.btnShowPassword.place(in_=self.entryPassword,x=385,y=2)
         else:
             self.setMessage("Incorrect code entered.","red")
     
@@ -262,6 +268,6 @@ class ResetPassword(CTkToplevel):
         
         self.lblEntry.focus_set()
 
-register = ResetPassword()
+#register = ResetPassword()
         
         

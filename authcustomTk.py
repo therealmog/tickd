@@ -10,6 +10,7 @@ from lib.getWallpaper import getRandom as getWallpaper
 from lib.createUserFolder import createUserFolder
 from register import Register
 from lib.checkWithPepper import checkWithPepper
+from resetPassword import ResetPassword
 
 
 
@@ -47,6 +48,7 @@ class Auth(CTk):
         print(self.btnRegister.cget("state"))
 
         self.registerWinOpen = False
+        self.resetWinOpen = False
         self.theme = "dark"
         self.mainloop()
         
@@ -90,11 +92,13 @@ class Auth(CTk):
         self.lblMessage = CTkLabel(self.frameLogin,font=(globalFontName,30),textvariable=self.messageVar)
         
 
-        self.lblRememberMe = CTkLabel(self.frameLogin,text="Remember me",font=(globalFontName,25),text_color=self.globalColour,cursor="hand2")
+        self.lblRememberMe = CTkLabel(self.frameLogin,text="remember me",font=(globalFontName,25),text_color=self.globalColour,cursor="hand2")
         self.lblRememberMe.bind("<Button-1>",lambda event: self.checkboxRememberMe.boxClicked(event))
 
-        
-        
+        self.lblForgotPassword = CTkLabel(self.frameLogin,font=(globalFontName,22),text="forgot your password?",cursor="hand2")
+        self.lblForgotPassword.bind("<Enter>",lambda event: self.forgotLblEnter())
+        self.lblForgotPassword.bind("<Leave>",lambda event: self.forgotLblLeave())
+        self.lblForgotPassword.bind("<Button-1>",lambda event: self.createResetWindow())
         
         self.elements = {
             "lblEmail":self.lblEmail,
@@ -123,6 +127,8 @@ class Auth(CTk):
         self.btnSignIn.place(in_=self.btnRegister,x=150)
         self.checkboxRememberMe.placeWidget()
         self.lblRememberMe.place(in_=self.entryPassword,x=40,y=52)
+        self.lblForgotPassword.place(in_=self.entryPassword,x=70,y=200)
+        
         
     def changeMode(self):
         if get_appearance_mode() == "Light":
@@ -140,6 +146,20 @@ class Auth(CTk):
             self.btnMode.configure(fg_color="#eaeaeb")
             self.globalColour = "black"
     
+    def forgotLblEnter(self):
+        self.hoverOriginalFont = self.lblForgotPassword._font
+        newFont = (self.hoverOriginalFont[0],self.hoverOriginalFont[1],"underline")
+        self.lblForgotPassword.configure(font=newFont,text_color=self.accent)
+    
+    def forgotLblLeave(self):
+        self.lblForgotPassword.configure(font=self.hoverOriginalFont,text_color=("black","white"))
+
+    def createResetWindow(self):
+        if self.resetWinOpen:
+            self.setMessage("Reset password window already active.")
+        else:
+            self.resetWinOpen = True
+            self.resetWin = ResetPassword(self.imgBGPath,self.accent,origin=self)
 
     def showHide(self):
         if self.btnShowPassword.winfo_ismapped():
@@ -307,6 +327,7 @@ class Auth(CTk):
             else:
                 clickable.configure(state="normal")
 
+    
 
     def rememberMeConfirmClicked(self):
         self.loggedInEmail = self.rememberedEmail
