@@ -133,7 +133,7 @@ class DetailsPanel(CTkFrame):
         listName = self.taskAttributes["listName"]
         uploadTask(self.userPath,self.taskAttributes,listName)
         print(newDescription)
-        self.lblSave.place(in_=self.btnSaveDescription,x=-60)
+        self.lblSave.place(in_=self.btnSaveDescription,x=-500)
         self.after(1000,self.lblSave.place_forget)
 
 

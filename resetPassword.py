@@ -6,6 +6,8 @@ import json
 import smtplib,ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from random import randint
+from lib.genHash import genHash
 
 class ResetPassword(CTkToplevel):
     def __init__(self,imgBGPath=None,accent="dodgerblue2",origin=None):
@@ -41,15 +43,14 @@ class ResetPassword(CTkToplevel):
         
 
         self.elements = {"entryEmail":self.entryEmail,
+                         "entryCode":self.entryCode,
                          "entryPassword":self.entryPassword}
-        
-        
-        
+      
 
         self.mainloop()
 
     def close_window(self):
-        self.origin.registerWinOpen = False
+        self.origin.resetWinOpen = False
         self.destroy()
 
     def widgets(self):
@@ -65,16 +66,21 @@ class ResetPassword(CTkToplevel):
         self.frameRegister = CTkFrame(self,width=575,height=350,fg_color=("white","gray9"),border_color="gray7",border_width=5,corner_radius=20)
         self.logoImg = CTkImage(dark_image=Image.open("logo//blackBGLogo.png"),light_image=Image.open("logo//whiteBGLogo.png"),size=(140,45))
         self.panelLogo = CTkLabel(self.frameRegister,text="",image=self.logoImg)
-        self.registerLbl = CTkLabel(self.frameRegister,font=(globalFontName,35),text="Reset your password.")
+        self.lblTitle = CTkLabel(self.frameRegister,font=(globalFontName,35),text="Reset your password.")
 
         self.entryEmail = CTkEntry(self.frameRegister,font=(globalFontName,25),width=375,placeholder_text="email",corner_radius=15)
-        self.entryPassword = CTkEntry(self.frameRegister,font=(globalFontName,25),width=400,placeholder_text="password",show="*",corner_radius=15)
-        self.lblEmail = CTkLabel(self.frameRegister,font=emojiFont,text="✉️")
-        self.lblPassword = CTkLabel(self.frameRegister,font=emojiFont,text="🔒")
+        self.entryPassword = CTkEntry(self.frameRegister,font=(globalFontName,25),width=375,placeholder_text="new password",show="*",corner_radius=15)
+        self.entryCode = CTkEntry(self.frameRegister,font=(globalFontName,25),width=150,placeholder_text="code",corner_radius=15)
+        self.lblEntry = CTkLabel(self.frameRegister,font=emojiFont,text="✉️")
 
+        self.imgShowPassword = CTkImage(Image.open("eyeIcon.png"),size=(33,24))
+        self.btnShowPassword = CTkButton(self.frameRegister,image=self.imgShowPassword,text="",width=1,command=self.showHide,corner_radius=15,fg_color=self.accent)
+        self.imgHidePassword = CTkImage(Image.open("eyeIconOff.png"),size=(33,24))
+        self.btnHidePassword = CTkButton(self.frameRegister,image=self.imgHidePassword,text="",width=0,command=self.showHide,corner_radius=15,fg_color=self.accent)
+        
         self.btnVerify = CTkButton(self.frameRegister,text="verify",width=60,corner_radius=15,fg_color=self.accent,font=(globalFontName,25),command=self.checkEmailFormat)
 
-        #self.btnRegister = CTkButton(self.frameRegister,text="register",font=(globalFontName,30),corner_radius=15,text_color="white",border_color=("black","gray12"),fg_color=self.accent,border_width=2,command=self.registerClicked)
+        self.btnReset = CTkButton(self.frameRegister,text="reset",font=(globalFontName,30),corner_radius=15,text_color="white",border_color=("black","gray12"),fg_color=self.accent,border_width=2,command=self.resetClicked)
         self.messageVar = StringVar()
         self.messageVar.set("hello")
         self.lblMessage = CTkLabel(self.frameRegister,textvariable=self.messageVar,font=(globalFontName,25))
@@ -85,10 +91,10 @@ class ResetPassword(CTkToplevel):
         self.panelImgBG.place(x=0,y=0)
         self.frameRegister.place(relx=0.5,rely=0.5,anchor="center")
         self.panelLogo.place(relx=0.35,y=20)
-        self.registerLbl.place(in_=self.panelLogo,x=-85,y=45)
+        self.lblTitle.place(in_=self.panelLogo,x=-85,y=45)
 
         self.entryEmail.place(x=95,y=150)
-        self.lblEmail.place(in_=self.entryEmail,x=-50,y=-3)
+        self.lblEntry.place(in_=self.entryEmail,x=-50,y=-3)
         """self.entryPassword.place(in_=self.entryEmail,y=70)
         self.lblPassword.place(in_=self.entryPassword,x=-50,y=-3)"""
 
@@ -114,50 +120,55 @@ class ResetPassword(CTkToplevel):
             server.sendmail(tickdEmail,receiverEmail,message.as_string())
             print("Message sent!")
         
-
+    def showHide(self):
+        if self.btnShowPassword.winfo_ismapped():
+            self.btnShowPassword.place_forget()
+            self.btnHidePassword.place(in_=self.entryPassword,x=405,y=2)
+            self.entryPassword.configure(show="")
+        else:
+            self.btnHidePassword.place_forget()
+            self.btnShowPassword.place(in_=self.entryPassword,x=405,y=2)
+            self.entryPassword.configure(show="*")
     
     def grabWin(self):
         self.grab_set()
         self.lift()
         self.after(1000,lambda: self.grab_release())
 
-    def registerClicked(self):
+    def resetClicked(self):
         print("Hello")
-
-        email = self.entryEmail.get()
-        password = self.entryPassword.get()
-        username = self.entryUsername.get()
+        newPasswordTxt = self.entryPassword.get().strip()
         
         details,rememberMeIndex = getAllDetails()
         
-        emailEmpty, passwordEmpty,usernameEmpty = self.checkEmpty(email, password,username)
-        emailValid = self.checkEmail(email)
-        found,self.userDetails = self.checkDetailsFound(email,details)
-        
+        if newPasswordTxt == "":
+            self.setMessage("Your password cannot be blank.","white")
+        else:
+            newPasswordHashed = genHash(newPasswordTxt)
+            
+            detailsSet = ""
+            index = 0
+            found = False
+            while not found:
+                if details[index][0] == self.email:
+                    detailsSet = details[index]
+                    details.pop(index)
+                    found = True
+                else:
+                    index += 1
 
-        if emailEmpty == False and passwordEmpty == False and usernameEmpty == False:
-            if emailValid and found:
-                self.setMessage("An account already exists with this email.","red")
-                self.resetEntry(["entryEmail"])
-            elif not emailValid:
-                self.setMessage("Please enter a valid email.","red")
-                self.entryEmail.focus_set()
-                self.resetEntry(["entryEmail"])
-            else:
-                newDetails = [email,password,username]
+            detailsSet[1] = newPasswordHashed
+            details.append(detailsSet)
+            newAuthDetails = {"details":details,"rememberMe":rememberMeIndex}
 
-                
-                details.append(newDetails)
-                newAuthDetails = {"details":details,"rememberMe":rememberMeIndex}
-
-                print(newAuthDetails)
-                
-                with open("authDetails.json","w") as f:
-                    f.write(json.dumps(newAuthDetails))
-                
-                self.resetEntry(["entryEmail","entryPassword"])
-                createUserFolder(userPath=f"users//{email}") # Creates new folder for the new user with one "inbox.json" list
-                self.setMessage("Account successfully created. Please log in.","limegreen")
+            print(newAuthDetails)
+            
+            with open("authDetails.json","w") as f:
+                json.dump(newAuthDetails,f,indent=4)
+            
+            self.resetEntry(["entryPassword"])
+            self.setMessage("Password successfully reset. Please log in.","limegreen")
+            self.close_window()
         
 
 
@@ -174,40 +185,33 @@ class ResetPassword(CTkToplevel):
             userDetails = []
 
         return found, userDetails
-    
-    def checkEmpty(self,email,password,username):
-        emailEmpty = False
-        passwordEmpty = False
-        usernameEmpty = False
 
-        email = email.strip()
-        username = username.strip()
-        
-        print(f"{email}, {password},{username}")
-        fields = {"email":email,"password":password,"username":username}
-        fieldsVars = {"email":emailEmpty,"password":passwordEmpty,"username":usernameEmpty}
-        for each in fields:
-            print(each)
-            if fields[each] == "":
-                print("empty")
-                fieldsVars[each] = True
-                self.setMessage(f"Please fill out all fields.","red")
-        emailEmpty = fieldsVars["email"]
-        passwordEmpty = fieldsVars["password"]
-        usernameEmpty = fieldsVars["username"]
-        print(f"{fieldsVars['email']} {passwordEmpty} {usernameEmpty}")
-        
-        return emailEmpty, passwordEmpty,usernameEmpty
+    def genCode(self):
+        code = ""
+        for each in range(6):
+            digit = str(randint(0,9))
+            code+=digit
+        return code
 
     def checkEmailFormat(self):
-        email = self.entryEmail.get()
-        if "@" in email:
-            splitEmail = email.split("@")
+        self.email = self.entryEmail.get()
+        if "@" in self.email:
+            splitEmail = self.email.split("@")
             if "." in splitEmail[1]:
-                emailRegistered = self.checkEmailRegistered(email)
+                emailRegistered = self.checkEmailRegistered(self.email)
 
                 if emailRegistered:
-                    self.setMessage("Email registered.","limegreen")
+                    self.setMessage("Code sent, please check your email\nand enter the code.","limegreen")
+                    self.lblEntry.configure(text="🔑")
+                    self.entryEmail.place_forget()
+                    self.entryCode.place(x=170,y=150)
+                    self.lblEntry.place(in_=self.entryCode,x=-50,y=-3)
+                    self.btnVerify.configure(command=self.checkCode)
+                    self.btnVerify.place(in_=self.entryCode,x=155)
+                    self.code = self.genCode()
+                    self.sendEmail(self.email)
+
+
                 else:
                     self.setMessage("Email not registered.","red")
             else:
@@ -223,12 +227,26 @@ class ResetPassword(CTkToplevel):
                 return True
         return False
 
+    def checkCode(self):
+        codeInput = self.entryCode.get()
+
+        if codeInput == self.code:
+            self.setMessage("Please enter your new password.","white")
+            self.btnVerify.place_forget()
+            self.lblEntry.configure(text="🔒")
+            self.entryCode.place_forget()
+            self.entryPassword.place(x=95,y=150)
+            self.lblEntry.place(in_=self.entryPassword,x=-50,y=-3)
+            self.btnReset.place(in_=self.entryPassword,x=125,y=100)
+            self.btnShowPassword.place(in_=self.entryPassword,x=405,y=2)
+        else:
+            self.setMessage("Incorrect code entered.","red")
     
     def setMessage(self,message,colour = "white"):
         length = len(message)
         lblMessage = self.lblMessage
 
-        lblMessage.place(in_=self.lblEmail,x=40,y=60)
+        lblMessage.place(in_=self.lblTitle,x=-40,y=150)
         
         if colour == "black" or colour == "white":
             colour = ("black","white")
@@ -242,7 +260,7 @@ class ResetPassword(CTkToplevel):
             element = elements[each]
             element.delete(0,END)
         
-        self.lblEmail.focus_set()
+        self.lblEntry.focus_set()
 
 register = ResetPassword()
         

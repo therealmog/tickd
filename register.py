@@ -4,9 +4,11 @@ from lib import getWallpaper
 from lib.getDetails import getAllDetails
 import json
 from lib.createUserFolder import createUserFolder
-import string
 from random import choice
-import hashlib
+from datetime import date
+from lib.uploadTask import uploadTask
+from lib.genHash import genHash
+
 
 class Register(CTkToplevel):
     # This class doesn't have an __init__ function, to allow it to be stored in the Auth window.
@@ -106,7 +108,16 @@ class Register(CTkToplevel):
 
         self.setMessage("hello!!","limegreen")
         
-
+    def createSampleTask(self):
+        welcomeTaskDict = {"title":"Welcome to Tickd!",
+                               "date":f"{date.today().strftime('%d/%m/%Y')}",
+                               "description":"Welcome to a simpler life with Tickd.\nSimply add tasks with the 'Add a task' box at the top, and use keywords such as 'today' and 'tomorrow' in the date, or for other dates simply add the date using the DD/MM/YY format.\ne.g. for the 31st December 2025, you would put 31/12/25.",
+                               "completed":"False",
+                               "time":"",
+                               "priority":"",
+                               "taskID":"welcome"}
+        uploadTask(self.userPath,welcomeTaskDict,"inbox")
+    
     def showHide(self):
         if self.btnShowPassword.winfo_ismapped():
             self.btnShowPassword.place_forget()
@@ -145,7 +156,7 @@ class Register(CTkToplevel):
                 self.entryEmail.focus_set()
                 self.resetEntry(["entryEmail"])
             else:
-                passwordToStore = self.genHash(password)
+                passwordToStore = genHash(password)
                 newDetails = [email,passwordToStore,username]
 
                 
@@ -158,8 +169,11 @@ class Register(CTkToplevel):
                     json.dump(newAuthDetails,f,indent=4)
                 
                 self.resetEntry(["entryEmail","entryPassword"])
-                createUserFolder(userPath=f"users//{email}") # Creates new folder for the new user with one "inbox.json" list
+                self.userPath = f"users//{email}"
+                createUserFolder(self.userPath) # Creates new folder for the new user with one "inbox.json" list
+                self.createSampleTask()
                 self.setMessage("Account successfully created. Please log in.","limegreen")
+                self.origin.registerWinOpen = False
                 self.after(2000,self.destroy)
         
 
@@ -235,31 +249,7 @@ class Register(CTkToplevel):
         self.lblEmail.focus_set()
 
     
-    def genSalt(self):
-        chars = string.ascii_letters + "#£%*!" + "0123456789" # Specifically does not include $ sign.
-        salt = ""
-        for each in range(6):
-            salt+=choice(chars)
-        print(salt)
-
-        return salt
-
-    def genPepper(self):
-        chars = string.ascii_letters
-        pepper = choice(chars)
-
-        return pepper
     
-    def genHash(self,password):
-        salt = self.genSalt()
-        pepper = self.genPepper()
-
-        passwordToHash = salt + password + pepper
-        hash = hashlib.sha256(passwordToHash.encode()).hexdigest()
-
-        passwordToStore = salt+"$"+hash
-
-        return passwordToStore
 
 #register = Register()
         
