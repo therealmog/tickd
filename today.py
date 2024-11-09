@@ -79,7 +79,6 @@ class Today(CTk):
         }
 
 
-
         self.bind("<Return>",lambda event:self.checkEnteredUsername())
         self.checkUserName()
 
@@ -102,11 +101,11 @@ class Today(CTk):
         frameX,frameY = self.frameDimensions()
         self.frameToday = CTkFrame(self,width=frameX,height=frameY,fg_color=("white","gray9"),border_color="gray7",border_width=5,corner_radius=20)
 
-        self.lblDate = CTkLabel(self.frameToday,text=self.todaysDate,font=(globalFontName,30))
+        self.lblListName = CTkLabel(self.frameToday,text=self.listName.title(),font=(globalFontName,40))
         
         self.textVar = StringVar()
         self.textVar.set(f"Welcome, {self.userName}!")
-        self.lblWelcome = CTkLabel(self.frameToday,textvariable=self.textVar,font=(globalFontName,18))
+        self.lblDate = CTkLabel(self.frameToday,text=self.todaysDate,font=(globalFontName,20))
         self.imgLogo = CTkImage(light_image=Image.open("logo//whiteBGLogo.png"),dark_image=Image.open("logo//blackBGLogo.png"),size=(155,49)) 
         self.logoPanel = CTkLabel(self.frameToday,text="",image=self.imgLogo)
         self.entryTask = CTkEntry(self.frameToday,placeholder_text="Enter a task...",font=(globalFontName,30),width=550,corner_radius=20)
@@ -134,10 +133,10 @@ class Today(CTk):
         self.frameToday.place(relx=0.5,rely=0.5,anchor="center")
         self.panelImgBG.place(x=0,y=0)
         
-        self.lblDate.place(x=25,y=50)
-        self.lblWelcome.place(in_=self.lblDate,x=0,y=-30)
+        self.lblListName.place(x=125,y=50)
+        self.lblDate.place(in_=self.lblListName,x=0,y=-30)
         self.logoPanel.place(relx=0.98,y=40,anchor=E)
-        self.entryTask.place(in_=self.lblDate,x=450,y=-20)
+        self.entryTask.place(in_=self.lblListName,x=450,y=-20)
 
         #self.sampleDetailsPanel.place(in_=self.entryTask,x=50,y=100)
 
@@ -151,15 +150,16 @@ class Today(CTk):
         
     def resizeFrame(self):
         #print(self.winfo_width(),"by",self.winfo_height())
-        frameX = 0.78 * self.winfo_width()
-        frameY = 0.78 * self.winfo_height()
+        frameX = 0.85 * self.winfo_width()
+        frameY = 0.85 * self.winfo_height()
 
         self.frameToday.configure(width=frameX,height=frameY)
         #self.panelImgBG._image
-
+        
+        
         if self.winfo_width() < 1505:
             self.entryTask.place_forget()
-        
+
         if self.winfo_width() > 1505:
             self.entryTask.place(in_=self.logoPanel,x=-650,y=10)
 
@@ -345,7 +345,7 @@ class Today(CTk):
                 self.taskList.remove(each)
         
         if len(self.taskList) == 0:
-            self.lblNoTasks.place(in_=self.lblDate,y=150)
+            self.lblNoTasks.place(in_=self.lblListName,y=150)
         else:
             print(self.taskList)
             self.placeTasks()
@@ -482,7 +482,7 @@ class Today(CTk):
             self.entryTask.bind("<Button-1>",lambda event,reason="Please enter your username before entering in a task.":self.taskEntryClickedWhileDisabled(reason))
             self.entryTask.configure(state="disabled")
             self.btnTaskSubmit.configure(state="disabled")
-            self.lblEnterUsername.place(in_=self.lblWelcome,y=60)
+            self.lblEnterUsername.place(in_=self.lblDate,y=60)
             self.entryUserName.place(in_=self.lblEnterUsername,x=0,y=35)
             self.btnSubmitUsername.place(in_=self.entryUserName,x=340,y=-3)
             self.bindTaskEntry()
