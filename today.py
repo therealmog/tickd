@@ -2,7 +2,6 @@ from customtkinter import *
 from datetime import date,timedelta
 from lib.getDetails import getAllDetails,getDetailsIndividual,writeToAuthDetails
 from lib.submitBtn import SubmitButton
-import lib.getWallpaper as getWallpaper
 from lib.createTaskDict import createTaskDict
 from lib.checkDate import checkDate
 from lib.checkTime import checkTime
@@ -10,66 +9,50 @@ from lib.task import Task
 from lib.loadTaskList import loadTaskList
 from lib.getTasks import getTasks
 from lib.uploadTask import uploadTask
-from lib.updateTaskListData import updateTaskListData
 from copy import copy
+from lib.updateTaskListData import updateTaskListData
 from lib.detailsPanel import DetailsPanel
+from tkinter import messagebox
+from lib.getOverdue import getOverdue
+from lib.getListImgs import getListImgs
+
 
 
 from PIL import Image
 
-class Today(CTk):
+class Today(CTkFrame):
     
     globalFontName = "Bahnschrift"
     textgrey="#9e9f9f"
-    def __init__(self,email,imgBGPath,userPath,theme,listName="inbox"):
+    def __init__(self,mainWindow,email,userPath,todaysDate,userAccent="dodgerblue2",listName="inbox",):
         """The class object used to generate the Today view, which is the landing page of the app once the user has logged in.
     
     It should only be declared once in the main function, and then the declared object can be called multiple times."""
         
         
-        super().__init__()
+        super().__init__(mainWindow,width=1400,height=900,fg_color=("white","gray9"),border_color="gray7",border_width=5,corner_radius=20)
         
-        self.geometry(f"{self.winfo_screenwidth()}x{self.winfo_screenheight()}")
-        self.minsize(750,800)
-        
-        print(self.winfo_screenwidth(),"by",self.winfo_screenheight())
+        self.mainWindow = mainWindow
+        self.mainWindow.title("Today - Tickd")
 
-        self.maxdims = [1920,1080]
-        self.maxsize(self.maxdims[0],self.maxdims[1])
-        self.title("Today - Tickd")
-
-        self.darkImgBGPath = imgBGPath[0]
-        self.lightImgBGPath = imgBGPath[1]
         self.userPath = userPath
-        self.theme = theme
         self.listName = listName
-        
-        self.userDetails,self.userIndex = getDetailsIndividual(email)
-        try:
-            self.userName = self.userDetails[2]
-        except TypeError:
-            print("Invalid email entered. Have you registered?")
+        self.email = email
 
-        self.today = date.today()
-        self.todaysDate = self.today.strftime("%A, %d %B %Y")
-        print(self.todaysDate)
 
-        if theme == "dark":
-            set_appearance_mode("Dark")
-        else:
-            set_appearance_mode("Light")
-        self.accent = "dodgerblue2"
-        #self.bind("<Configure>",lambda event:self.mode())
-        
-
-        #deactivate_automatic_dpi_awareness()
+        self.accent = userAccent
+        self.userName = getDetailsIndividual(self.email)
 
         self.elements = {
             
         } 
 
+        # Calculated and passed into this class from app
+        self.todaysDate = todaysDate
+
         self.widgets()
         self.placeWidgets()
+
 
         self.entriesDict = {
             "entryTask":self.entryTask,
@@ -78,82 +61,82 @@ class Today(CTk):
             "dropdownPriority":self.dropdownPriority
         }
 
+        
 
-        self.bind("<Return>",lambda event:self.checkEnteredUsername())
-        self.checkUserName()
+        self.entryTask.bind("<Return>",lambda event:self.taskSubmitted())
+        self.bindTaskEntry()
 
         self.loadTasks()
 
-        self.bind("<Configure>",lambda event:self.resizeFrame())
-        self.mainloop()
+        #self.bind("<Configure>",lambda event:self.resizeFrame())
 
     #------------------------# Widgets and placing #-------------------------#    
     def widgets(self):
         globalFontName = self.globalFontName
-
-        self.darkImgBG = getWallpaper.getFromPath(self.darkImgBGPath,(self.maxdims[0],self.maxdims[1]))
-        self.lightImgBG = getWallpaper.getFromPath(self.lightImgBGPath,(self.maxdims[0],self.maxdims[1]))
-        if self.theme == "dark":
-            self.panelImgBG = CTkLabel(self,text="",image=self.darkImgBG)
-        else:
-            self.panelImgBG = CTkLabel(self,text="",image=self.lightImgBG)
         
-        frameX,frameY = self.frameDimensions()
-        self.frameToday = CTkFrame(self,width=frameX,height=frameY,fg_color=("white","gray9"),border_color="gray7",border_width=5,corner_radius=20)
-
-        self.lblListName = CTkLabel(self.frameToday,text=self.listName.title(),font=(globalFontName,40))
+        print("Bonjour.")
+        self.lblListName = CTkLabel(self,text=self.listName.title(),font=(globalFontName,40))
+    
+        self.lblDate = CTkLabel(self,text=self.todaysDate,font=(globalFontName,20)) 
+        self.imgLogo = CTkImage(light_image=Image.open("logo//whiteBGLogo.png"),dark_image=Image.open("logo//blackBGLogo.png"),size=(155,49))
+        self.logoPanel = CTkLabel(self,text="",image=self.imgLogo)
+        self.entryTask = CTkEntry(self,placeholder_text="Enter a task...",font=(globalFontName,30),width=650,corner_radius=20)
         
-        self.textVar = StringVar()
-        self.textVar.set(f"Welcome, {self.userName}!")
-        self.lblDate = CTkLabel(self.frameToday,text=self.todaysDate,font=(globalFontName,20))
-        self.imgLogo = CTkImage(light_image=Image.open("logo//whiteBGLogo.png"),dark_image=Image.open("logo//blackBGLogo.png"),size=(155,49)) 
-        self.logoPanel = CTkLabel(self.frameToday,text="",image=self.imgLogo)
-        self.entryTask = CTkEntry(self.frameToday,placeholder_text="Enter a task...",font=(globalFontName,30),width=550,corner_radius=20)
-        
-        
-        self.messageVar = StringVar()
-        self.lblMessage = CTkLabel(self.frameToday,textvariable=self.messageVar,font=(globalFontName,25))
 
-        self.lblEnterUsername = CTkLabel(self.frameToday,text="Please enter your new username:",font=(globalFontName,22))
-        self.entryUserName = CTkEntry(self.frameToday,placeholder_text="",font=(globalFontName,22),width=330)
-        self.btnSubmitUsername = SubmitButton(parent=self.frameToday,command=self.checkEnteredUsername,colour=self.accent,buttonSize=(30,30),radius=70)
-
-        self.entryDate = CTkEntry(self.frameToday,placeholder_text="date",font=(globalFontName,22),corner_radius=20,border_width=0)
-        self.entryTime = CTkEntry(self.frameToday,placeholder_text="time",font=(globalFontName,22),corner_radius=20,border_width=0)
-        self.dropdownPriority = CTkOptionMenu(self.frameToday,values=["priority","P1","P2","P3"],font=(globalFontName,22),dropdown_font=(globalFontName,20),corner_radius=20,fg_color=("#f9f9fa","#353639"),button_color=("#f9f9fa","#353639"),text_color=self.textgrey,command=self.priorityCallback)
-        self.btnTaskSubmit = SubmitButton(self.frameToday,colour=self.accent,buttonSize=(35,35),command=self.taskSubmitted,radius=60)
+        self.entryDate = CTkEntry(self,placeholder_text="date",font=(globalFontName,22),corner_radius=20,border_width=0)
+        self.entryTime = CTkEntry(self,placeholder_text="time",font=(globalFontName,22),corner_radius=20,border_width=0)
+        self.dropdownPriority = CTkOptionMenu(self,values=["priority","P1","P2","P3"],font=(globalFontName,22),dropdown_font=(globalFontName,20),corner_radius=20,fg_color=("#f9f9fa","#353639"),button_color=("#f9f9fa","#353639"),text_color=self.textgrey,command=self.priorityCallback)
+        self.btnTaskSubmit = SubmitButton(self,colour=self.accent,buttonSize=(35,35),command=self.taskSubmitted,radius=60)
         
-        self.lblNoTasks = CTkLabel(self.frameToday,text="You have no tasks.",font=(globalFontName,40))
+        self.lblNoTasks = CTkLabel(self,text="You have no tasks.",font=(globalFontName,40))
 
-        """self.sampleDetailsPanel = DetailsPanel(self.frameToday,{"title": "Welcome!", "date": "16/10/2024", "taskID": "TjAiDX", "completed": "False", "time": "", "priority": "", "description": ""},
+        """self.sampleDetailsPanel = DetailsPanel(self,{"title": "Welcome!", "date": "16/10/2024", "taskID": "TjAiDX", "completed": "False", "time": "", "priority": "", "description": ""},
                                                self.taskCompleted,{"taskID":"TjAiDX"})"""
         self.entries = [self.entryDate,self.dropdownPriority,self.entryTime]
 
+        self.taskFrame = CTkScrollableFrame(self,width=410,height=720,fg_color="#191616")
+        self.overdueFrame = CTkScrollableFrame(self,width=410,height=200,fg_color="#191616")
+        self.lblOverdue = CTkLabel(self,text="OVERDUE",font=(globalFontName,30))
+
+        listImgs = getListImgs()
+        try:
+            image = listImgs[self.listName.capitalize()]
+            self.lblOtherTasks = CTkLabel(self,text=f" {self.listName.capitalize()} - ",font=(globalFontName,30),image=image,compound="left")
+        except KeyError:
+            print(f"Image does not exist for {self.listName}")
+            self.lblOtherTasks = CTkLabel(self,text=f"{self.listName.capitalize()} - ",font=(globalFontName,30))
+
+        
+
     def placeWidgets(self):
-        self.frameToday.place(relx=0.5,rely=0.5,anchor="center")
-        self.panelImgBG.place(x=0,y=0)
+        #self.place(relx=0.5,rely=0.5,anchor="center")
+        #self.panelImgBG.place(x=0,y=0)
         
         self.lblListName.place(x=125,y=50)
-        self.lblDate.place(in_=self.lblListName,x=0,y=-30)
+        self.lblDate.place(in_=self.lblListName,x=0,y=-25)
         self.logoPanel.place(relx=0.98,y=40,anchor=E)
-        self.entryTask.place(in_=self.lblListName,x=450,y=-20)
+        self.entryTask.place(in_=self.lblListName,x=350,y=-20)
 
         #self.sampleDetailsPanel.place(in_=self.entryTask,x=50,y=100)
 
         self.currentAttribute = ""
 
+        
+
     def frameDimensions(self):
+        print(f"Width: {self.winfo_screenwidth()}, Height: {self.winfo_screenheight()}")
         frameX = 0.68 * self.winfo_screenwidth()
         frameY = 0.68 * self.winfo_screenheight()
 
         return frameX, frameY
         
     def resizeFrame(self):
+        
         #print(self.winfo_width(),"by",self.winfo_height())
-        frameX = 0.85 * self.winfo_width()
-        frameY = 0.85 * self.winfo_height()
+        frameX = 0.95 * self.winfo_width()
+        frameY = 0.95 * self.winfo_height()
 
-        self.frameToday.configure(width=frameX,height=frameY)
+        self.configure(width=frameX,height=frameY)
         #self.panelImgBG._image
         
         
@@ -164,36 +147,88 @@ class Today(CTk):
             self.entryTask.place(in_=self.logoPanel,x=-650,y=10)
 
     def loadTasks(self): # Should only be run at the start of the program
-        """try:
-            for each in self.taskList:
-                each.place_forget()
-        except:
-            pass"""
         
-        self.taskList = getTasks(self.frameToday,self.userPath,"inbox",self.accent,command=self.taskCompleted,fontName=self.globalFontName)
+        self.taskList = getTasks(self.taskFrame,self.userPath,"inbox",self.accent,command=self.taskCompleted,fontName=self.globalFontName)
         
+        """# Getting a list with the same tasks, but the master for these tasks is overdueFrame. 
+        self.overdueList = getTasks(self.overdueFrame,self.userPath,"inbox",self.accent,command=self.taskCompleted,fontName=self.globalFontName)"""
+        
+
         self.detailPanels = {} # taskID:detailPanelObj
         self.currentDisplayed = "" # stores taskID of task with details panel displayed.
 
-
+        self.overdueList = []
+        
         if self.taskList != False:
-            self.lblNoTasks.place_forget()
-            self.taskList[0].place(x=25,y=200)
-            
-            taskID = self.taskList[0].attributes["taskID"]
-            self.setDetailsPanel(self.taskList[0],taskID)
+            # Gathering overdue tasks
+            self.overdueDict = getOverdue(self.taskList) # Returns a dictionary
 
-            for each in range(1,len(self.taskList)): # Starts with second item
-                task = self.taskList[each]
-                task.place(in_=self.taskList[each-1],y=75)
+            #print(self.overdueDict)
+            print(list(self.overdueDict.keys()))
+            for each in self.taskList.copy():
+                if each.attributes["taskID"] in list(self.overdueDict.keys()):
+                    self.taskList.remove(each)
+                    #print(f"Removing {each.attributes["taskID"]}")
+                    overdueTask = Task(self.overdueFrame,each.attributes,accent=self.accent,font=self.globalFontName,command=self.taskCompleted)
+                    self.overdueList.append(overdueTask)
+                    self.setDetailsPanel(overdueTask,each.attributes["taskID"])
+
+
+            self.lblNoTasks.place_forget()
+           
+            newOtherTasksText = f" {self.listName.capitalize()} - {len(self.taskList)}"
+            self.lblOtherTasks.configure(text=newOtherTasksText)
+
+            newOverdueTasksText = f"OVERDUE - {len(self.overdueList)}"
+            self.lblOverdue.configure(text=newOverdueTasksText)
+
+            # Placing tasks in taskList
+            if len(self.taskList)>=1:
+                self.taskList[0].grid(row=0,column=0,pady=(5,10))
                 
-                taskID = task.attributes["taskID"]
-                self.setDetailsPanel(task,taskID)
+                taskID = self.taskList[0].attributes["taskID"]
+                self.setDetailsPanel(self.taskList[0],taskID)
+                i = 1 # Indicates column for taskFrame grid
+
+                for each in range(1,len(self.taskList)): # Starts with second item
+                    task = self.taskList[each]
+                    task.grid(row=i,column=0,pady=10)
+                    i+=1
+                    
+                    taskID = task.attributes["taskID"]
+                    self.setDetailsPanel(task,taskID)
+
+            
+            if len(self.overdueList) != 0:
+                self.overdueList[0].grid(row=1,column=0,pady=(20,10))
+
+                i = 2
+                for each in range(1,len(self.overdueList)):
+                    widget = self.overdueList[each]
+                    
+                    widget.grid(row=i,column=0,pady=10)
+                    i+=1
+            
+                self.lblOverdue.place(in_=self.lblListName,x=-5,y=100)
+                self.overdueFrame.place(in_=self.lblOverdue,y=30)
+
+                if len(self.taskList) >=1:
+                    self.lblOtherTasks.place(in_=self.lblOverdue,y=280)
+                    self.taskFrame.place(in_=self.lblOtherTasks,y=30)
+            else:
+                if len(self.taskList) >=1:
+                    self.lblOtherTasks.place(in_=self.lblListName,x=-5,y=100)
+                    self.taskFrame.place(in_=self.lblOtherTasks,y=35)
+                else:
+                    self.lblNoTasks.place(x=25,y=150)
+            
+            
 
         else:
             self.lblNoTasks.place(x=25,y=150)
     
-            
+    def renameMainWin(self):
+        self.mainWindow.title("Today - Tickd")
         
 
     #--------------------# Task entry and button functions #------------------#
@@ -221,78 +256,116 @@ class Today(CTk):
 
     
     def taskSubmitted(self):
+        # Input received from entry box.
         title = self.entryTask.get()
+
+        # The task's attributes dictionary
         attributes = {}
 
         if title == "":
-            self.lblMessage.place(in_=self.entryTask,x=5,y=85)
-            self.messageVar.set("Please enter a task title before submitting.")
+            messagebox.showinfo("Cannot create task","Please enter a task title before submitting.")
         else: # Start to interpret attributes
             dateInput = self.entryDate.get()
+            dateInput = dateInput.strip()
             if dateInput == "":
-                date = ""
+                # No date has been entered.
+                date = "" 
             else:
                 date,message = checkDate(userInput=dateInput)
 
-            if date == False:
-                self.messageVar.set(message)
+            if date == False: # Date is set as False by checkDate function
+                # Displays error message
+                messagebox.showerror("Invalid date",message)
+                #self.messageVar.set(message)
             else:
+                # Adding date to the task attributes dict.
                 attributes["date"] = date
 
+                # Getting the input from the time entry box.
                 timeInput = self.entryTime.get()
                 if timeInput == "":
                     time = ""
                 else:
+                    # Validates time input.
                     time,message = checkTime(userInput=timeInput)
 
                 if time == False:
-                    self.messageVar.set(message)
+                    # Displays error message for time.
+                    #self.messageVar.set(message)
+                    messagebox.showerror("Invalid time",message)
                 else:
+                    # Adds time to the attributes dict.
                     attributes["time"] = time                
                 
+                    
                     if self.dropdownPriority.get() != "priority":
+                        # Since priority comes from option menu, it can be added straight
+                        # to the attributes dict.
                         attributes["priority"] = self.dropdownPriority.get()
                     else:
                         attributes["priority"] = ""
                     
+
+                    # Adds extra attributes to be altered later if desired.
                     attributes["description"] = ""
                     attributes["listName"] = self.listName
                     
+                    # All the attributes are brought together to create a task dictionary
+                    # to be written to the task list JSON file.
                     taskDict = createTaskDict(title,date,attributes)
                     self.resetEntry(["entryTask","entryDate","entryTime","dropdownPriority"])
 
-                    
+                    # Task is written to the specified list.
                     uploadTask(self.userPath,taskDict,listName="inbox")
+
+
+                    
+                    # Task is placed onto the screen.
                     self.placeNewTask(taskDict)
+
 
                     print([x.attributes["title"] for x in self.taskList])
 
     def placeNewTask(self,taskDict):
-        newTask = Task(self.frameToday,taskDict,self.accent,command=self.taskCompleted,font=self.globalFontName)
+        newTask = Task(self.taskFrame,taskDict,self.accent,command=self.taskCompleted,font=self.globalFontName)
         
         if bool(self.taskList) == False:
             self.lblNoTasks.place_forget()
             self.taskList = []
-            newTask.place(x=25,y=200)
+
+            if self.overdueFrame.winfo_ismapped():
+                self.lblOtherTasks.place(in_=self.lblOverdue,y=300)
+                self.taskFrame.place(in_=self.lblOtherTasks,y=30)
+            else:
+                self.lblOtherTasks.place(in_=self.lblListName,x=-5,y=100)
+                self.taskFrame.place(in_=self.lblOtherTasks,y=30)
+            newTask.grid(row=0,column=0,pady=10)
         else:
-            newTask.place(in_=self.taskList[-1],y=75)
+            newTask.grid(row=len(self.taskList),column=0,pady=10)
 
         taskID = newTask.attributes["taskID"]
         self.setDetailsPanel(newTask,taskID)
         self.taskList.append(newTask)
+
+        self.lblOtherTasks.configure(text=f" {self.listName.capitalize()} - {len(self.taskList)}")
     
     def setDetailsPanel(self,task,taskID):
-        self.detailPanels[taskID] = DetailsPanel(self.frameToday,self.userPath,task.attributes,self.taskCompleted,{"taskID":taskID},self.globalFontName,self.accent)
+        self.detailPanels[taskID] = DetailsPanel(self,self,self.userPath,task.attributes,self.taskCompleted,{"taskID":taskID},self.globalFontName,self.accent)
         task.bind("<Button-1>",lambda event,taskID=taskID:self.showDetailsPanel(taskID))
+        task.lblTitle.bind("<Button-1>",lambda event,taskID=taskID:self.showDetailsPanel(taskID))
+        task.lblDate.bind("<Button-1>",lambda event,taskID=taskID:self.showDetailsPanel(taskID))
 
     def showDetailsPanel(self,taskID):
-        if self.currentDisplayed != "":
-            self.detailPanels[self.currentDisplayed].place_forget() # Removes current display panel.
-        print("you clicked me")
-        taskDetailsPanel = self.detailPanels[taskID]
-        self.currentDisplayed = taskID
+        if self.winfo_width() < 1505:
+            messagebox.showinfo("Can't display details panel.","Increase your window width to\ndisplay the details panel for this task.")
+        else:
+            if self.currentDisplayed != "":
+                self.detailPanels[self.currentDisplayed].place_forget() # Removes current display panel.
+            print("you clicked me")
+            taskDetailsPanel = self.detailPanels[taskID]
+            self.currentDisplayed = taskID
 
-        taskDetailsPanel.place(in_=self.entryTask,y=150)
+            taskDetailsPanel.place(in_=self.entryTask,y=150)
 
 
     def taskCompleted(self,taskID):
@@ -306,7 +379,7 @@ class Today(CTk):
             completedTasksDict = taskListData["completed"]
         
                 
-    
+        taskDict = ""
         for each in allTasksDict.copy():
             if each == taskID: # Dictionary key for each task in allTasksDict is the taskID
                 taskDict = allTasksDict[each]
@@ -320,15 +393,15 @@ class Today(CTk):
         taskListData["completed"] = completedTasksDict
 
         updateTaskListData(taskListData,self.userPath,"inbox")
-
-
         
-
-        #uploadTask(self.userPath,taskDict,listName="inbox")
-        
-        for each in self.taskList:
-            if each.attributes["taskID"] == taskID:
-                each.attributes["completed"] = "True"
+        if taskID in self.overdueDict:
+            for each in self.overdueList.copy():
+                if each.attributes["taskID"] == taskID:
+                    self.overdueList.remove(each)
+        else:
+            for each in self.taskList:
+                if each.attributes["taskID"] == taskID:
+                    each.attributes["completed"] = "True"
         
         self.detailPanels[taskID].place_forget()
         self.detailPanels.pop(taskID)
@@ -340,23 +413,46 @@ class Today(CTk):
 
     def removeIfCompleted(self):
         for each in self.taskList:
-            each.place_forget()
             if each.attributes["completed"] == "True":
-                self.taskList.remove(each)
+                print(f"Removing {each.attributes["title"]}")
+                self.placeTasks(self.taskList.index(each))
         
-        if len(self.taskList) == 0:
-            self.lblNoTasks.place(in_=self.lblListName,y=150)
-        else:
+        self.lblOtherTasks.configure(text=f" {self.listName.capitalize()} - {len(self.taskList)}")
+        
+        if len(self.taskList) == 0 and len(self.overdueList) == 0:
+            self.taskFrame.place_forget()
+            self.lblOtherTasks.place_forget()
+            self.overdueFrame.place_forget()
+            self.lblOverdue.place_forget()
+            self.lblNoTasks.place(x=25,y=150)
+        """else:
             print(self.taskList)
-            self.placeTasks()
+            self.placeTasks()"""
 
-    def placeTasks(self):
+
+    def placeTasks(self,removedIndex):
         print("hello")
-        self.taskList[0].place_forget()
+        # Removes completed task by index
+        # Then places all tasks again after the one which has been removed.
+
+        
+        for each in range(removedIndex,len(self.taskList)):
+            self.taskList[each].grid_forget()
+
+        self.taskList.pop(removedIndex)
+
+        """self.taskList[0].grid(row=0,column=0,pady=(5,10))"""
+        
+
+        for each in range(removedIndex,len(self.taskList)): # Starts with index which was removed
+            task = self.taskList[each]
+            task.grid(row=each,column=0,pady=10)
+    
+        """self.taskList[0].place_forget()
         self.taskList[0].place(x=25,y=200)
         if len(self.taskList)>1:
             for i in range(1,len(self.taskList)):
-                self.taskList[i].place(in_=self.taskList[i-1],y=75)
+                self.taskList[i].place(in_=self.taskList[i-1],y=75)"""
 
         """try:
             for each in self.taskList:
@@ -369,22 +465,19 @@ class Today(CTk):
         
 
 
-    def taskEntryClickedWhileDisabled(self,reason):
-        self.messageVar.set(reason)
-        self.lblMessage.place(in_=self.entryTask,x=5,y=85)
-        self.frameToday.after(3000,self.lblMessage.place_forget)
-
-
     def priorityCallback(self,event):
         if self.dropdownPriority.get() == "priority":
             self.dropdownPriority.configure(text_color="#9e9f9f")
         else:
             self.dropdownPriority.configure(text_color=("black","white"))
 
+    def bindEnterKey(self):
+        self.bind("<Return>",lambda event: self.taskSubmitted)
+        #print("enter is back")
 
     def placeAttributeEntries(self):
-        self.btnTaskSubmit.place(in_=self.entryTask,x=555)
-        self.btnTaskSubmit.bind("<Return>",self.taskSubmitted)
+        self.btnTaskSubmit.place(in_=self.entryTask,x=650)
+        self.bindEnterKey()
 
         entries = [self.entryDate,self.entryTime,self.dropdownPriority]
         entries[0].place(in_=self.entryTask,y=50)
@@ -398,7 +491,6 @@ class Today(CTk):
         entries = [self.entryDate,self.entryTime,self.dropdownPriority,self.btnTaskSubmit]
         for each in range(0,len(entries)):
             entries[each].place_forget()
-        self.messageVar.set("")
             
     def resetEntry(self,entries:list):
         entriesDict = self.entriesDict
@@ -410,21 +502,6 @@ class Today(CTk):
             else:
                 entriesDict[each].delete(0,"end")
 
-         
-
-
-    def clickablesOnOff(self):
-        clickables = []
-        elements = self.elements
-        for each in elements:
-            if "entry" in each or "btn" in each:
-                clickables.append(elements[each])
-        
-        for clickable in clickables:
-            if clickable.cget("state") == "normal":
-                clickable.configure(state="disabled")
-            else:
-                clickable.configure(state="normal")
 
     def bindTaskEntry(self):
         self.entryTask.bind("<FocusIn>",lambda event:self.taskEntryEnter())
@@ -435,65 +512,4 @@ class Today(CTk):
             each.bind("<FocusOut>",lambda event:self.attributeLeave())
 
 
-    #-----------------------------# Username stuff #--------------------------------#    
-    def checkEnteredUsername(self):
-        print("hello")
-        userInput = self.entryUserName.get()
-        self.lblMessage.place(in_=self.entryTask,x=5,y=85)
-        if userInput.strip()=="":
-            self.messageVar.set("Please enter a username.")
-        elif len(userInput) > 20 or len(userInput) < 3:
-            self.messageVar.set("Please ensure that username is 3-20 characters long.")
-        elif " " in userInput.strip():
-            self.messageVar.set("Please ensure that there are no spaces in your username.")
-        else:
-            self.userDetails[2] = userInput
-            details,rememberMeIndex = getAllDetails()
-            details[self.userIndex] = self.userDetails
-            authDetails = {"details":details,"rememberMe":rememberMeIndex}
-
-            writeToAuthDetails(authDetails)
-            self.textVar.set(f"Welcome, {self.userDetails[2]}!")
-            self.messageVar.set("Success!")
-
-
-            self.entryTask.configure(state="normal")
-            self.btnTaskSubmit.configure(state="normal")
-            self.entryTask.unbind("<Button-1>")
-            self.bind("<Return>",lambda event:self.taskSubmitted())
-            
-            self.lblEnterUsername.place_forget()
-            self.entryUserName.place_forget()
-            self.btnSubmitUsername.place_forget()
-
-            # Adding 'welcome' task
-
-            welcomeTaskDict = {"title":"Welcome to Tickd!",
-                               "date":f"{date.today().strftime('%d/%m/%Y')}",
-                               "description":"Welcome to a simpler life with Tickd.\nSimply add tasks with the 'Add a task' box at the top, and use keywords such as 'today' and 'tomorrow' in the date, or for other dates simply add the date using the DD/MM/YY format.\ne.g. for the 31st December 2025, you would put 31/12/25.",
-                               "completed":"False",
-                               "taskID":"welcome"}
-            uploadTask(self.userPath,welcomeTaskDict,"inbox")
-            self.loadTasks()
-
-    def checkUserName(self):
-        if self.userName == "":
-            print("You haven't got a username!")
-            self.entryTask.bind("<Button-1>",lambda event,reason="Please enter your username before entering in a task.":self.taskEntryClickedWhileDisabled(reason))
-            self.entryTask.configure(state="disabled")
-            self.btnTaskSubmit.configure(state="disabled")
-            self.lblEnterUsername.place(in_=self.lblDate,y=60)
-            self.entryUserName.place(in_=self.lblEnterUsername,x=0,y=35)
-            self.btnSubmitUsername.place(in_=self.entryUserName,x=340,y=-3)
-            self.bindTaskEntry()
-        else:
-            self.unbind("<Return>")
-            self.bind("<Return>",lambda event:self.taskSubmitted())
-            self.bindTaskEntry()
-    
-    
-    
-     
-
-
-today = Today(email="omar@gmail.com",imgBGPath=["wallpapers//dark1.png","wallpapers//light1.png"],userPath="users//omar@gmail.com",theme="dark",listName="inbox")
+#today = Today(mainWindow=None,email="omar@gmail.com",userPath="users//omar@gmail.com",theme="dark",listName="inbox")

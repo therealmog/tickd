@@ -1,1 +1,284 @@
-{"shared": "no", "tasks": {"kppcRu": {"title": "Bonjour!", "date": "28/08/2024", "taskID": "kppcRu", "completed": "True", "time": "12:10", "priority": ""}, "MipRbu": {"title": "hello", "date": "05/09/2024", "taskID": "MipRbu", "completed": "True", "time": "", "priority": ""}, "hLwEvq": {"title": "Brush my teeth", "date": "06/09/2024", "taskID": "hLwEvq", "completed": "True", "time": "", "priority": ""}, "BtiGuw": {"title": "TMUA", "date": "06/09/2024", "taskID": "BtiGuw", "completed": "True", "time": "", "priority": ""}, "qgGczt": {"title": "Lunch", "date": "06/09/2024", "taskID": "qgGczt", "completed": "True", "time": "13:00", "priority": ""}, "filKls": {"title": "Wake up", "date": "07/09/2024", "taskID": "filKls", "completed": "True", "time": "05:30", "priority": ""}, "MTvErR": {"title": "Ganesh Chaturthi", "date": "07/09/2024", "taskID": "MTvErR", "completed": "True", "time": "", "priority": ""}, "BpRCvF": {"title": "Hi", "date": "07/09/2024", "taskID": "BpRCvF", "completed": "True", "time": "", "priority": ""}, "ZrzmzF": {"title": "Wake up early", "date": "08/09/2024", "taskID": "ZrzmzF", "completed": "True", "time": "05:00", "priority": ""}, "azIgrD": {"title": "Happy birthday!", "date": "18/6/2025", "taskID": "azIgrD", "completed": "True", "time": "", "priority": ""}, "oTUIwc": {"title": "Ganesh immersion", "date": "08/09/2024", "taskID": "oTUIwc", "completed": "True", "time": "16:00", "priority": ""}, "hHdWGy": {"title": "Binomial expansion", "date": "09/09/2024", "taskID": "hHdWGy", "completed": "True", "time": "", "priority": ""}, "rsYkWb": {"title": "Integration assessed hwrk", "date": "20/09/2024", "taskID": "rsYkWb", "completed": "True", "time": "", "priority": ""}, "CjgenU": {"title": "go to bed", "date": "", "taskID": "CjgenU", "completed": "True", "time": "", "priority": ""}, "gdZjQM": {"title": "go bed bro", "date": "22/09/2024", "taskID": "gdZjQM", "completed": "True", "time": "", "priority": ""}, "DWQFtu": {"title": "go to the toilet", "date": "", "taskID": "DWQFtu", "completed": "True", "time": "", "priority": "P3"}, "gSoFTS": {"title": "eat your breakfast", "date": "05/10/2024", "taskID": "gSoFTS", "completed": "True", "time": "13:00", "priority": ""}}, "completed": {"jJDAHk": {"title": "1", "date": "", "taskID": "jJDAHk", "completed": "True", "time": "", "priority": "", "description": ""}, "Eamwbn": {"title": "2", "date": "", "taskID": "Eamwbn", "completed": "True", "time": "", "priority": "", "description": ""}, "swHzob": {"title": "3", "date": "", "taskID": "swHzob", "completed": "True", "time": "", "priority": "", "description": ""}, "ZfvSiD": {"title": "2", "date": "", "taskID": "ZfvSiD", "completed": "True", "time": "", "priority": "", "description": ""}, "TgHjXE": {"title": "3", "date": "", "taskID": "TgHjXE", "completed": "True", "time": "", "priority": "", "description": ""}, "zfwpmP": {"title": "1", "date": "", "taskID": "zfwpmP", "completed": "True", "time": "", "priority": "", "description": ""}, "SjWdSv": {"title": "Go to gym", "date": "21/10/2024", "taskID": "SjWdSv", "completed": "True", "time": "", "priority": "", "description": ""}, "bJKkMT": {"title": "Go to gym", "date": "24/10/2024", "taskID": "bJKkMT", "completed": "True", "time": "", "priority": "", "description": ""}, "NbZpNN": {"title": "CS project", "date": "22/10/2024", "taskID": "NbZpNN", "completed": "True", "time": "06:00", "priority": "", "description": ""}}}
+{
+    "shared": "no",
+    "tasks": {
+        "kppcRu": {
+            "title": "Bonjour!",
+            "date": "28/08/2024",
+            "taskID": "kppcRu",
+            "completed": "True",
+            "time": "12:10",
+            "priority": ""
+        },
+        "MipRbu": {
+            "title": "hello",
+            "date": "05/09/2024",
+            "taskID": "MipRbu",
+            "completed": "True",
+            "time": "",
+            "priority": ""
+        },
+        "hLwEvq": {
+            "title": "Brush my teeth",
+            "date": "06/09/2024",
+            "taskID": "hLwEvq",
+            "completed": "True",
+            "time": "",
+            "priority": ""
+        },
+        "BtiGuw": {
+            "title": "TMUA",
+            "date": "06/09/2024",
+            "taskID": "BtiGuw",
+            "completed": "True",
+            "time": "",
+            "priority": ""
+        },
+        "qgGczt": {
+            "title": "Lunch",
+            "date": "06/09/2024",
+            "taskID": "qgGczt",
+            "completed": "True",
+            "time": "13:00",
+            "priority": ""
+        },
+        "filKls": {
+            "title": "Wake up",
+            "date": "07/09/2024",
+            "taskID": "filKls",
+            "completed": "True",
+            "time": "05:30",
+            "priority": ""
+        },
+        "MTvErR": {
+            "title": "Ganesh Chaturthi",
+            "date": "07/09/2024",
+            "taskID": "MTvErR",
+            "completed": "True",
+            "time": "",
+            "priority": ""
+        },
+        "BpRCvF": {
+            "title": "Hi",
+            "date": "07/09/2024",
+            "taskID": "BpRCvF",
+            "completed": "True",
+            "time": "",
+            "priority": ""
+        },
+        "ZrzmzF": {
+            "title": "Wake up early",
+            "date": "08/09/2024",
+            "taskID": "ZrzmzF",
+            "completed": "True",
+            "time": "05:00",
+            "priority": ""
+        },
+        "azIgrD": {
+            "title": "Happy birthday!",
+            "date": "18/6/2025",
+            "taskID": "azIgrD",
+            "completed": "True",
+            "time": "",
+            "priority": ""
+        },
+        "oTUIwc": {
+            "title": "Ganesh immersion",
+            "date": "08/09/2024",
+            "taskID": "oTUIwc",
+            "completed": "True",
+            "time": "16:00",
+            "priority": ""
+        },
+        "hHdWGy": {
+            "title": "Binomial expansion",
+            "date": "09/09/2024",
+            "taskID": "hHdWGy",
+            "completed": "True",
+            "time": "",
+            "priority": ""
+        },
+        "rsYkWb": {
+            "title": "Integration assessed hwrk",
+            "date": "20/09/2024",
+            "taskID": "rsYkWb",
+            "completed": "True",
+            "time": "",
+            "priority": ""
+        },
+        "CjgenU": {
+            "title": "go to bed",
+            "date": "",
+            "taskID": "CjgenU",
+            "completed": "True",
+            "time": "",
+            "priority": ""
+        },
+        "gdZjQM": {
+            "title": "go bed bro",
+            "date": "22/09/2024",
+            "taskID": "gdZjQM",
+            "completed": "True",
+            "time": "",
+            "priority": ""
+        },
+        "DWQFtu": {
+            "title": "go to the toilet",
+            "date": "",
+            "taskID": "DWQFtu",
+            "completed": "True",
+            "time": "",
+            "priority": "P3"
+        },
+        "gSoFTS": {
+            "title": "eat your breakfast",
+            "date": "05/10/2024",
+            "taskID": "gSoFTS",
+            "completed": "True",
+            "time": "13:00",
+            "priority": ""
+        },
+        "iXlVIn": {
+            "title": "CS - recursion blurt",
+            "date": "03/12/2024",
+            "taskID": "iXlVIn",
+            "completed": "False",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "inbox"
+        },
+        "vILsaU": {
+            "title": "bonjour ",
+            "date": "16/12/2024",
+            "taskID": "vILsaU",
+            "completed": "False",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "inbox"
+        }
+    },
+    "completed": {
+        "jJDAHk": {
+            "title": "1",
+            "date": "",
+            "taskID": "jJDAHk",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": ""
+        },
+        "Eamwbn": {
+            "title": "2",
+            "date": "",
+            "taskID": "Eamwbn",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": ""
+        },
+        "swHzob": {
+            "title": "3",
+            "date": "",
+            "taskID": "swHzob",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": ""
+        },
+        "ZfvSiD": {
+            "title": "2",
+            "date": "",
+            "taskID": "ZfvSiD",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": ""
+        },
+        "TgHjXE": {
+            "title": "3",
+            "date": "",
+            "taskID": "TgHjXE",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": ""
+        },
+        "zfwpmP": {
+            "title": "1",
+            "date": "",
+            "taskID": "zfwpmP",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": ""
+        },
+        "SjWdSv": {
+            "title": "Go to gym",
+            "date": "21/10/2024",
+            "taskID": "SjWdSv",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": ""
+        },
+        "bJKkMT": {
+            "title": "Go to gym",
+            "date": "24/10/2024",
+            "taskID": "bJKkMT",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": ""
+        },
+        "NbZpNN": {
+            "title": "CS project",
+            "date": "22/10/2024",
+            "taskID": "NbZpNN",
+            "completed": "True",
+            "time": "06:00",
+            "priority": "",
+            "description": ""
+        },
+        "VycWlJ": {
+            "title": "yes",
+            "date": "",
+            "taskID": "VycWlJ",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "inbox"
+        },
+        "nmZaTp": {
+            "title": "my first task",
+            "date": "",
+            "taskID": "nmZaTp",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "inbox"
+        },
+        "TUPplt": {
+            "title": "bonjour",
+            "date": "",
+            "taskID": "TUPplt",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "inbox"
+        },
+        "ZLcpqm": {
+            "title": "hello there",
+            "date": "10/11/2024",
+            "taskID": "ZLcpqm",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "there's no time like the present buddy",
+            "listName": "inbox"
+        }
+    }
+}

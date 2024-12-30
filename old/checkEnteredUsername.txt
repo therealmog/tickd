@@ -1,0 +1,79 @@
+## Old function from list/today window ##
+
+    def checkEnteredUsername(self):
+        print("hello")
+        userInput = self.entryUserName.get()
+        self.lblMessage.place(in_=self.entryTask,x=5,y=85)
+        if userInput.strip()=="":
+            self.messageVar.set("Please enter a username.")
+        elif len(userInput) > 20 or len(userInput) < 3:
+            self.messageVar.set("Please ensure that username is 3-20 characters long.")
+        elif " " in userInput.strip():
+            self.messageVar.set("Please ensure that there are no spaces in your username.")
+        else:
+            self.userDetails[2] = userInput
+            details,rememberMeIndex = getAllDetails()
+            details[self.userIndex] = self.userDetails
+            authDetails = {"details":details,"rememberMe":rememberMeIndex}
+
+            writeToAuthDetails(authDetails)
+            self.textVar.set(f"Welcome, {self.userDetails[2]}!")
+            self.messageVar.set("Success!")
+
+
+            self.entryTask.configure(state="normal")
+            self.btnTaskSubmit.configure(state="normal")
+            self.entryTask.unbind("<Button-1>")
+            self.bind("<Return>",lambda event:self.taskSubmitted())
+            
+            self.lblEnterUsername.place_forget()
+            self.entryUserName.place_forget()
+            self.btnSubmitUsername.place_forget()
+
+            # Adding 'welcome' task
+
+            welcomeTaskDict = {"title":"Welcome to Tickd!",
+                               "date":f"{date.today().strftime('%d/%m/%Y')}",
+                               "description":"Welcome to a simpler life with Tickd.\nSimply add tasks with the 'Add a task' box at the top, and use keywords such as 'today' and 'tomorrow' in the date, or for other dates simply add the date using the DD/MM/YY format.\ne.g. for the 31st December 2025, you would put 31/12/25.",
+                               "completed":"False",
+                               "taskID":"welcome"}
+            uploadTask(self.userPath,welcomeTaskDict,"inbox")
+            self.loadTasks()
+
+
+
+        self.lblEnterUsername = CTkLabel(self,text="Please enter your new username:",font=(globalFontName,22))  
+        self.entryUserName = CTkEntry(self,placeholder_text="",font=(globalFontName,22),width=330)
+        self.btnSubmitUsername = SubmitButton(parent=self,command=self.checkEnteredUsername,colour=self.accent,buttonSize=(30,30),radius=70)
+
+        
+            #-----------------------------# Username stuff #--------------------------------#    
+
+    def checkUserName(self):
+        if self.userName == "":
+            print("You haven't got a username!")
+            self.entryTask.bind("<Button-1>",lambda event,reason="Please enter your username before entering in a task.":self.taskEntryClickedWhileDisabled(reason))
+            self.entryTask.configure(state="disabled")
+            self.btnTaskSubmit.configure(state="disabled")
+            self.lblEnterUsername.place(in_=self.lblDate,y=60)
+            self.entryUserName.place(in_=self.lblEnterUsername,x=0,y=35)
+            self.btnSubmitUsername.place(in_=self.entryUserName,x=340,y=-3)
+            self.bindTaskEntry()
+        else:
+            self.unbind("<Return>")
+            self.bind("<Return>",lambda event:self.taskSubmitted())
+            self.bindTaskEntry()
+
+
+    def clickablesOnOff(self):
+        clickables = []
+        elements = self.elements
+        for each in elements:
+            if "entry" in each or "btn" in each:
+                clickables.append(elements[each])
+        
+        for clickable in clickables:
+            if clickable.cget("state") == "normal":
+                clickable.configure(state="disabled")
+            else:
+                clickable.configure(state="normal")

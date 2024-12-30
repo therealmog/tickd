@@ -1,0 +1,9 @@
+## From today/list window ##
+
+# In widgets()
+"""self.darkImgBG = getWallpaper.getFromPath(self.darkImgBGPath,(self.maxdims[0],self.maxdims[1]))
+        self.lightImgBG = getWallpaper.getFromPath(self.lightImgBGPath,(self.maxdims[0],self.maxdims[1]))
+        if self.theme == "dark":
+            self.panelImgBG = CTkLabel(self,text="",image=self.darkImgBG)
+        else:
+            self.panelImgBG = CTkLabel(self,text="",image=self.lightImgBG)"""

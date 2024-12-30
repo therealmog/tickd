@@ -6,8 +6,8 @@ from lib.uploadTask import uploadTask
 
 
 class DetailsPanel(CTkFrame):
-    def __init__(self,master,userPath,taskAttributes,taskButtonCommand,commandArgs,fontName="Bahnschrift",accent="dodgerblue2"):
-        super().__init__(master,width=600,height=380,border_width=3,border_color="white")
+    def __init__(self,master,origin,userPath,taskAttributes,taskButtonCommand,commandArgs,fontName="Bahnschrift",accent="dodgerblue2"):
+        super().__init__(master,width=800,height=500,border_width=3,border_color="grey5")
 
         self.taskAttributes = taskAttributes
         self.taskName = taskAttributes["title"]
@@ -18,6 +18,7 @@ class DetailsPanel(CTkFrame):
         self.fontName = fontName
         self.accent = accent
         self.userPath = userPath
+        self.origin = origin
 
         self.taskButtonCommand = taskButtonCommand
         self.commandArgs = commandArgs
@@ -36,15 +37,18 @@ class DetailsPanel(CTkFrame):
 
     def widgets(self):
         globalFontName = self.fontName
-        self.lblTaskName = CTkLabel(self,text=self.taskName,font=(globalFontName,30),cursor="hand2")
+        self.lblTaskName = CTkLabel(self,text=self.taskName,font=(globalFontName,35),cursor="hand2")
         
         self.checkTitleLength()
         
+        self.imgClose = CTkImage(Image.open("icons//cancel.png"),size=(20,20))
+        self.btnClose = CTkButton(self,image=self.imgClose,text="",width=20,fg_color="grey12",hover_color="red",border_color="grey5",border_width=2,command=self.place_forget)
+
         self.taskButton = self.getTaskButton()
         self.lblDate = CTkLabel(self,text=self.taskDate,font=(globalFontName,20),cursor="hand2")
         self.lblTime = CTkLabel(self,text=self.taskTime,font=(globalFontName,20),cursor="hand2")
-        self.lblDescription = CTkLabel(self,text="description:",font=(globalFontName,20))
-        self.entryDescription = CTkTextbox(self,width=550,height=180,font=(globalFontName,20),wrap=WORD,activate_scrollbars=True)
+        self.lblDescription = CTkLabel(self,text="description:",font=(globalFontName,22))
+        self.entryDescription = CTkTextbox(self,width=750,height=250,font=(globalFontName,22),wrap=WORD,activate_scrollbars=True,fg_color="gray13")
         self.entryDescription.insert("1.0",self.taskDescription)
         self.entryDescription.bind("<Button-1>",lambda event: self.descriptionBoxEnter())
 
@@ -56,17 +60,20 @@ class DetailsPanel(CTkFrame):
                         }
         self.hoverWidgetFonts = {}
 
-        self.imgSave = CTkImage(Image.open("save.png"),size=(25,25))
+        self.imgSave = CTkImage(Image.open("icons//save.png"),size=(25,25))
         self.btnSaveDescription = CTkButton(self,text="save",font=(globalFontName,25),fg_color=self.accent,command=lambda:self.saveDescription(),width=70,image=self.imgSave)
-        self.lblSave = CTkLabel(self,text="Saved description.",text_color="limegreen",font=(globalFontName,25))
-        self.imgCancel = CTkImage(Image.open("cancel.png"),size=(25,25))
-        self.btnCancel = CTkButton(self,text="cancel",fg_color="red",image=self.imgCancel,font=(globalFontName,25),width=80)
+        self.tickImg = CTkImage(Image.open("logo//tick.png"),size=(35,35))
+        self.lblSave = CTkLabel(self,text="Saved description.",text_color="limegreen",font=(globalFontName,25),image=self.tickImg,compound="left")
+        self.imgCancel = CTkImage(Image.open("icons//cancel.png"),size=(25,25))
+        self.btnCancel = CTkButton(self,text="cancel",fg_color="red",image=self.imgCancel,font=(globalFontName,25),width=80,command=self.btnCancelClicked,hover_color="#c92d2a")
+
 
     def placeWidgets(self):
-        self.lblTaskName.place(x=75,y=20)
-        self.lblDate.place(in_=self.lblTaskName,y=35)
+        self.btnClose.place(x=740,y=20)
+        self.lblTaskName.place(x=80,y=20)
+        self.lblDate.place(in_=self.lblTaskName,y=45)
         self.lblTime.place(in_=self.lblDate,x=12*(len(self.lblDate.cget("text"))))
-        self.lblDescription.place(x=25,y=100)
+        self.lblDescription.place(x=25,y=110)
         self.entryDescription.place(in_=self.lblDescription,y=30)
         self.taskButton.placeWidget()
         #self.btnSaveDescription.place(in_=self.entryDescription,x=220,y=190)
@@ -99,7 +106,7 @@ class DetailsPanel(CTkFrame):
     
     def bindEventListeners(self):
         for each in self.hoverWidgets:
-            print(each)
+            #print(each)
             self.hoverWidgets[each].bind("<Enter>",lambda event,widgetName=each:self.onhover(widgetName))
             self.hoverWidgets[each].bind("<Leave>",lambda event,widgetName=each:self.onhoverexit(widgetName))
 
@@ -116,25 +123,38 @@ class DetailsPanel(CTkFrame):
     
     def onhoverexit(self,widgetName):
         widget = self.hoverWidgets[widgetName]
-        widget.configure(font=self.hoverWidgetFonts[widgetName],text_color="white")
+        widget.configure(font=self.hoverWidgetFonts[widgetName],text_color=("black","white"))
     
     def btnCancelClicked(self):
-        pass
+        self.entryDescription.delete(1.0,"end")
+        self.entryDescription.insert(1.0,self.taskDescription)
+        self.btnCancel.place_forget()
+        self.btnSaveDescription.place_forget()
+        self.lblDescription.focus()
 
     def descriptionBoxEnter(self):
-        self.btnSaveDescription.place(in_=self.entryDescription,x=450,y=190)
+        self.btnSaveDescription.place(in_=self.entryDescription,x=650,y=260)
         self.btnCancel.place(in_=self.btnSaveDescription,x=-125)
+
+        self.origin.unbind("<Return>")
+        
 
     def saveDescription(self):
         self.lblDescription.focus()
         newDescription = self.entryDescription.get(1.0,END).strip()
         self.taskAttributes["description"] = newDescription
+        self.taskDescription = newDescription
 
         listName = self.taskAttributes["listName"]
         uploadTask(self.userPath,self.taskAttributes,listName)
         print(newDescription)
-        self.lblSave.place(in_=self.btnSaveDescription,x=-500)
+        self.lblSave.place(in_=self.entryDescription,y=255)
+
+        self.origin.bindEnterKey()
+        self.btnCancel.place_forget()
+        self.btnSaveDescription.place_forget()
         self.after(1000,self.lblSave.place_forget)
+
 
 
         

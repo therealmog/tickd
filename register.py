@@ -28,10 +28,14 @@ class Register(CTkToplevel):
 
         set_appearance_mode("dark")
 
+        if imgBGPath == None:
+            pass
+        else:
+            self.imgBGPath = imgBGPath
 
-        self.imgBGPath = imgBGPath
         self.accent = accent
 
+        self.iconbitmap("logo//tickd.ico")
         
         self.widgets()
         self.placeWidgets()
@@ -59,12 +63,12 @@ class Register(CTkToplevel):
         globalFontName = "Bahnschrift"
         emojiFont = ("Segoe UI Emoji",30)
 
-        if self.imgBGPath == None:
+        """if self.imgBGPath == None:
             self.imgBG,_ = getWallpaper.getRandom((self.imagedims[0],self.imagedims[1]))
         else:
             self.imgBG = getWallpaper.getFromPath(self.imgBGPath,(self.imagedims[0],self.imagedims[1]))
         self.panelImgBG = CTkLabel(self,text="",image=self.imgBG)
-
+"""
         self.frameRegister = CTkFrame(self,width=575,height=500,fg_color=("white","gray9"),border_color="gray7",border_width=5,corner_radius=20)
         self.logoImg = CTkImage(dark_image=Image.open("logo//blackBGLogo.png"),light_image=Image.open("logo//whiteBGLogo.png"),size=(140,45))
         self.panelLogo = CTkLabel(self.frameRegister,text="",image=self.logoImg)
@@ -77,9 +81,9 @@ class Register(CTkToplevel):
         self.entryUsername = CTkEntry(self.frameRegister,font=(globalFontName,25),width=400,placeholder_text="username",corner_radius=15)
         self.lblUsername = CTkLabel(self.frameRegister,font=emojiFont,text="🧑")
 
-        self.imgShowPassword = CTkImage(Image.open("eyeIcon.png"),size=(33,24))
+        self.imgShowPassword = CTkImage(Image.open("icons//eyeIcon.png"),size=(33,24))
         self.btnShowPassword = CTkButton(self.frameRegister,image=self.imgShowPassword,text="",width=1,command=self.showHide,corner_radius=15,fg_color=self.accent)
-        self.imgHidePassword = CTkImage(Image.open("eyeIconOff.png"),size=(33,24))
+        self.imgHidePassword = CTkImage(Image.open("icons//eyeIconOff.png"),size=(33,24))
         self.btnHidePassword = CTkButton(self.frameRegister,image=self.imgHidePassword,text="",width=0,command=self.showHide,corner_radius=15,fg_color=self.accent)
 
         self.btnRegister = CTkButton(self.frameRegister,text="register",font=(globalFontName,30),corner_radius=15,text_color="white",border_color=("black","gray12"),fg_color=self.accent,border_width=2,command=self.registerClicked)
@@ -90,7 +94,7 @@ class Register(CTkToplevel):
         self.btnCancel = CTkButton(self.frameRegister,text="cancel",font=(globalFontName,30),corner_radius=15,hover_color="red",text_color="white",border_color=("black","gray12"),fg_color=self.accent,border_width=2,command=self.close_window)
 
     def placeWidgets(self):
-        self.panelImgBG.place(x=0,y=0)
+        #self.panelImgBG.place(x=0,y=0)
         self.frameRegister.place(relx=0.5,rely=0.5,anchor="center")
         self.panelLogo.place(relx=0.35,y=20)
         self.registerLbl.place(in_=self.panelLogo,x=-85,y=45)
@@ -136,7 +140,7 @@ class Register(CTkToplevel):
     def registerClicked(self):
         print("Hello")
 
-        email = self.entryEmail.get()
+        email = self.entryEmail.get().lower()
         password = self.entryPassword.get()
         username = self.entryUsername.get()
         
@@ -168,6 +172,14 @@ class Register(CTkToplevel):
                 with open("authDetails.json","w") as f:
                     json.dump(newAuthDetails,f,indent=4)
                 
+                with open("preferences.json","r") as f:
+                    prefs = json.load(f)
+                    prefs[email] = {"accent":"dodgerblue2"}
+
+                with open("preferences.json","w") as f:
+                    json.dump(prefs,f,indent=4)
+
+
                 self.resetEntry(["entryEmail","entryPassword"])
                 self.userPath = f"users//{email}"
                 createUserFolder(self.userPath) # Creates new folder for the new user with one "inbox.json" list

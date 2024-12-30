@@ -2,15 +2,14 @@
 # Auth screen with customtkinter
 
 from customtkinter import *
-from PIL import ImageTk, Image
+from PIL import Image
 import json
 from lib.checkbox_customTk import Checkbox
 from lib.getDetails import getAllDetails
-from lib.getWallpaper import getRandom as getWallpaper
-from lib.createUserFolder import createUserFolder
 from register import Register
 from lib.checkWithPepper import checkWithPepper
 from resetPassword import ResetPassword
+from tkinter import messagebox
 
 
 
@@ -24,33 +23,28 @@ class Auth(CTk):
     def __init__(self):
         super().__init__()
 
-        self.dimensions = [700,650]
-        self.maxdimensions = [700,650]
-
-        maxdims = self.maxdimensions 
-        x=self.dimensions[0]
-        y=self.dimensions[1]
-        self.geometry(f"{x}x{y}")
-        self.minsize(x,y)
-        self.maxsize(maxdims[0],maxdims[1])
+        self.geometry("600x400")
+        self.minsize(600,400)
+        self.maxsize(600,400)
         self.title("Log in - Tickd")
+        self.iconbitmap("logo//tickd.ico")
 
         self.loggedIn = False
 
-        
-
-        self.widgets()
-        self.placeWidgets()
+        set_appearance_mode("dark")
         self.checkRememberMe()
+        if not self.loggedIn:
+            self.widgets()
+            self.placeWidgets()
+            
 
-        self.bind("<Return>",lambda event:self.signInClicked())
+            self.bind("<Return>",lambda event:self.signInClicked())
 
-        print(self.btnRegister.cget("state"))
+            self.registerWinOpen = False
+            self.resetWinOpen = False
+            self.theme = "dark"
 
-        self.registerWinOpen = False
-        self.resetWinOpen = False
-        self.theme = "dark"
-        self.mainloop()
+            self.mainloop()
         
         
 
@@ -59,16 +53,13 @@ class Auth(CTk):
         emojiFont = self.emojiFont
         buttonFont = self.buttonFont
 
-        self.darkImgBG,self.lightImgBG,self.darkImgBGPath,self.lightImgBGPath = getWallpaper((1280,800))
-        self.imgBGPath = self.darkImgBGPath # Can be changed in changeMode() function - to be passed into next window (register or main display)
-        self.panelImgBG = CTkLabel(self,text="",image=self.darkImgBG)
-        self.frameLogin = CTkFrame(self,width=575,height=570,corner_radius=20,border_color="gray7",border_width=5,fg_color=("white","#171616"))
+        self.frameLogin = CTkFrame(self,width=560,height=370,corner_radius=20,border_color="gray7",border_width=5,fg_color=("white","#171616"))
         
 
         self.imgMode = CTkImage(light_image=Image.open("logo//moon.png"),dark_image=Image.open("logo//sun.png"),size=(35,35))
         self.btnMode = CTkButton(self.frameLogin,image=self.imgMode,text="",command=self.changeMode,width=1,fg_color="#252425",hover_color=self.accent,corner_radius=50)
         
-        self.logo = CTkImage(light_image=Image.open("logo//whiteBGLogo.png"),dark_image=Image.open("logo//blackBGLogo.png"),size=(330,105)) 
+        self.logo = CTkImage(light_image=Image.open("logo//whiteBGLogo.png"),dark_image=Image.open("logo//blackBGLogo.png"),size=(282,90)) #Ratio 330x105
         self.logoPanel = CTkLabel(self.frameLogin,text="",image=self.logo)
         
         
@@ -77,19 +68,18 @@ class Auth(CTk):
         self.lblEmail = CTkLabel(self.frameLogin,font=emojiFont,text="✉️")
         self.lblPassword = CTkLabel(self.frameLogin,font=emojiFont,text="🔒")
         
-        self.imgShowPassword = CTkImage(Image.open("eyeIcon.png"),size=(29,23))
+        self.imgShowPassword = CTkImage(Image.open("icons//eyeicon newsized.png"),size=(32,24))
         self.btnShowPassword = CTkButton(self.frameLogin,image=self.imgShowPassword,text="",width=1,command=self.showHide,corner_radius=15,fg_color=self.accent)
-        self.imgHidePassword = CTkImage(Image.open("eyeIconOff.png"),size=(29,23))
+        self.imgHidePassword = CTkImage(Image.open("icons//eyeIcon off new sized.png"),size=(32,24))
         self.btnHidePassword = CTkButton(self.frameLogin,image=self.imgHidePassword,text="",width=1,command=self.showHide,corner_radius=15)
         self.btnRegister = CTkButton(self.frameLogin,text="register",font=buttonFont,corner_radius=15,text_color=self.globalColour,border_color=("black","gray12"),fg_color=self.accent,border_width=2,command=self.createRegisterWindow)
         
 
         self.btnSignIn = CTkButton(self.frameLogin,text="sign in",font=buttonFont,corner_radius=15,command=self.signInClicked,text_color=self.globalColour,border_color=("black","gray12"),fg_color=self.accent,border_width=2)
         self.btnConfirm = CTkButton(self.frameLogin,text="confirm",font=buttonFont,corner_radius=15,command=self.signInClicked,text_color=self.globalColour,border_color=("black","gray12"),fg_color=self.accent,border_width=2)
-        self.btnDeny = CTkButton(self.frameLogin,text="deny",font=buttonFont,corner_radius=15,command=self.rememberMeDeniedClicked,text_color=self.globalColour,border_color=("black","gray12"),fg_color=self.accent,border_width=2)
         self.checkboxRememberMe = Checkbox(self.frameLogin,x=0,y=50,size=(35,35),relWidget=self.entryPassword)
         self.messageVar = StringVar()
-        self.lblMessage = CTkLabel(self.frameLogin,font=(globalFontName,30),textvariable=self.messageVar)
+        self.lblMessage = CTkLabel(self.frameLogin,font=(globalFontName,30),textvariable=self.messageVar,justify="left")
         
 
         self.lblRememberMe = CTkLabel(self.frameLogin,text="remember me",font=(globalFontName,25),text_color=self.globalColour,cursor="hand2")
@@ -99,6 +89,9 @@ class Auth(CTk):
         self.lblForgotPassword.bind("<Enter>",lambda event: self.forgotLblEnter())
         self.lblForgotPassword.bind("<Leave>",lambda event: self.forgotLblLeave())
         self.lblForgotPassword.bind("<Button-1>",lambda event: self.createResetWindow())
+
+        self.imgTick = CTkImage(Image.open("logo//tick.png"),size=(35,35))
+        self.lblLoggingIn = CTkLabel(self.frameLogin,font=(globalFontName,22),text=" Logging in.",text_color="limegreen",image=self.imgTick,compound="left")
         
         self.elements = {
             "lblEmail":self.lblEmail,
@@ -110,15 +103,14 @@ class Auth(CTk):
             "btnShowPassword":self.btnShowPassword,
             "btnHidePassword":self.btnHidePassword,
             }
-        #self.bindingEventListeners()
         
 
     def placeWidgets(self):
-        self.panelImgBG.place(x=0,y=0)
+        #self.panelImgBG.place(x=0,y=0)
         self.frameLogin.place(relx=0.5,rely=0.5,anchor="center")
-        self.logoPanel.place(relx=0.2,rely=0.1)
-        self.btnMode.place(in_=self.logoPanel,x=370,y=-30)
-        self.entryEmail.place(in_=self.logoPanel,x=-15,y=150)
+        self.logoPanel.place(relx=0.25,rely=0.05)
+        self.btnMode.place(in_=self.logoPanel,x=330,y=-5)
+        self.entryEmail.place(in_=self.logoPanel,x=-60,y=105)
         self.entryPassword.place(in_=self.entryEmail,y=50)
         self.lblEmail.place(in_=self.entryEmail,x=-50,y=-5)
         self.lblPassword.place(in_=self.entryPassword,x=-50,y=-5)
@@ -127,22 +119,22 @@ class Auth(CTk):
         self.btnSignIn.place(in_=self.btnRegister,x=150)
         self.checkboxRememberMe.placeWidget()
         self.lblRememberMe.place(in_=self.entryPassword,x=40,y=52)
-        self.lblForgotPassword.place(in_=self.entryPassword,x=70,y=200)
+        self.lblForgotPassword.place(in_=self.btnRegister,x=50,y=50)
         
         
     def changeMode(self):
         if get_appearance_mode() == "Light":
             self.theme = "dark"
             set_appearance_mode("Dark")
-            self.panelImgBG.configure(image=self.darkImgBG)
-            self.imgBGPath = self.darkImgBGPath
+            #self.panelImgBG.configure(image=self.darkImgBG)
+            #self.imgBGPath = self.darkImgBGPath
             self.btnMode.configure(fg_color="#252425")
             self.globalColour = "white"
         else:
             self.theme = "light"
             set_appearance_mode("Light")
-            self.panelImgBG.configure(image=self.lightImgBG)
-            self.imgBGPath = self.lightImgBGPath
+            #self.panelImgBG.configure(image=self.lightImgBG)
+            #self.imgBGPath = self.lightImgBGPath
             self.btnMode.configure(fg_color="#eaeaeb")
             self.globalColour = "black"
     
@@ -156,10 +148,12 @@ class Auth(CTk):
 
     def createResetWindow(self):
         if self.resetWinOpen:
-            self.setMessage("Reset password window already active.")
+            messagebox.showinfo("Window already active","Reset password window already active.")
+            #self.setMessage("Reset password window already active.")
         else:
             self.resetWinOpen = True
-            self.resetWin = ResetPassword(self.imgBGPath,self.accent,origin=self)
+            # Replace "no" with self.imgBGPath
+            self.resetWin = ResetPassword("no",self.accent,origin=self)
 
     def showHide(self):
         if self.btnShowPassword.winfo_ismapped():
@@ -174,8 +168,8 @@ class Auth(CTk):
 
     def checkDetailsFound(self,email,details):
         found = False
-        for each in details:
-            if each[0] == email:
+        for each in details: # Selects each sublist in the large overall list of details.
+            if each[0] == email: # Uses format [email,password,username] so each[0] means the email.
                 userDetails = each
                 found = True
         if found == False:
@@ -188,13 +182,13 @@ class Auth(CTk):
         emailEmpty = False
         passwordEmpty = False
 
-        email = email.strip()
+        email = email.strip() # Removes any unnecessary whitespace in the entry boxes.
 
         if email == "" and password == "":
             emailEmpty = True
             passwordEmpty = True
         elif email == "":
-            self.setMessage("Please enter your email.",self.globalColour)
+            messagebox.showerror("Can't sign in to Tickd.","Please enter your email.")
             emailEmpty = True
         elif password == "":
             passwordEmpty = True
@@ -204,18 +198,18 @@ class Auth(CTk):
     def checkEmail(self,email):
         if "@" in email:
             splitEmail = email.split("@")
+            # Splits the email into two parts, e.g. john@gmail.com -> ["john","gmail.com"]
             if "." in splitEmail[1]:
                 return True
             else:
                 return False
-        else:
-            self.setMessage("Invalid email entered.","red")
-            return False
+        else: # The entered email contains no "@" symbol.
+            return False 
 
     def setMessage(self,message,colour="white"):
         lblMessage = self.lblMessage
         btnRegister = self.btnRegister
-        fontSize = 25
+        fontSize = 20
 
         if colour == "white" or colour == "black":
             colour = ("black","white")
@@ -231,7 +225,7 @@ class Auth(CTk):
         x = increment * 6
 
         
-        lblMessage.place(x=x,rely=0.73)
+        lblMessage.place(x=x,rely=0.8)
 
 
         lblMessage.configure(font=(self.globalFontName,fontSize),text_color=colour)
@@ -272,10 +266,9 @@ class Auth(CTk):
 
 
     def signInClicked(self):
-        print("Hello")
         self.btnConfirm.place_forget()
 
-        email = self.entryEmail.get()
+        email = self.entryEmail.get().lower()
         passwordTxt = self.entryPassword.get()
         
         details,_ = getAllDetails()
@@ -286,17 +279,18 @@ class Auth(CTk):
         
 
         if emailEmpty and passwordEmpty:
-            self.setMessage("Please enter your details.",self.globalColour)
+            messagebox.showerror("Can't sign in to Tickd.","Please enter your details.")
         elif emailEmpty:
-            self.setMessage("Please enter your email.",self.globalColour)
+            messagebox.showerror("Can't sign in to Tickd.","Please enter your email.")
             self.resetEntry(["entryPassword"])
         elif passwordEmpty:
-            self.setMessage("Please enter your password.",self.globalColour)
+            messagebox.showerror("Can't sign in to Tickd.","Please enter your password.")
         else:
             if emailValid and not found:
-                self.setMessage("Details not found.\nPlease click 'register' to make a new account.","red")
+                messagebox.showerror("Details not found.","These details have not been found.\n\
+                                     Please click 'register' if you do not already have an account.")
             elif not emailValid:
-                self.setMessage("Please enter a valid email.",self.globalColour)
+                messagebox.showerror("Can't sign in to Tickd.","Please enter a valid email.")
                 self.resetEntry(["entryPassword","entryEmail"])
             else:
                 correctPasswordTxt = self.userDetails[1]
@@ -309,10 +303,14 @@ class Auth(CTk):
                     
                     self.userLoginSequence()
                     self.signIn(self.userDetails)
+                    self.lblForgotPassword.place_forget()
+                    self.lblLoggingIn.place(in_=self.btnRegister,x=65,y=50)
                     self.after(1500,self.destroy)
                 else:
-                    self.setMessage("Incorrect password.","red")
+                    messagebox.showerror("Can't sign in to Tickd.","Incorrect password.")
+                    #self.setMessage("Incorrect password.","red")
                     self.resetEntry(["entryPassword"])
+                    self.entryPassword.focus()
 
     def clickablesOnOff(self):
         clickables = []
@@ -322,85 +320,70 @@ class Auth(CTk):
                 clickables.append(elements[each])
         
         for clickable in clickables:
-            if clickable.cget("state") == "normal":
-                clickable.configure(state="disabled")
-            else:
-                clickable.configure(state="normal")
+            try:
+                if clickable.cget("state") == "normal":
+                    clickable.configure(state="disabled")
+                else:
+                    clickable.configure(state="normal")
+            except:
+                pass
 
     
 
     def rememberMeConfirmClicked(self):
         self.loggedInEmail = self.rememberedEmail
         self.userPath = f"users//{self.loggedInEmail}"
-        self.setMessage(f"Logging in as {self.loggedInEmail}","limegreen")
+
         self.loggedIn = True
         self.after(1000,self.destroy)
     
-    def rememberMeDeniedClicked(self):
-        self.lblMessage.place_forget()
-        self.btnConfirm.place_forget()
-        self.btnDeny.place_forget()
-
-        self.loggedInEmail = ""
-        self.clickablesOnOff()
-
-
     def signIn(self,userDetails):
         self.rememberedEmail = userDetails[0]
+        # Uses email that has been verified.
+        
         if not self.loggedIn:
-            self.setMessage(f"Would you like to login automatically as\n{self.rememberedEmail}?",self.globalColour)
-            self.clickablesOnOff()
-            self.btnConfirm.configure(command=self.rememberMeConfirmClicked)
-            self.btnConfirm.place(in_=self.btnRegister,y=150)
-            self.btnDeny.place(in_=self.btnSignIn,y=150)
+            rememberMeInput = messagebox.askyesno("Automatic sign-in",f"Login automatically as\n{self.rememberedEmail}?")
+            # Message box returns either True or False if yes or no clicked.
+            
+            if rememberMeInput:
+                self.rememberMeConfirmClicked()
 
         else:
             self.loggedInEmail = self.rememberedEmail
-            self.setMessage(f"Logging in as {self.loggedInEmail}","limegreen")
             self.userPath = f"users//{self.loggedInEmail}"
 
 
     def createRegisterWindow(self):
         if self.registerWinOpen:
-            self.setMessage("Register window already active.","white")
+            messagebox.showinfo("Window already active","Register window already active.")
         else:
             self.registerWinOpen = True
             self.registerWindow = Register()
+            self.imgBGPath = None
             self.registerWindow.initialise(self.imgBGPath,self.accent,origin=self)
         
-
-        
-        
-        """if self.registerWindow.state() == "normal":
-            self.setMessage("Register window already active.","white")
-        else:
-            self.registerWindow.__init__()"""
-            
-
-            
-        """except AttributeError:
-            self.registerWindow = Register()
-            self.focus_force()"""
-           
-
-
-    
-
-
     def userLoginSequence(self):
-        rememberMeVal = self.checkboxRememberMe.value
+        rememberMeVal = self.checkboxRememberMe.getValue()
+        # Takes value from checkbox using public getter
+
         details,_ = getAllDetails()
-
+        # Retrieves all auth details from JSON file using pre-written function (from lib)
+        # Second underscore is for old remember me index, which is not needed.
+        
         if rememberMeVal:
-            userDetailsIndex = details.index(self.userDetails)
+            newRememberMeIndex = details.index(self.userDetails)
         else:
-            userDetailsIndex = "False"
+            newRememberMeIndex = "False"
 
-        newAuthDetails = {"details":details,"rememberMe":userDetailsIndex}
+        newAuthDetails = {"details":details,"rememberMe":newRememberMeIndex}
+        # Rewrites auth details dictionary using new Remember me index.
+        
         with open("authDetails.json","w") as f:
             json.dump(newAuthDetails,f,indent=4)
+            # Writes JSON object to file with indenting to make it look readable. 
         
         self.loggedIn = True
+        # Allows user to sign into main app.
     
     def checkRememberMe(self):
         print("hello")
@@ -409,15 +392,5 @@ class Auth(CTk):
             userDetails = details[rememberMeIndex]
             self.signIn(userDetails)
 
-    def bindingEventListeners(self):
-        elements = self.elements
-        for each in elements:
-            elements[each].bind("<Enter>",lambda event,element=each:self.elementMouseEnter(element))
-            elements[each].bind("<Leave>",lambda event,element=each:self.elementMouseLeave(element))
-
-        """self.entryEmail.bind("<FocusIn>",self.emailFocusIn)
-        self.entryEmail.bind("<FocusOut>",self.emailFocusOut)
-        self.entryPassword.bind("<FocusIn>",self.passwordFocusIn)
-        self.entryPassword.bind("<FocusOut>",self.passwordFocusOut)"""
 
 auth = Auth()

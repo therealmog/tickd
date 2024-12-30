@@ -29,7 +29,7 @@ class Checkbox(CTkBaseClass):
         self.emptyImgPanel.bind("<Button-1>",lambda event:self.boxClicked(event))
         self.checkedImgPanel.bind("<Button-1>",lambda event:self.boxClicked(event))
 
-        self.value = False
+        self.__value = False
         self.justAccessed = False
 
     def placeWidget(self):
@@ -49,21 +49,24 @@ class Checkbox(CTkBaseClass):
     
     def boxClicked(self,_):
         self.checkedImgPanel.focus()
-        if self.value == False:
-            self.value = True
+        if self.__value == False:
+            self.__value = True
             self.setChecked(_)
             
         else:
-            self.value = False
+            self.__value = False
             self.setEmpty(_)
 
     def disableClicks(self):
         print("helloooo")
-        if self.value:
+        if self.__value:
             self.boxClicked(None)
         self.emptyImgPanel.bind("<Button-1>",None)
     
     def enableClicks(self):
         self.emptyImgPanel.bind("<Button-1>",lambda event:self.boxClicked(event))
+
+    def getValue(self):
+        return self.__value
 
 #myBox = Checkbox(parent=root,x=10,y=20,size=(50,50))

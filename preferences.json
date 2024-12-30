@@ -1,12 +1,50 @@
 {
-    "amoghg75@yahoo.com":
-    {
-        "property1":"value1",
-        "porperty2":"value2"
+    "amoghg75@yahoo.com": {
+        "accent": "dodgerblue2"
     },
-    "omar@gmail.com":
-    {
-        "property1":"value3",
-        "property2":"value2"
+    "tickd@gmail.com": {
+        "accent": "dodgerblue2"
+    },
+    "omar@gmail.com": {
+        "accent": "crimson"
+    },
+    "ajayng@tickd.co.uk": {
+        "accent": "dodgerblue2"
+    },
+    "test@gmail.com": {
+        "accent": "dodgerblue2"
+    },
+    "snehan@gmail.com": {
+        "accent": "dodgerblue2"
+    },
+    "freitasarod@gmail.com": {
+        "accent": "dodgerblue2"
+    },
+    "sufyaan.hussain@outlook.com": {
+        "accent": "dodgerblue2"
+    },
+    "tickd2@gmail.com": {
+        "accent": "dodgerblue2"
+    },
+    "bertwaldron@gmail.com": {
+        "accent": "dodgerblue2"
+    },
+    "bingbong@gmail.com": {
+        "accent": "dodgerblue2"
+    },
+    "tickd.todolist@gmail.com": {
+        "accent": "dodgerblue2"
+    },
+    "ajayng5678@gmail.com": {
+        "accent": "dodgerblue2"
+    },
+    "snehan.biswas2007@gmail.com": {
+        "accent": "dodgerblue2"
+    },
+    "test@tickd.com": {
+        "accent": "dodgerblue2"
+    },
+    "test4@gmail.com": {
+        "accent": "dodgerblue2"
     }
 }
