@@ -4,8 +4,6 @@
 from customtkinter import *
 from PIL import ImageTk, Image
 
-"""root = Tk()
-root.geometry("600x400")"""
 
 class Checkbox(CTkBaseClass):
     def __init__(self,parent:CTk,x,y,size:tuple,relWidget=None,command=None,commandArgs=None):
@@ -24,8 +22,6 @@ class Checkbox(CTkBaseClass):
         self.checkedImgPanel = CTkLabel(parent,image=self.checkedImg,cursor="hand2",text="")
 
         
-        #self.emptyImgPanel.bind("<Enter>",self.setChecked)
-        #self.checkedImgPanel.bind("<Leave>",self.setEmpty)
         self.emptyImgPanel.bind("<Button-1>",lambda event:self.boxClicked(event))
         self.checkedImgPanel.bind("<Button-1>",lambda event:self.boxClicked(event))
 

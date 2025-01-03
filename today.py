@@ -1,4 +1,5 @@
 from customtkinter import *
+from PIL import Image
 from datetime import date,timedelta
 from lib.getDetails import getAllDetails,getDetailsIndividual,writeToAuthDetails
 from lib.submitBtn import SubmitButton
@@ -9,16 +10,12 @@ from lib.task import Task
 from lib.loadTaskList import loadTaskList
 from lib.getTasks import getTasks
 from lib.uploadTask import uploadTask
-from copy import copy
 from lib.updateTaskListData import updateTaskListData
 from lib.detailsPanel import DetailsPanel
 from tkinter import messagebox
 from lib.getOverdue import getOverdue
 from lib.getListImgs import getListImgs
 
-
-
-from PIL import Image
 
 class Today(CTkFrame):
     
@@ -48,7 +45,10 @@ class Today(CTkFrame):
         } 
 
         # Calculated and passed into this class from app
-        self.todaysDate = todaysDate
+        if isinstance(todaysDate,str):
+            self.todaysDate = todaysDate
+        else:
+            self.todaysDate = todaysDate.strftime("%A, %d %B %Y")
 
         self.widgets()
         self.placeWidgets()
@@ -94,8 +94,8 @@ class Today(CTkFrame):
                                                self.taskCompleted,{"taskID":"TjAiDX"})"""
         self.entries = [self.entryDate,self.dropdownPriority,self.entryTime]
 
-        self.taskFrame = CTkScrollableFrame(self,width=410,height=720,fg_color="#191616")
-        self.overdueFrame = CTkScrollableFrame(self,width=410,height=200,fg_color="#191616")
+        self.taskFrame = CTkScrollableFrame(self,width=410,height=720,fg_color=("white","#191616"))
+        self.overdueFrame = CTkScrollableFrame(self,width=410,height=200,fg_color=("white","#191616"))
         self.lblOverdue = CTkLabel(self,text="OVERDUE",font=(globalFontName,30))
 
         listImgs = getListImgs()
@@ -215,6 +215,7 @@ class Today(CTkFrame):
                 if len(self.taskList) >=1:
                     self.lblOtherTasks.place(in_=self.lblOverdue,y=280)
                     self.taskFrame.place(in_=self.lblOtherTasks,y=30)
+                    #self.taskFrame.configure(height=500)
             else:
                 if len(self.taskList) >=1:
                     self.lblOtherTasks.place(in_=self.lblListName,x=-5,y=100)
@@ -397,7 +398,7 @@ class Today(CTkFrame):
         if taskID in self.overdueDict:
             for each in self.overdueList.copy():
                 if each.attributes["taskID"] == taskID:
-                    self.overdueList.remove(each)
+                    each.attributes["completed"] = "True"
         else:
             for each in self.taskList:
                 if each.attributes["taskID"] == taskID:
@@ -415,7 +416,12 @@ class Today(CTkFrame):
         for each in self.taskList:
             if each.attributes["completed"] == "True":
                 print(f"Removing {each.attributes["title"]}")
-                self.placeTasks(self.taskList.index(each))
+                self.placeTasks(self.taskList.index(each),overdue=False)
+        
+        for each in self.overdueList:
+            if each.attributes["completed"] == "True":
+                print(f"Removing {each.attributes["title"]}")
+                self.placeTasks(self.overdueList.index(each),overdue=True)
         
         self.lblOtherTasks.configure(text=f" {self.listName.capitalize()} - {len(self.taskList)}")
         
@@ -425,45 +431,31 @@ class Today(CTkFrame):
             self.overdueFrame.place_forget()
             self.lblOverdue.place_forget()
             self.lblNoTasks.place(x=25,y=150)
-        """else:
-            print(self.taskList)
-            self.placeTasks()"""
 
 
-    def placeTasks(self,removedIndex):
+    def placeTasks(self,removedIndex,overdue:bool):
         print("hello")
         # Removes completed task by index
         # Then places all tasks again after the one which has been removed.
 
+        if overdue:
+            list = self.overdueList
+        else:
+            list = self.taskList
         
-        for each in range(removedIndex,len(self.taskList)):
-            self.taskList[each].grid_forget()
+        for each in range(removedIndex,len(list)):
+            list[each].grid_forget()
 
-        self.taskList.pop(removedIndex)
-
-        """self.taskList[0].grid(row=0,column=0,pady=(5,10))"""
+        if not overdue:
+            self.taskList.pop(removedIndex)
+        else:
+            self.overdueList.pop(removedIndex)
         
 
-        for each in range(removedIndex,len(self.taskList)): # Starts with index which was removed
-            task = self.taskList[each]
+        for each in range(removedIndex,len(list)): # Starts with index which was removed
+            task = list[each]
             task.grid(row=each,column=0,pady=10)
-    
-        """self.taskList[0].place_forget()
-        self.taskList[0].place(x=25,y=200)
-        if len(self.taskList)>1:
-            for i in range(1,len(self.taskList)):
-                self.taskList[i].place(in_=self.taskList[i-1],y=75)"""
-
-        """try:
-            for each in self.taskList:
-                each.place_forget()
-            
-            
-        except IndexError:
-            print("list is empty!")"""
-        
-        
-
+     
 
     def priorityCallback(self,event):
         if self.dropdownPriority.get() == "priority":

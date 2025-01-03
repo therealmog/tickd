@@ -7,6 +7,7 @@ from today import Today
 from myLists import MyLists
 from lib.accentsConfig import getAccent
 from lib.menu import Menu
+from list import List
 
 
 from PIL import Image
@@ -70,7 +71,7 @@ class App(CTk):
         self.menu.place(x=20,y=30)
 
         
-        self.loadFrame("today")
+        self.loadFrame("inbox")
         #self.bindTaskEntry()
 
         self.bind("<Configure>",lambda event:self.resizeFrame())
@@ -100,14 +101,14 @@ class App(CTk):
         self.taskFrame = CTkScrollableFrame(self.currentFrame,width=410,height=600,fg_color="#191616")
 
         #-----------------# Regular app frames #------------------#
-        self.frameToday = Today(self,email=self.userEmail,userPath=self.userPath,todaysDate=self.todaysDate,userAccent=self.accent,listName="inbox")
+        self.frameInbox = List(self,email=self.userEmail,userPath=self.userPath,todaysDate=self.todaysDate,userAccent=self.accent,listName="inbox")
         self.frameMyLists = MyLists(self,email=self.userEmail,userPath=self.userPath,todaysDate=self.todaysDate,userAccent=self.accent)
 
-        self.frames = {"today":self.frameToday,
+        self.frames = {"today":self.dummyFrame,
                        "myLists":self.frameMyLists,
                        "starred":self.dummyFrame,
                        "leaderboard":self.dummyFrame,
-                       "inbox":self.dummyFrame}
+                       "inbox":self.frameInbox}
         
         self.preferencesMenuDict = {"Theme":lambda:self.mode(),
                                     "Accent colour":lambda msg="hello":print(msg)}
@@ -115,7 +116,7 @@ class App(CTk):
         
         self.logoMenuIsOpen = False
 
-            
+
         
         
         
@@ -174,14 +175,24 @@ class App(CTk):
             
             
             if self.winfo_width() < 1505:
-                if self.currentFrame == self.frames["today"]:
+                if isinstance(self.currentFrame,Today) or isinstance(self.currentFrame,List):
                     self.currentFrame.entryTask.place_forget()
-                    self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.7)
+                    
+                    if len(self.currentFrame.overdueList) >0:
+                        #print("changing")
+                        self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.4)
+                    else:
+                        self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.7)
 
             if self.winfo_width() > 1505:
-                if self.currentFrame == self.frames["today"]:
+                if isinstance(self.currentFrame,Today) or isinstance(self.currentFrame,List):
                     self.currentFrame.entryTask.place(in_=self.currentFrame.logoPanel,x=-750,y=10)
-                    self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.7)
+
+                    if len(self.currentFrame.overdueList) >0:
+                        #print("changing")
+                        self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.4)
+                    else:
+                        self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.7)
         except:
             pass
         

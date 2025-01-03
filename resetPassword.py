@@ -82,17 +82,14 @@ class ResetPassword(CTkToplevel):
         self.entryCode = CTkEntry(self.frameRegister,font=(globalFontName,25),width=150,placeholder_text="code",corner_radius=15)
         self.lblEntry = CTkLabel(self.frameRegister,font=emojiFont,text="✉️")
 
-        self.imgShowPassword = CTkImage(Image.open("eyeIcon.png"),size=(33,24))
+        self.imgShowPassword = CTkImage(Image.open("icons//eyeIcon.png"),size=(33,24))
         self.btnShowPassword = CTkButton(self.frameRegister,image=self.imgShowPassword,text="",width=1,command=self.showHide,corner_radius=15,fg_color=self.accent)
-        self.imgHidePassword = CTkImage(Image.open("eyeIconOff.png"),size=(33,24))
+        self.imgHidePassword = CTkImage(Image.open("icons//eyeIconOff.png"),size=(33,24))
         self.btnHidePassword = CTkButton(self.frameRegister,image=self.imgHidePassword,text="",width=0,command=self.showHide,corner_radius=15,fg_color=self.accent)
         
         self.btnVerify = CTkButton(self.frameRegister,text="verify",width=55,corner_radius=15,fg_color=self.accent,font=(globalFontName,25),command=self.checkEmailFormat)
 
         self.btnReset = CTkButton(self.frameRegister,text="reset",font=(globalFontName,30),corner_radius=15,text_color="white",border_color=("black","gray12"),fg_color=self.accent,border_width=2,command=self.resetClicked)
-        self.messageVar = StringVar()
-        self.messageVar.set("hello")
-        self.lblMessage = CTkLabel(self.frameRegister,font=(globalFontName,22),text="Please enter your email to receive a 6-digit code.")
 
         #self.btnCancel = CTkButton(self.frameRegister,text="cancel",font=(globalFontName,30),corner_radius=15,hover_color="red",text_color="white",border_color=("black","gray12"),fg_color=self.accent,border_width=2,command=self.close_window)
 
@@ -108,7 +105,6 @@ class ResetPassword(CTkToplevel):
         self.lblPassword.place(in_=self.entryPassword,x=-50,y=-3)"""
 
         self.btnVerify.place(in_=self.entryEmail,x=380)
-        self.lblMessage.place(in_=self.lblEntry,x=10,y=60)
         #self.btnRegister.place(in_=self.entryEmail,x=45,y=100)
         #self.btnCancel.place(in_=self.btnRegister,x=145)
 
@@ -220,7 +216,6 @@ class ResetPassword(CTkToplevel):
                 emailRegistered = self.checkEmailRegistered(self.email)
 
                 if emailRegistered:
-                    self.lblMessage.place_forget()
                     self.lblEntry.configure(text="🔑")
                     self.entryEmail.place_forget()
                     self.entryCode.place(x=170,y=150)
@@ -258,7 +253,7 @@ class ResetPassword(CTkToplevel):
             self.entryCode.place_forget()
             self.entryPassword.place(x=95,y=150)
             self.lblEntry.place(in_=self.entryPassword,x=-50,y=-3)
-            self.btnReset.place(in_=self.entryPassword,x=125,y=125)
+            self.btnReset.place(in_=self.entryPassword,x=125,y=50)
             self.btnShowPassword.place(in_=self.entryPassword,x=385,y=2)
         else:
             messagebox.showerror("Can't reset password.","Invalid code entered.")

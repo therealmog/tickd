@@ -4,8 +4,19 @@ from lib.task import Task
 def getTasks(master,userPath,listName,accent,command,fontName="Bahnschrift"):
         path = f"{userPath}//{listName}.json"
         
-        with open(path,"r") as f:
-            theList = json.load(f)
+        try:
+            with open(path,"r") as f:
+                theList = json.load(f)
+        except FileNotFoundError:
+            print(f"List {listName} doesn't exist, creating it now.")
+            with open(path,"w") as f:
+                newDict = {"shared":"no",
+                           "tasks":{},
+                           }
+                json.dump(newDict,f,indent=4)
+            with open(path,"r") as f:
+                theList = json.load(f)
+            
         
         try:
             taskDict = theList["tasks"] # First attribute is always "shared", then comes the tasklist

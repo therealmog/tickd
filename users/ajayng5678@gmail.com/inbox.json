@@ -1,11 +1,33 @@
 {
     "shared": "no",
     "tasks": {
+        "qshlhD": {
+            "title": "bonjour",
+            "date": "",
+            "taskID": "qshlhD",
+            "completed": "False",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "inbox"
+        }
+    },
+    "completed": {
+        "GHqKUq": {
+            "title": "Finish maths homework",
+            "date": "01/01/2025",
+            "taskID": "GHqKUq",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "inbox"
+        },
         "welcome": {
             "title": "Welcome to Tickd!",
             "date": "05/11/2024",
-            "description": "Welcome to a simpler life with Tickd.\nSimply add tasks with the 'Add a task' box at the top, and use keywords such as 'today' and 'tomorrow' in the date, or for other dates simply add the date using the DD/MM/YY format.\ne.g. for the 31st December 2025, you would put 31/12/25.",
-            "completed": "False",
+            "description": "Welcome to a simpler life with Tickd.",
+            "completed": "True",
             "time": "",
             "priority": "",
             "taskID": "welcome"

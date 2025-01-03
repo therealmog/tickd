@@ -7,8 +7,8 @@ from datetime import date,timedelta
 class Task(CTkFrame):
 
     def __init__(self,master,attributes:dict,accent="dodgerblue2",font="Bahnschrift",size=30,command=None):
-        super().__init__(master=master,width=400,height=50,fg_color=("white","gray13"),border_color="gray15",\
-                         border_width=3,cursor="hand2")
+        super().__init__(master=master,width=400,height=67,fg_color=("white","gray13"),border_color="gray15",\
+                         border_width=3,cursor="question_arrow")
 
         self.font = font
         self.size = size
@@ -16,7 +16,6 @@ class Task(CTkFrame):
         self.attributes = attributes
         self.command = command
 
-        self.getAttributes()
         self.widgets()
         self.placeWidgets()
 
@@ -28,96 +27,110 @@ class Task(CTkFrame):
         self.lblDate.bind("<Leave>",lambda event:self.onmouseLeave())
 
     def widgets(self):
-        self.lblTitle = CTkLabel(self,text=self.title,font=(self.font,self.size*0.80),cursor="hand2")
+        # Defining the title and date label widgets.
+        self.lblTitle = CTkLabel(self,text=self.attributes["title"],font=(self.font,self.size*0.80),cursor="question_arrow")
         self.lblTitle.bind("<Button-1>",lambda event: self.lblTitle.focus())
         self.taskDate = self.getDate()
         self.lblDate = CTkLabel(self,text=self.taskDate,font=(self.font,17*0.95))
 
+        # Checking if the date is overdue, to set a red label.
         if self.taskDateObj != None:
             if self.taskDateObj < date.today():
                 self.lblDate.configure(text_color="red")
-        
+
+            # Calculates the string to show if hovering over date (e.g. "2 days ago", "in 4 days", etc.)
             self.differenceStr = self.getTimeDifference()
-            print(self.differenceStr)
+            print(self.differenceStr)   
 
+        # Creating the checkbox for the task.
+        # Passing in the command which is taken in from the main app (i.e. in the constructor.)
+        self.checkbox = Checkbox(self,x=-40,y=5,size=(self.size,self.size),relWidget=self.lblTitle,\
+                                 command=self.command,commandArgs={"taskID":self.attributes["taskID"]})
+        
+        # Adds the time to the date label if applicable.
+        if self.attributes["time"] != "":
+            self.lblDate.configure(text=f"{self.taskDate}, {self.attributes["time"]}")
 
-        self.checkbox = Checkbox(self,x=-40,y=5,size=(self.size,self.size),relWidget=self.lblTitle,command=self.command,commandArgs={"taskID":self.attributes["taskID"]})
+        # Assigns the priority colour, if applicable.
+        if self.attributes["priority"] != "":
+            priority = self.attributes["priority"]
+            if  priority == "P1":
+                self.configure(border_color="red")
+            elif priority == "P2":
+                self.configure(border_color="#db9d09")
+            else:
+                self.configure(border_color="limegreen")
 
     def placeWidgets(self):
         self.lblTitle.place(x=45,y=5)#This should stay as it is, since it is the frame that will be placed inside the actual app.
         self.checkbox.placeWidget()
-        if self.lblDate != "":
-            self.configure(height=65)
-            self.lblDate.place(in_=self.lblTitle,x=0,y=30)
+
+        self.lblDate.place(in_=self.lblTitle,x=0,y=30)
+
+            
+
+        
 
     def onmouseEnter(self):
         self.lblTitle.configure(text_color=self.accent)
-
-        self.lblDate.configure(text=self.differenceStr)
+        
+        try:
+            self.lblDate.configure(text=self.differenceStr)
+        except:
+            pass
         
 
     def onmouseLeave(self):
         self.lblTitle.configure(text_color=("black","white"))
         if self.taskDateObj != None:
-            self.lblDate.configure(text=self.taskDate)
+            if self.attributes["time"] != "":
+                self.lblDate.configure(text=f"{self.taskDate}, {self.attributes["time"]}")
+            else:
+                self.lblDate.configure(text=self.taskDate)
 
-    def getAttributes(self):
-        attributes = self.attributes
-
-        self.title = attributes["title"]
-        if self.title == "":
-            self.title = "(no title)"
-        
-        #---- Possible attributes ----#
-        self.date = ""
-        self.time = ""
-        self.priority = ""
-        self.description = ""
-
-        possibleAttributes = {"date":self.date,
-                              "time":self.time,
-                              "priority":self.priority,
-                              "description":self.description}
-        for each in attributes:
-            try:
-                possibleAttributes[each] = attributes[each]
-            except:
-                pass
     
     def getDate(self):
-        #try:
+        # Gets the date stored in the task dictionary (or attributes dict in this object.)
         taskDateStr = self.attributes["date"]
         dateList = taskDateStr.split("/")
 
+        # If the date is valid (it will create a list with more than 1 part)
         if len(dateList) >1:
+            # Creates a datetime object for the task date - saved as an attribute.
             self.taskDateObj = date(int(dateList[-1]),int(dateList[1]),int(dateList[0]))
+
+            # Creates datetime objects for today and tomorrow.
             today = date.today()
             tomorrow = date.today() + timedelta(days=1)
 
+            # The task date can be displayed as "today" or "tomorrow" if applicable.
             if self.taskDateObj == today:
                 taskDate = "today"
             elif self.taskDateObj == tomorrow:
                 taskDate = "tomorrow"
             else:
+                # Date is simply displayed as the regular short date.
+                # Derived from taskDateObj using the strftime method.
                 taskDate = self.taskDateObj.strftime("%d/%m/%Y")
         else:
+            # No date saved - this is displayed clearly for the user.
             self.taskDateObj = None
             taskDate = "(no date)"
-            
-        """except:
-            self.taskDateObj = None
-            taskDate = taskDateStr"""
-                    
+                                
         return taskDate
     
     def getTimeDifference(self):
         late = False
         if self.taskDateObj >= date.today():
+            # The "-" operator creates a timedelta object using
+            # the datetime module.
             difference = self.taskDateObj - date.today()
         else:
             difference = date.today() - self.taskDateObj
             late = True
-        
+
+        # The timedelta object has different parts
+        # We only need the days part, so this is selected.
         days = difference.days
         if late:
             differenceStr = f"{days} days ago"

@@ -14,5 +14,5 @@ if email == "":
     print("No email. Cannot sign in to main program.")
 else:
     #today = Today(email,userPath=auth.userPath,theme=auth.theme)
-    app = App(email,userPath=auth.userPath,theme=auth.theme)
+    app = App(email,userPath=auth.userPath)
 
