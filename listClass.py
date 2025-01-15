@@ -8,7 +8,7 @@ from lib.checkDate import checkDate
 from lib.checkTime import checkTime
 from lib.task import Task
 from lib.loadTaskList import loadTaskList
-from lib.getTasks import getTasks,getTasksAllLists
+from lib.getTasks import getTasks
 from lib.uploadTask import uploadTask
 from lib.updateTaskListData import updateTaskListData
 from lib.detailsPanel import DetailsPanel
@@ -21,21 +21,20 @@ from lib.checkListName import checkListName
 
 
 
-class Today(CTkFrame):
+class List(CTkFrame):
     
     globalFontName = "Bahnschrift"
     textgrey="#9e9f9f"
-    def __init__(self,mainWindow,email,userPath,todaysDate,userAccent="dodgerblue2"):
-        """The class for the Today view"""
+    def __init__(self,mainWindow,email,userPath,todaysDate,userAccent="dodgerblue2",listName="inbox",):
+        """The class for generating frames for individual lists."""
         
         
         super().__init__(mainWindow,width=1400,height=900,fg_color=("white","gray9"),border_color="gray7",border_width=5)
         
         self.mainWindow = mainWindow
-        self.mainWindow.title("Today - Tickd")
 
         self.userPath = userPath
-        self.listName = "Today"
+        self.listName = listName
         self.email = email
 
 
@@ -52,6 +51,20 @@ class Today(CTkFrame):
         else:
             self.todaysDate = todaysDate.strftime("%A, %d %B %Y")
 
+
+        # Indicates whether list is renameable, shareable, or deleteable.
+        # Keeping these as 3 separate variables allows them to be toggled separately.
+        # e.g. a list could be renameable and deleteable, but not shareable.
+        # However, at the moment I have not made any lists like that so they are all toggled at the same time.
+        if self.listName.lower() == "inbox" or self.listName.lower() == "starred":
+            # If these are toggled, the respective buttons are made for these.
+            self.renameable = False
+            self.shareable = False
+            self.deleteable = False
+        else:
+            self.renameable = True
+            self.shareable = True
+            self.deleteable = True
 
         self.widgets()
         self.placeWidgets()
@@ -87,6 +100,19 @@ class Today(CTkFrame):
         self.lblListName.bind("<Button-1>",lambda event:self.checkRenameList())
 
         
+        smallerListImgs = getListImgs((20,20))
+        if self.renameable:
+            self.btnRename = CTkButton(self,text="Rename list",font=(self.globalFontName,20),width=130,image=smallerListImgs["Rename"],compound="left",command=self.checkRenameList,
+                                       fg_color=self.accent)
+        
+        if self.shareable:
+            self.btnShare = CTkButton(self,text="Share list",font=(self.globalFontName,20),width=130,image=smallerListImgs["Share"],compound="left",
+                                      fg_color=self.accent)
+
+        if self.deleteable:
+            self.btnDelete = CTkButton(self,text="Delete list",font=(self.globalFontName,20),width=130,image=smallerListImgs["Delete"],compound="left",command=self.deleteList,
+                                       fg_color=self.accent)
+
         self.lblDate = CTkLabel(self,text=self.todaysDate,font=(globalFontName,20)) 
         self.imgLogo = CTkImage(light_image=Image.open("logo//whiteBGLogo.png"),dark_image=Image.open("logo//blackBGLogo.png"),size=(155,49))
         self.logoPanel = CTkLabel(self,text="",image=self.imgLogo)
@@ -132,6 +158,10 @@ class Today(CTkFrame):
 
         self.currentAttribute = ""
 
+        if self.renameable and self.deleteable and self.shareable:
+            self.btnRename.place(in_=self.lblListName,y=55)
+            self.btnDelete.place(in_=self.btnRename,x=160)
+            self.btnShare.place(in_=self.btnDelete,x=145)
         
 
     def frameDimensions(self):
@@ -203,58 +233,85 @@ class Today(CTkFrame):
     def loadTasks(self): # Should only be run once at the start of the program
 
         # Gets a list of Task objects.
-        self.taskList = getTasksAllLists(self.taskFrame,self.userPath,self.accent,command=self.taskCompleted,fontName=self.globalFontName,displayListName=True)
-        todayObj = date.today()
-
-        for each in self.taskList:
-            dateSplit = each.attributes["date"]
-            if len(dateSplit) == 3:
-                dateObj = date(int(dateSplit[2]),int(dateSplit[1]),int(dateSplit[0]))
-                if dateObj == todayObj:
-                    print(f"Task {each.attributes["title"]} is due today.")
-                else:
-                    self.taskList.remove(each)
-            else:
-                print(f"Date not set for {each.attributes["title"]}")
-                self.taskList.remove(each)
-            
-
-
+        self.taskList = getTasks(self.taskFrame,self.userPath,self.listName,self.accent,command=self.taskCompleted,fontName=self.globalFontName)
+               
         # Creates the list for details panels
         self.detailPanels = {} # taskID:detailPanelObj
         self.currentDisplayed = "" # stores taskID of task with details panel displayed.
+
+        # Creates a list for overdue task objects
+        self.overdueList = []
         
         # self.taskList = False indicates that there are no tasks.
         # If there are no tasks at all, there will be no overdue tasks either.
         if self.taskList != False:
+            # Gathering overdue tasks
+            self.overdueDict = getOverdue(self.taskList) # Returns a dictionary
+
             
+            for each in self.taskList.copy():
+                if each.attributes["taskID"] in list(self.overdueDict.keys()):
+                    self.taskList.remove(each)
+
+                    # Creates a new Task object with the same details as the removed object.
+                    overdueTask = Task(self.overdueFrame,each.attributes,accent=self.accent,font=self.globalFontName,command=self.taskCompleted)
+
+                    # New object added to overdue list and details panel binded.
+                    self.overdueList.append(overdueTask)
+                    self.setDetailsPanel(overdueTask,each.attributes["taskID"])
+
             # Creates labels for the regular lists
             newOtherTasksText = f" {self.listName.capitalize()} - {len(self.taskList)}"
             self.lblOtherTasks.configure(text=newOtherTasksText)
 
+            newOverdueTasksText = f"OVERDUE - {len(self.overdueList)}"
+            self.lblOverdue.configure(text=newOverdueTasksText)
 
             # Placing tasks in taskList
             # First, tasks are ordered.
             self.orderList(self.taskList)
 
             # grid method used to display tasks in scrollable frame
-            self.taskList[0].grid(row=0,column=0,pady=(5,10))
-            
-            taskID = self.taskList[0].attributes["taskID"]
-            self.setDetailsPanel(self.taskList[0],taskID)
-            i = 1 # Indicates column for taskFrame grid
-
-            for each in range(1,len(self.taskList)): # Starts with second item
-                task = self.taskList[each]
-                task.grid(row=i,column=0,pady=10)
-                i+=1
+            if len(self.taskList)>=1:
+                self.taskList[0].grid(row=0,column=0,pady=(5,10))
                 
-                taskID = task.attributes["taskID"]
-                self.setDetailsPanel(task,taskID)
+                taskID = self.taskList[0].attributes["taskID"]
+                self.setDetailsPanel(self.taskList[0],taskID)
+                i = 1 # Indicates column for taskFrame grid
 
-                 
-            self.lblOtherTasks.place(in_=self.lblListName,x=-5,y=100)
-            self.taskFrame.place(in_=self.lblOtherTasks,y=35)
+                for each in range(1,len(self.taskList)): # Starts with second item
+                    task = self.taskList[each]
+                    task.grid(row=i,column=0,pady=10)
+                    i+=1
+                    
+                    taskID = task.attributes["taskID"]
+                    self.setDetailsPanel(task,taskID)
+
+            # Overdue tasks displayed in overdueFrame
+            if len(self.overdueList) != 0:
+                self.overdueList[0].grid(row=1,column=0,pady=(20,10))
+
+                i = 2
+                for each in range(1,len(self.overdueList)):
+                    widget = self.overdueList[each]
+                    
+                    widget.grid(row=i,column=0,pady=10)
+                    i+=1
+            
+                # Overdue tasks always placed at the top to grab user's attention.
+                self.lblOverdue.place(in_=self.lblListName,x=-5,y=115)
+                self.overdueFrame.place(in_=self.lblOverdue,y=30)
+
+                # If other tasks are also there which aren't overdue.
+                if len(self.taskList)>0:
+                    self.lblOtherTasks.place(in_=self.lblOverdue,y=295)
+                    self.taskFrame.place(in_=self.lblOtherTasks,y=30)
+                    
+            else:
+                # No overdue tasks
+                # Places task frame and label at the top.
+                self.lblOtherTasks.place(in_=self.lblListName,x=-5,y=100)
+                self.taskFrame.place(in_=self.lblOtherTasks,y=35)
                 
             
             
@@ -277,7 +334,6 @@ class Today(CTkFrame):
         """This ensures that the attribute entries are always displayed if they are clicked on, especially since
         when you click out of another attribute entry, it removes the entries, so this places them back."""
         self.placeAttributeEntries()
-        print("yes")
         
         
 
@@ -346,7 +402,7 @@ class Today(CTkFrame):
 
                     # Adds extra attributes to be altered later if desired.
                     attributes["description"] = ""
-                    attributes["listName"] = "inbox"
+                    attributes["listName"] = self.listName
                     
                     # All the attributes are brought together to create a task dictionary
                     # to be written to the task list JSON file.
@@ -354,7 +410,7 @@ class Today(CTkFrame):
                     self.resetEntry(["entryTask","entryDate","entryTime","dropdownPriority"])
 
                     # Task is written to the specified list.
-                    uploadTask(self.userPath,taskDict,listName="inbox")
+                    uploadTask(self.userPath,taskDict,listName=self.listName)
 
 
                     
@@ -362,7 +418,7 @@ class Today(CTkFrame):
                     self.placeNewTask(taskDict)
 
 
-                    print([x.attributes["title"] for x in self.taskList])
+                    #print([x.attributes["title"] for x in self.taskList])
     
     def deleteListFromFolder(self):
         path = f"{self.userPath}//{self.listName}.json"
@@ -476,7 +532,7 @@ class Today(CTkFrame):
 
     def taskCompleted(self,taskID):
         # Retrieving all of the data for the list.
-        taskListData = loadTaskList(self.userPath,"inbox")
+        taskListData = loadTaskList(self.userPath,self.listName)
 
 
         # Selecting the tasks part (tasks is a sub-dictionary)
@@ -516,7 +572,7 @@ class Today(CTkFrame):
 
 
         # Saving the changes by writing them to the JSON file.
-        updateTaskListData(taskListData,self.userPath,"inbox")
+        updateTaskListData(taskListData,self.userPath,self.listName)
 
 
         # Checking if task is in the overdue section.
@@ -539,14 +595,13 @@ class Today(CTkFrame):
         # Removes the task from the screen and edits text for list title.
         self.removeIfCompleted()
 
-        #print(self.taskList)
         
     
     def removeIfCompleted(self):
         # First checks if task in regular task list
         for each in self.taskList:
             if each.attributes["completed"] == "True":
-                print(f"Removing {each.attributes["title"]}")
+                #print(f"Removing {each.attributes["title"]}")
 
                 # Runs placeTasks procedure, passing in index of item and if it is overdue or not.
                 self.placeTasks(self.taskList.index(each),overdue=False)
@@ -557,7 +612,7 @@ class Today(CTkFrame):
         # Then checks if it is in overdue list.
         for each in self.overdueList:
             if each.attributes["completed"] == "True":
-                print(f"Removing {each.attributes["title"]}")
+                #print(f"Removing {each.attributes["title"]}")
 
                 # Same as above except for overdue lists
                 self.placeTasks(self.overdueList.index(each),overdue=True)

@@ -1,9 +1,15 @@
-from customtkinter import *
+from customtkinter import * 
 from datetime import date,timedelta
 from lib.getDetails import getAllDetails,getDetailsIndividual,writeToAuthDetails
 from lib.submitBtn import SubmitButton
 from lib.detailsPanel import DetailsPanel
 from lib.getListImgs import getListImgs
+import glob
+from listClass import List
+from lib.accentsConfig import getAccent,setAccent
+from lib.getValueWindow import GetValueWin
+from tkinter import messagebox
+from lib.checkListName import checkListName
 
 
 from PIL import Image
@@ -24,6 +30,7 @@ class MyLists(CTkFrame):
         self.userPath = userPath
         self.listName = "My lists"
         self.email = email
+        self.todaysDate = todaysDate
 
         """self.today = date.today()
         self.todaysDate = self.today.strftime("%A, %d %B %Y")
@@ -43,8 +50,7 @@ class MyLists(CTkFrame):
         self.placeWidgets()
         self.topButtonCallback("ownedByMe")
 
-
-        #self.bind("<Configure>",lambda event:self.resizeFrame())
+        self.creatingNewList = False
 
     #------------------------# Widgets and placing #-------------------------#    
     def widgets(self):
@@ -63,18 +69,37 @@ class MyLists(CTkFrame):
         self.btnSharedWithMe = CTkButton(self,text="Shared with me",font=(globalFontName,35),command=lambda btn="sharedWithMe":self.topButtonCallback(btn),fg_color="grey",hover=False,border_width=5,border_color="grey5",corner_radius=60)
 
         #---------# System lists #---------#
+
+        # Defining image and label for default lists title.
         self.imgLogoDefaultLists = CTkImage(light_image=Image.open("logo//whiteBGLogo.png"),dark_image=Image.open("logo//blackBGLogo.png"),size=(114,36))
         self.lblDefaultLists = CTkLabel(self,text="default lists",font=(globalFontName,30),image=self.imgLogoDefaultLists,compound="left")
 
+        # Gets a list of icons to use for lists.
         self.listImgs = getListImgs((36,36))
-        self.btnInbox = CTkButton(self,text="Inbox",font=(globalFontName,40),width=280,fg_color="grey28",hover_color="grey24",border_width=5,border_color="grey5",corner_radius=60,image=self.listImgs["Inbox"],compound="left",cursor="hand2")
-        self.btnToday = CTkButton(self,text="Today",font=(globalFontName,40),width=280,fg_color="grey28",hover_color="grey24",border_width=5,border_color="grey5",corner_radius=60,image=self.listImgs["Today"],compound="left",cursor="hand2")
-        self.btnStarred = CTkButton(self,text="Starred",font=(globalFontName,40),width=280,fg_color="grey28",hover_color="grey24",border_width=5,border_color="grey5",corner_radius=60,image=self.listImgs["Starred"],compound="left",cursor="hand2")
 
-        self.tickdDefaults = [self.btnToday,self.btnInbox,self.btnStarred]
+        self.tickdDefaults = []
+        # List of titles for the buttons, also acts as key for the icons dict.
+        buttons = ["Inbox","Today","Starred"]
+        
+        for each in buttons:
+            button = CTkButton(self,text=each,font=(globalFontName,40),width=280,fg_color="grey28",hover_color="grey24",\
+                               border_width=5,border_color="grey5",corner_radius=60,image=self.listImgs[each],compound="left",\
+                               cursor="hand2",command=lambda listName=each.lower():self.mainWindow.loadFrame(listName))
+            self.tickdDefaults.append(button)
+            
 
+        # Other two titles defined
         self.lblYourCustomLists = CTkLabel(self,text="Your custom lists",font=(globalFontName,30))
         self.lblYourSharedLists = CTkLabel(self,text="Your shared lists",font=(globalFontName,30))
+
+        # User's custom lists are retrieved.
+        self.getCustomLists()
+
+        # Button to add lists is defined.
+        self.btnAddList = CTkButton(self,text="Create list",font=(globalFontName,28),
+                                    width=180,fg_color=self.accent,hover_color="green",border_width=3,\
+                                    border_color="grey5",corner_radius=60,image=self.listImgs["Add"],
+                                    compound="left",cursor="hand2",command=self.createList)
 
     def placeWidgets(self):
         #self.place(relx=0.5,rely=0.5,anchor="center")
@@ -93,13 +118,34 @@ class MyLists(CTkFrame):
         self.lblYourCustomLists.place(in_=self.lblDefaultLists,x=450)
         self.lblYourSharedLists.place(in_=self.lblYourCustomLists,x=450)
         
+        
+
         self.tickdDefaults[0].place(in_=self.lblDefaultLists,y=50)
         for each in range(1,len(self.tickdDefaults)):
             self.tickdDefaults[each].place(in_=self.tickdDefaults[each-1],y=70)
+        
+        self.btnAddList.place(in_=self.lblYourCustomLists,y=50)
+        if len(self.customListsBtnsArray) > 0:
+            self.customListsBtnsArray[0].place(in_=self.btnAddList,y=50)
+            if len(self.customListsBtnsArray)>1:
+                for each in range(1,len(self.customListsBtnsArray)):
+                    self.customListsBtnsArray[each].place(in_=self.customListsBtnsArray[each-1],y=50)
+        
 
         
 
         self.currentAttribute = ""
+
+    def placeCustomLists(self):
+        if len(self.customListsBtnsArray) !=0:
+            for each in self.customListsBtnsArray:
+                each.place_forget()
+
+            self.customListsBtnsArray[0].place(in_=self.btnAddList,y=50)
+            if len(self.customListsBtnsArray) > 1:
+                for each in range(1,len(self.customListsBtnsArray)):
+                    self.customListsBtnsArray[each].place(in_=self.customListsBtnsArray[each-1],y=50)
+
 
     def frameDimensions(self):
         print(f"Width: {self.winfo_screenwidth()}, Height: {self.winfo_screenheight()}")
@@ -108,6 +154,7 @@ class MyLists(CTkFrame):
 
         return frameX, frameY
     
+
     def topButtonCallback(self,btn):
         if btn == "ownedByMe":
             self.btnOwnedByMe.configure(fg_color=self.accent)
@@ -116,24 +163,88 @@ class MyLists(CTkFrame):
             self.btnSharedWithMe.configure(fg_color=self.accent)
             self.btnOwnedByMe.configure(fg_color="grey")
 
-    """def resizeFrame(self):
-        screenWidth = self.winfo_screenwidth()
-        screenHeight = self.winfo_screenheight()
-        
-        #print(self.winfo_width(),"by",self.winfo_height())
-        frameX = 0.95 * self.winfo_width()
-        frameY = 0.95 * self.winfo_height()
+    def getCustomLists(self):
+        globalFontName = self.globalFontName
+        self.customLists = {} 
+        # key should be name of list, followed by a list with frame object and button object.
 
-        self.configure(width=frameX,height=frameY)
-        #self.panelImgBG._image
+        paths = glob.glob(f"{self.userPath}//*.json")
+        toRemove = ["inbox.json"]
+        for each in paths:
+            for disallowedPhrase in toRemove:
+                if disallowedPhrase in each:
+                    paths.remove(each)
         
-        
-        if self.winfo_width() < 1505:
-            self.entryTask.place_forget()
+        print(paths)
+        for each in paths:
+            listName = each.replace(f"{self.userPath}\\","")
+            listName = listName.replace(".json","")
+            
+            listFrame = List(self.mainWindow,self.email,self.userPath,self.todaysDate,getAccent(self.email),listName=listName)
+            self.mainWindow.frames[listName] = listFrame
+            print(self.mainWindow.frames)
+            listBtn = CTkButton(self,text=f"{listName}",font=(globalFontName,30),width=280,fg_color="grey28",hover_color="grey24",border_width=3,border_color="grey5",corner_radius=60,compound="left",cursor="hand2",command=lambda listName=listName:self.mainWindow.loadFrame(listName))
 
-        if self.winfo_width() > 1505:
-            self.entryTask.place(in_=self.logoPanel,x=-650,y=10)"""
-          
+            self.customLists[listName] = [listFrame,listBtn]
+        
+        self.customListsBtnsArray = []
+        for each in self.customLists:
+            self.customListsBtnsArray.append(self.customLists[each][1])
+
+    def changeNewListFlag(self):
+        self.creatingNewList = not self.creatingNewList
+
+    def createNewCustomListBtn(self,listName):
+        globalFontName = self.globalFontName
+        
+        # Sets flag for list name window to False
+        self.creatingNewList = False
+
+        # Creates new List object.
+        listFrame = List(self.mainWindow,self.email,self.userPath,self.todaysDate,getAccent(self.email),listName=listName)
+
+        # Adds to frames dictionary in main window.
+        self.mainWindow.frames[listName] = listFrame
+
+        # Creates new list button for "My lists" page
+        # The command for this button is to use the "loadFrame" procedure.
+        listBtn = CTkButton(self,text=f"{listName}",font=(globalFontName,30),width=280,fg_color="grey28",hover_color="grey24",
+                            border_width=3,border_color="grey5",corner_radius=60,compound="left",cursor="hand2",
+                            command=lambda listName=listName:self.mainWindow.loadFrame(listName))
+
+        # Appends to array with list buttons
+        self.customListsBtnsArray.append(listBtn)
+        self.customLists[listName] = [listFrame,listBtn]
+
+        # Places under previous buttons if they exist, otherwise underneath the "Create new list" button
+        # The index [-2] indicates the second last button, since the last item in the array will be the button being placed.
+        if len(self.customLists) > 1:
+            listBtn.place(in_=self.customListsBtnsArray[-2],y=50)
+        else:
+            listBtn.place(in_=self.btnAddList,y=50)
+
+    def createList(self):
+        # self.creatingNewList is a flag variable used to indicate whether the window to get the new list name is open or not.
+        # This ensures that two windows are not open simultaneously.
+        if self.creatingNewList:
+            # Shows error message since another window is already open.
+            messagebox.showinfo("New list being created.",
+                                "A new list is already being created.\nPlease close the previous box before opening a new one.")
+        else:
+            # Sets flag to True
+            self.creatingNewList = True
+
+            # Creates window to get the value of the new task list name.
+            # Function to create new list is passed into this window.
+            validationKwargs = {"userPath":self.userPath}
+            getValueWin = GetValueWin("list name",assigningFunc=self.createNewCustomListBtn,
+                                      validationFunc=checkListName,validationFuncArgs=validationKwargs,
+                                      customTitle="Enter name of new list.",accent=self.accent,flagFunc=self.changeNewListFlag)
+
+            
+
+
+
     def renameMainWin(self):
         self.mainWindow.title("My lists - Tickd")
 

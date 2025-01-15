@@ -7,23 +7,27 @@ from today import Today
 from myLists import MyLists
 from lib.accentsConfig import getAccent
 from lib.menu import Menu
-from list import List
+from listClass import List
+import cProfile
+import pstats
 
 
 from PIL import Image
 
 class App(CTk):
-    
+    # Key class attributes are defined here.
     globalFontName = "Bahnschrift"
     textgrey="#9e9f9f"
     def __init__(self,email,userPath):
         """Main app container for Tickd."""
 
+        # NOTE: Debugging purposes, profiler used.
+        """with cProfile.Profile() as profile:"""
+
+        # Initialise CTk instance
         super().__init__()
         
-        
-        #self.attributes("-topmost",True)
-        
+        # Define size of window and minsize.
         self.geometry(f"{self.winfo_screenwidth()}x{self.winfo_screenheight()}")
         self.minsize(750,800)
         
@@ -32,14 +36,17 @@ class App(CTk):
 
         self.maxdims = [2000,1100]
         self.maxsize(self.maxdims[0],self.maxdims[1])
+
+        # Set window title and favicon
         self.title("Tickd")
-        
         self.iconbitmap("logo//tickd.ico")
 
+        # Calcuate today's date and put into "long date" format.
         self.today = date.today()
         self.todaysDate = self.today.strftime("%A, %d %B %Y")
-        print(self.todaysDate)
 
+        # Define key object attributes
+        # (Defined here since they are used repeatedly throughout the program)
         self.userEmail = email
         self.userPath = userPath
         
@@ -47,39 +54,51 @@ class App(CTk):
         try:
             self.userName = self.userDetails[2]
         except TypeError:
+            # Handles error if user's details can't be found.
             print("Invalid email entered. Have you registered?")
-
+            
+        # Gets user's accent colour from the preferences.json file.
         self.accent = getAccent(email)
 
         if self.accent == False:
             print("User not found in preferences file. Setting colour to default.")
             self.accent = "dodgerblue2"
+
         
-       
-        """self.attributes("-fullscreen",True)
-        self.after(500,lambda option="-fullscreen",val=False:self.attributes(option,val))"""
+        self.frames = {}
 
         self.widgets()
         self.placeWidgets()
 
-        # Add in frames for different app functions here.
-        self.menu = MenuAndButton(self.currentFrame,{"Inbox":lambda msg="hello there":print(msg),
-                                          "Today":lambda:self.loadFrame("today"),
-                                          "My lists":lambda:self.loadFrame("myLists"),
-                                          "Starred":"asdasdasd",
-                                          "Leaderboard":"asdasd"},origin=self,userName=self.userName)
+        # Menu dictionary is defined to be passed into MenuAndButton class.
+        self.dictForMenu = {"Inbox":lambda:self.loadFrame("inbox"),
+                            "Today":lambda:self.loadFrame("today"),
+                            "My lists":lambda:self.loadFrame("myLists"),
+                            "Starred":lambda:self.loadFrame("starred"),
+                            "Leaderboard":lambda:self.loadFrame("leaderboard")}
+        
+        # MenuAndButton object is defined
+        self.menu = MenuAndButton(self.currentFrame,self.dictForMenu,origin=self,userName=self.userName)
         self.menu.place(x=20,y=30)
 
-        
+        # Inbox frame is loaded.
         self.loadFrame("inbox")
-        #self.bindTaskEntry()
 
         self.bind("<Configure>",lambda event:self.resizeFrame())
 
+        self.protocol("WM_DELETE_WINDOW",lambda: self.close_window())
+
         
-        
-        
+
+            
         self.mainloop()
+        
+        """
+        NOTE: To be placed before mainloop statement
+        results = pstats.Stats(profile)
+        results.sort_stats(pstats.SortKey.TIME)
+        results.print_stats()"""
+
 
     #------------------------# Widgets and placing #-------------------------#    
     def widgets(self):
@@ -94,25 +113,30 @@ class App(CTk):
         
         self.lblNoTasks = CTkLabel(self.currentFrame,text="Load a content frame.",font=(globalFontName,40))
 
-        """self.sampleDetailsPanel = DetailsPanel(self.currentFrame,{"title": "Welcome!", "date": "16/10/2024", "taskID": "TjAiDX", "completed": "False", "time": "", "priority": "", "description": ""},
-                                               self.taskCompleted,{"taskID":"TjAiDX"})"""
-        #6self.entries = [self.entryDate,self.dropdownPriority,self.entryTime]
 
         self.taskFrame = CTkScrollableFrame(self.currentFrame,width=410,height=600,fg_color="#191616")
 
         #-----------------# Regular app frames #------------------#
-        self.frameInbox = List(self,email=self.userEmail,userPath=self.userPath,todaysDate=self.todaysDate,userAccent=self.accent,listName="inbox")
+        self.frameInbox = List(self,email=self.userEmail,userPath=self.userPath,
+                               todaysDate=self.todaysDate,userAccent=self.accent,
+                               listName="inbox")
+        """self.frameToday = Today(self,email=self.userEmail,userPath=self.userPath,
+                                todaysDate=self.todaysDate,userAccent=self.accent)"""
+        
         self.frameMyLists = MyLists(self,email=self.userEmail,userPath=self.userPath,todaysDate=self.todaysDate,userAccent=self.accent)
 
-        self.frames = {"today":self.dummyFrame,
+        framesToAdd = {"today":self.dummyFrame,
                        "myLists":self.frameMyLists,
                        "starred":self.dummyFrame,
                        "leaderboard":self.dummyFrame,
                        "inbox":self.frameInbox}
         
-        self.preferencesMenuDict = {"Theme":lambda:self.mode(),
+        for each in framesToAdd:
+            self.frames[each] = framesToAdd[each]
+        
+        self.preferencesMenuDict = {"Toggle theme":lambda:self.mode(),
                                     "Accent colour":lambda msg="hello":print(msg)}
-        self.preferencesMenu = Menu(self,self.preferencesMenuDict,self.accent,topLabel="",bottomLabel="Your preferences.")
+        self.preferencesMenu = Menu(self,self.preferencesMenuDict,self.accent,topLabel=f"{self.userName}",bottomLabel="Your preferences.")
         
         self.logoMenuIsOpen = False
 
@@ -122,15 +146,18 @@ class App(CTk):
         
 
     def placeWidgets(self):
+        # Not many widgets are placed here, since most of the functionality
+        # lies within the currentFrame, placed here in the middle of the screen.
         self.currentFrame.place(relx=0.5,rely=0.5,anchor="center")
-        #self.panelImgBG.place(x=0,y=0)
         
         self.logoPanel.place(relx=0.98,y=40,anchor=E)
         self.lblNoTasks.place(relx=0.4,rely=0.4)
 
-        #self.sampleDetailsPanel.place(in_=self.entryTask,x=50,y=100)
-
         self.currentAttribute = ""
+
+    def close_window(self):
+        self.unbind("<Configure>")
+        self.destroy()
 
     def mode(self):
         if get_appearance_mode().lower() == "light":
@@ -155,63 +182,58 @@ class App(CTk):
 
 
     def resizeFrame(self):
-        try:
-            screenWidth = self.winfo_screenwidth()
-            screenHeight = self.winfo_screenheight()
+        """try:"""
+        # Frame size calculated based on size of window at that time.
+        frameX = 0.95*self.winfo_width()
+        frameY = 0.95*self.winfo_height()
 
-            """if not self.winfo_ismapped():
-                pass"""
-            
-            #print(self.winfo_width(),"by",self.winfo_height())
-            """if self.winfo_width > 1560:"""
-            frameX = 0.95 * self.winfo_width()
-            frameY = 0.95 * self.winfo_height()
-            """else:
-                frameX = 0.80 * self.winfo_width()
-                frameY = 0.5 * self.winfo_height()"""
+        # Changes currentFrame width and height to calculated values.
+        self.currentFrame.configure(width=frameX,height=frameY)            
 
-            self.currentFrame.configure(width=frameX,height=frameY)
-            #self.panelImgBG._image
-            
-            
-            if self.winfo_width() < 1505:
-                if isinstance(self.currentFrame,Today) or isinstance(self.currentFrame,List):
-                    self.currentFrame.entryTask.place_forget()
-                    
-                    if len(self.currentFrame.overdueList) >0:
-                        #print("changing")
-                        self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.4)
-                    else:
-                        self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.7)
+        # When the window width is below a certain value.
+        if self.winfo_width() < 1505:
+            if isinstance(self.currentFrame,Today) or isinstance(self.currentFrame,List):
+                # Removes entry box from view, since it does not fit in the window correctly.
+                self.currentFrame.entryTask.place_forget()
 
-            if self.winfo_width() > 1505:
-                if isinstance(self.currentFrame,Today) or isinstance(self.currentFrame,List):
-                    self.currentFrame.entryTask.place(in_=self.currentFrame.logoPanel,x=-750,y=10)
+                # Adjusts height so that both overdueFrame and taskFrame fit in.
+                if len(self.currentFrame.overdueList) >0:
+                    self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.4)
+                else:
+                    self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.7)
 
-                    if len(self.currentFrame.overdueList) >0:
-                        #print("changing")
-                        self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.4)
-                    else:
-                        self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.7)
-        except:
-            pass
+        if self.winfo_width() > 1505:
+            if isinstance(self.currentFrame,Today) or isinstance(self.currentFrame,List):
+                # Places entry task back if there is enough space to display it.
+                self.currentFrame.entryTask.place(in_=self.currentFrame.logoPanel,x=-750,y=10)
+
+                # Similar code to above.
+                if len(self.currentFrame.overdueList) >0:
+                    self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.4)
+                else:
+                    self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.7)
+        """except:
+            # Used to avoid an error where resizeFrame tries to run on the window when it doesn't exist.
+            pass"""
         
     
     def loadFrame(self,frameName):
+        # Removes current frame from the screen
         self.currentFrame.place_forget()
+
+        # Accesses the frame to be placed.
         self.currentFrame = self.frames[frameName]
 
+        # Place the new frame
         self.currentFrame.place(relx=0.5,rely=0.5,anchor="center")
 
-        """if self.currentFrame == self.frames["today"]:
-            self.resizeFrame = self.currentFrame.resizeFrame"""
         try:
-            self.menu = MenuAndButton(self.currentFrame,{"Inbox":lambda:self.loadFrame("inbox"),
-                                          "Today":lambda:self.loadFrame("today"),
-                                          "My lists":lambda:self.loadFrame("myLists"),
-                                          "Starred":lambda:self.loadFrame("starred"),
-                                          "Leaderboard":lambda:self.loadFrame("leaderboard")},origin=self,userName=self.userName,accent=self.accent)
+            # Redefines the menu, logoPanel and preferencesMenu.
+            # This ensures that they can be displayed above the new frame, since they have been defined "last"
+            self.menu = MenuAndButton(self.currentFrame,self.dictForMenu,\
+                                      origin=self,userName=self.userName,accent=self.accent)
             
+
             self.logoPanel = CTkLabel(self.currentFrame,text="",image=self.imgLogo,cursor="hand2")
 
             self.preferencesMenu = self.preferencesMenu
@@ -224,13 +246,13 @@ class App(CTk):
             pass
 
         try:
+            # Runs the rename function in the new currentFrame
+            # In the listClass, this has been defined as a procedure, so will work for every listClass object.
             self.currentFrame.renameMainWin()
         except:
-            pass
-        #self.bind("<Configure>",lambda event: self.currentFrame.resizeFrame())
-
-
-    
+            # If the renameMainWin procedure doesn't exist, the window is renamed by default to the new frame name.
+            self.title(f"{frameName}")
+  
     
     
     
@@ -238,3 +260,4 @@ class App(CTk):
 
 
 app = App(email="omar@gmail.com",userPath="users//omar@gmail.com")
+#app = App(email="amoghg75@yahoo.com",userPath="users//amoghg75@yahoo.com")

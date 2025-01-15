@@ -9,6 +9,7 @@ def getAllDetails():
     return details,rememberMeIndex
 
 def getDetailsIndividual(email):
+    # Retrieves all details from JSON file.
     details,_ = getAllDetails()
 
     found = False
@@ -16,14 +17,18 @@ def getDetailsIndividual(email):
     i = 0 
     max = len(details)-1
     while not found and max >= i:
-        set = details[i]
-        if set[0] == email:
-            userDetails = set
+        # Each set of details is a list -> [userEmail,userPasswordHashed,userName]
+        detailsSet = details[i]
+
+        # detailsSet[0] is the user's email.
+        if detailsSet[0] == email:
+            userDetails = detailsSet
             found = True
             userIndex = i
         i += 1
 
     if found:
+        # userIndex returned to use with "remember me" function.
         return userDetails,userIndex
     else:
         return False,False

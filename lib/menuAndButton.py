@@ -10,14 +10,19 @@ class MenuAndButton(CTkFrame):
         a CTkButton, but rather is a CTkFrame instance that can be clicked.
         Once clicked, it will open a CTkFrame below it which is the menu."""
 
+        # Declares super class object (CTkFrame)
         super().__init__(master,width=60,height=60,corner_radius=20,border_width=3,border_color="black",fg_color="grey",cursor="hand2")
+
+        # origin is the variable representing the app's methods and attributes
         self.origin = origin
+        # master is the "currentFrame" where the button is being placed.
         self.master = master
-        #self.menuItemsAndLabels = menuItemsAndLabels
+
         self.globalFontName = font
         self.accent = accent
         self.userName = userName
 
+        # Declares image for open and close
         self.imgMenuOpen = CTkImage(Image.open("icons//menu open.png"),size=(40,40))
         self.panelMenuOpen = CTkLabel(self,text="",image=self.imgMenuOpen)
         self.imgMenuClose = CTkImage(Image.open("icons//menu close.png"),size=(40,40))
@@ -28,10 +33,13 @@ class MenuAndButton(CTkFrame):
         self.panelMenuOpen.bind("<Button-1>",lambda event: self.clicked())
         self.panelMenuClose.bind("<Button-1>",lambda event: self.clicked())
 
+        # Allows for colour to change when user hovers over button.
         self.bindHoverBGChange([self,self.panelMenuOpen,self.panelMenuClose])
         
         
         self.menuItems = []
+
+        # Declares menu object and flag for menu being open or closed.
         self.menu = Menu(master,menuItemsAndLabels,accent=self.accent,origin=self,font=font,bottomLabel=f"{self.userName}")
         self.menuOpen = False
 
@@ -55,16 +63,22 @@ class MenuAndButton(CTkFrame):
 
 
     def clicked(self):
+        # Lifts the menu in the stacking order
         self.menu.lift()
-        
+
+        # Closes the menu if it is open.
         if self.menuOpen:
             self.menu.place_forget()
             self.panelMenuClose.place_forget()
+            # Displays icon for a closed menu (if you click it opens the menu)
             self.panelMenuOpen.place(relx=0.5,rely=0.5,anchor="center")
             self.menuOpen = False
+            
+        # Opens the menu if it is closed
         else:
             self.menu.place(in_=self,y=60)
             self.panelMenuOpen.place_forget()
+            # Displays icon for an open menu (if you click it closes the menu)
             self.panelMenuClose.place(relx=0.5,rely=0.5,anchor="center")
             self.menuOpen = True
             

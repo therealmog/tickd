@@ -1,0 +1,31 @@
+"""def removeIfCompleted(self):
+        for each in self.taskList:
+            if each.attributes["completed"] == "True":
+                print(f"Removing {each.attributes["title"]}")
+                self.placeTasks(self.taskList.index(each))
+        
+        self.lblOtherTasks.configure(text=f" {self.listName.capitalize()} - {len(self.taskList)}")
+        
+        if len(self.taskList) == 0 and len(self.overdueList) == 0:
+            self.taskFrame.place_forget()
+            self.lblOtherTasks.place_forget()
+            self.overdueFrame.place_forget()
+            self.lblOverdue.place_forget()
+            self.lblNoTasks.place(x=25,y=150)
+
+
+    def placeTasks(self,removedIndex):
+        print("hello")
+        # Removes completed task by index
+        # Then places all tasks again after the one which has been removed.
+
+        
+        for each in range(removedIndex,len(self.taskList)):
+            self.taskList[each].grid_forget()
+
+        self.taskList.pop(removedIndex)
+        
+
+        for each in range(removedIndex,len(self.taskList)): # Starts with index which was removed
+            task = self.taskList[each]
+            task.grid(row=each,column=0,pady=10)"""

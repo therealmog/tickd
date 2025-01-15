@@ -7,25 +7,28 @@ class Menu(CTkFrame):
         """NOTE: Remember to add in the master as the app's self variable (also called master in menuAndButton). 
         menuItemsAndLabels should be a dictionary of the form {"label":lambda args:labelCommand(args),...}"""
 
-        super().__init__(master,width=300,height=480,border_width=3,border_color="black")
+        super().__init__(master,width=300,height=480,border_width=3,border_color="black",corner_radius=20)
 
         self.menuItems = []
         self.globalFontName = font
 
-        lblFont = (self.globalFontName,30)
-        
-    
+        lblFont = (self.globalFontName,32)
+            
+            # There are two labels available to be displayed.
         self.lblTop = CTkLabel(self,text=topLabel,font=(self.globalFontName,15))
-        
+
+        # Displays clearly if bottom label is empty.
         if bottomLabel == None:
             bottomLabel = "[insert text here]"
         if topLabel == "":
+            # Size for bottom label increases if top label is empty.
             size = 30
         else:
             size = 25
 
         self.lblBottom = CTkLabel(self,text=bottomLabel,font=(self.globalFontName,size),wraplength=250,justify="left")
 
+        # Places top label on its own if bottom label empty, or with bottom label if it is there.
         if topLabel == "":
             self.lblBottom.place(x=20,y=25)
         else:
@@ -42,8 +45,7 @@ class Menu(CTkFrame):
             self.isOrigin = False
 
         
-        #print(self.menuItemsAndLabels)
-        self.listImgs = getListImgs((40,40))
+        self.listImgs = getListImgs((42,42))
         for each in menuItemsAndLabels:
             lblText = " "+each
             try:

@@ -2,19 +2,22 @@
 from customtkinter import *
 from lib.checkbox_customTk import Checkbox
 from datetime import date,timedelta
-
+from lib.getListImgs import getListImgs
 
 class Task(CTkFrame):
 
-    def __init__(self,master,attributes:dict,accent="dodgerblue2",font="Bahnschrift",size=30,command=None):
+    def __init__(self,master,attributes:dict,accent="dodgerblue2",font="Bahnschrift",size=30,command=None,displayListName=False):
         super().__init__(master=master,width=400,height=67,fg_color=("white","gray13"),border_color="gray15",\
-                         border_width=3,cursor="question_arrow")
+                         border_width=3,cursor="hand2")
 
         self.font = font
         self.size = size
         self.accent = accent
         self.attributes = attributes
         self.command = command
+
+        # Task becomes bigger and displays list name underneath title
+        self.displayListName = displayListName
 
         self.widgets()
         self.placeWidgets()
@@ -40,7 +43,7 @@ class Task(CTkFrame):
 
             # Calculates the string to show if hovering over date (e.g. "2 days ago", "in 4 days", etc.)
             self.differenceStr = self.getTimeDifference()
-            print(self.differenceStr)   
+            #print(self.differenceStr)   
 
         # Creating the checkbox for the task.
         # Passing in the command which is taken in from the main app (i.e. in the constructor.)
@@ -60,6 +63,27 @@ class Task(CTkFrame):
                 self.configure(border_color="#db9d09")
             else:
                 self.configure(border_color="limegreen")
+        
+        if self.displayListName:
+            listImgs = getListImgs((20,20))
+            try:
+                listName = self.attributes["listName"]
+
+                iconFound = False
+                for each in listImgs:
+                    if listName.capitalize() == each:
+                        iconFound = True
+                        break
+                
+                if iconFound:
+                    self.lblListName = CTkLabel(self,text=f" {listName.capitalize()}",font=(self.font,self.size*0.6),image=listImgs[listName.capitalize()],compound="left")
+                else:
+                    self.lblListName = CTkLabel(self,text=listName.capitalize(),font=(self.font,self.size*0.6))
+
+            except KeyError:
+                print("List name not found.")
+                self.displayListName = False
+
 
     def placeWidgets(self):
         self.lblTitle.place(x=45,y=5)#This should stay as it is, since it is the frame that will be placed inside the actual app.
@@ -67,7 +91,13 @@ class Task(CTkFrame):
 
         self.lblDate.place(in_=self.lblTitle,x=0,y=30)
 
-            
+        if self.displayListName:
+            # Increases height of task.
+            self.configure(height=95)
+            self.lblListName.place(in_=self.lblTitle,x=0,y=32)
+            self.lblDate.place(in_=self.lblListName,y=25)
+
+
 
         
 
@@ -87,6 +117,52 @@ class Task(CTkFrame):
                 self.lblDate.configure(text=f"{self.taskDate}, {self.attributes["time"]}")
             else:
                 self.lblDate.configure(text=self.taskDate)
+
+    def refreshData(self):
+        # Makes sure that labels and messages are up to date with details, etc.
+
+        self.lblTitle.configure(text=self.attributes["title"])
+        self.taskDate = self.getDate()
+        self.differenceStr = self.getTimeDifference()
+        
+        
+
+        # Adds the time to the date label if applicable.
+        if self.attributes["time"] != "":
+            self.lblDate.configure(text=f"{self.taskDate}, {self.attributes["time"]}")
+        else:
+            self.lblDate.configure(text=self.taskDate)
+
+        # Assigns the priority colour, if applicable.
+        if self.attributes["priority"] != "":
+            priority = self.attributes["priority"]
+            if  priority == "P1":
+                self.configure(border_color="red")
+            elif priority == "P2":
+                self.configure(border_color="#db9d09")
+            else:
+                self.configure(border_color="limegreen")
+        
+        if self.displayListName:
+            listImgs = getListImgs((20,20))
+            try:
+                listName = self.attributes["listName"]
+
+                iconFound = False
+                for each in listImgs:
+                    if listName.capitalize() == each:
+                        iconFound = True
+                        break
+                
+                if iconFound:
+                    self.lblListName = CTkLabel(self,text=f" {listName.capitalize()}",font=(self.font,self.size*0.6),image=listImgs[listName.capitalize()],compound="left")
+                else:
+                    self.lblListName = CTkLabel(self,text=listName.capitalize(),font=(self.font,self.size*0.6))
+
+            except KeyError:
+                print("List name not found.")
+                self.displayListName = False
+        
 
     
     def getDate(self):
@@ -118,6 +194,15 @@ class Task(CTkFrame):
             taskDate = "(no date)"
                                 
         return taskDate
+    
+    def setTitleColour(self):
+        """Sets colour of title to accent colour to display that it is being viewed (display panel)"""
+
+        if self.lblTitle._text_color == self.accent:
+            self.lblTitle.configure(text_colour=("black","white"))
+        else:
+            self.lblTitle.configure(text_colour=self.accent)
+    
     
     def getTimeDifference(self):
         late = False

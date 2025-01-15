@@ -1,0 +1,57 @@
+{
+    "shared": "no",
+    "tasks": {
+        "RsWcIr": {
+            "title": "Genetic factors in aggression",
+            "date": "",
+            "taskID": "RsWcIr",
+            "completed": "False",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "Psych blurts"
+        },
+        "hWJilR": {
+            "title": "Token economy and management",
+            "date": "",
+            "taskID": "hWJilR",
+            "completed": "False",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "Psych blurts"
+        }
+    },
+    "completed": {
+        "TWrbYa": {
+            "title": "CBTp",
+            "date": "",
+            "taskID": "TWrbYa",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "Psych blurts"
+        },
+        "kdlqjn": {
+            "title": "Ethological explanation of aggression",
+            "date": "",
+            "taskID": "kdlqjn",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "Psych blurts"
+        },
+        "HMRrzt": {
+            "title": "Family therapy",
+            "date": "",
+            "taskID": "HMRrzt",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "Psych blurts"
+        }
+    }
+}

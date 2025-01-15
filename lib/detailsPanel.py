@@ -3,10 +3,13 @@ from customtkinter import *
 from lib.checkbox_customTk import Checkbox
 from PIL import Image
 from lib.uploadTask import uploadTask
+from lib.getValueWindow import GetValueWin
+from lib.checkDate import checkDate
+from lib.checkTime import checkTime
 
 
 class DetailsPanel(CTkFrame):
-    def __init__(self,master,origin,userPath,taskAttributes,taskButtonCommand,commandArgs,\
+    def __init__(self,master,origin,taskObj,userPath,taskAttributes,taskButtonCommand,commandArgs,\
                  fontName="Bahnschrift",accent="dodgerblue2"):
         super().__init__(master,width=800,height=500,border_width=3,border_color="grey5")
 
@@ -20,6 +23,9 @@ class DetailsPanel(CTkFrame):
         self.accent = accent
         self.userPath = userPath
         self.origin = origin
+        self.taskObj = taskObj      
+        
+        
 
         self.taskButtonCommand = taskButtonCommand
         self.commandArgs = commandArgs
@@ -34,6 +40,8 @@ class DetailsPanel(CTkFrame):
         self.widgets()
         self.placeWidgets()
         self.bindEventListeners()
+
+        
 
 
     def widgets(self):
@@ -78,21 +86,70 @@ class DetailsPanel(CTkFrame):
                                    width=80,command=self.btnCancelClicked,hover_color="#c92d2a")
 
         # Declares set reminder button and icon.
-        self.imgAlarm = CTkImage(Image.open("icons//alarm.png"),size=(25,25))
-        self.btnSetReminder = CTkButton(self,text="Set reminder",font=(globalFontName,25),fg_color=self.accent,width=70,\
+        self.imgAlarm = CTkImage(Image.open("icons//alarm.png"),size=(23,23))
+        self.btnSetReminder = CTkButton(self,text="Set reminder",font=(globalFontName,22),fg_color=self.accent,width=70,\
                                         image=self.imgAlarm)
+        
+        self.flagAttributeEditing = False
+
+        changeDateArgs = {"attributeName":"date",
+                          "assigningFunc":self.updateTaskInfo,
+                          "assigningFuncArgs":{"attributeName":"date"},
+                          "validationFunc":checkDate,
+                          "maxChars":8,
+                          "accent":self.accent}
+        
+        changeTimeArgs = {"attributeName":"time",
+                          "assigningFunc":self.updateTaskInfo,
+                          "assigningFuncArgs":{"attributeName":"time"},
+                          "validationFunc":checkTime,
+                          "maxChars":5,
+                          "accent":self.accent}
+        
+        changeNameArgs = {"attributeName":"name",
+                          "assigningFunc":self.updateTaskInfo,
+                          "assigningFuncArgs":{"attributeName":"name"},
+                          "accent":self.accent}
+        
+        self.lblDate.bind("<Button-1>",lambda event,customTitle=f"Change the date for {self.taskName}",
+                          kwargs=changeDateArgs:GetValueWin(customTitle=customTitle,**kwargs))
+        self.lblTime.bind("<Button-1>",lambda event,customTitle=f"Change the time for {self.taskName}",
+                          kwargs=changeTimeArgs:GetValueWin(customTitle=customTitle,**kwargs))
+        self.lblTaskName.bind("<Button-1>",lambda event,customTitle=f"Change the name of {self.taskName}",
+                              kwargs=changeNameArgs:GetValueWin(customTitle=customTitle,**kwargs))
+
 
     def placeWidgets(self):
         self.btnClose.place(x=740,y=20)
         self.lblTaskName.place(x=80,y=20)
-        self.btnSetReminder.place(in_=self.lblTaskName,x=400,y=5)
         self.lblDate.place(in_=self.lblTaskName,y=45)
         self.lblTime.place(in_=self.lblDate,x=12*(len(self.lblDate.cget("text"))))
+        self.btnSetReminder.place(in_=self.lblTime,x=100)
         self.lblDescription.place(x=25,y=110)
         self.entryDescription.place(in_=self.lblDescription,y=30)
         self.taskButton.placeWidget()
         #self.btnSaveDescription.place(in_=self.entryDescription,x=220,y=190)
-    
+
+    def updateTaskInfo(self,newData,attributeName):
+        if attributeName == "date":
+            self.taskDate = newData
+            self.lblDate.configure(text=newData)
+            self.taskAttributes["date"] = newData
+        elif attributeName == "time":
+            self.taskTime = newData
+            self.lblTime.configure(text=newData)
+            self.taskAttributes["time"] = newData
+        elif attributeName == "priority":
+            self.taskPriority = newData
+        else:
+            self.taskName = newData
+            self.lblTaskName.configure(text=newData)
+            self.taskAttributes["title"] = newData
+        
+
+        uploadTask(self.userPath,self.taskAttributes,listName=self.taskAttributes["listName"])
+        self.taskObj.refreshData()
+
     def getTaskButton(self):
         taskButton = Checkbox(self,x=20,y=20,size=(50,50),command=self.taskButtonCommand,\
                               commandArgs=self.commandArgs)

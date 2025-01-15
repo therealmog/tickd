@@ -17,7 +17,7 @@ from lib.getOverdue import getOverdue
 from lib.getListImgs import getListImgs
 
 
-class List(CTkFrame):
+class Today(CTkFrame):
     
     globalFontName = "Bahnschrift"
     textgrey="#9e9f9f"
@@ -67,7 +67,7 @@ class List(CTkFrame):
         self.bindTaskEntry()
 
         self.loadTasks()
-        self.btnTaskSubmit.bind("<Return>",lambda event:self.taskSubmitted())
+
         #self.bind("<Configure>",lambda event:self.resizeFrame())
 
     #------------------------# Widgets and placing #-------------------------#    
@@ -115,7 +115,7 @@ class List(CTkFrame):
         self.lblListName.place(x=125,y=50)
         self.lblDate.place(in_=self.lblListName,x=0,y=-25)
         self.logoPanel.place(relx=0.98,y=40,anchor=E)
-        self.entryTask.place(in_=self.logoPanel,x=-250)
+        self.entryTask.place(in_=self.lblListName,x=350,y=-20)
 
         #self.sampleDetailsPanel.place(in_=self.entryTask,x=50,y=100)
 
@@ -148,7 +148,7 @@ class List(CTkFrame):
 
     def loadTasks(self): # Should only be run at the start of the program
         
-        self.taskList = getTasks(self.taskFrame,self.userPath,self.listName,self.accent,command=self.taskCompleted,fontName=self.globalFontName)
+        self.taskList = getTasks(self.taskFrame,self.userPath,"inbox",self.accent,command=self.taskCompleted,fontName=self.globalFontName)
         
         """# Getting a list with the same tasks, but the master for these tasks is overdueFrame. 
         self.overdueList = getTasks(self.overdueFrame,self.userPath,"inbox",self.accent,command=self.taskCompleted,fontName=self.globalFontName)"""
@@ -183,9 +183,6 @@ class List(CTkFrame):
             self.lblOverdue.configure(text=newOverdueTasksText)
 
             # Placing tasks in taskList
-
-            self.orderList(self.taskList)
-
             if len(self.taskList)>=1:
                 self.taskList[0].grid(row=0,column=0,pady=(5,10))
                 
@@ -215,11 +212,10 @@ class List(CTkFrame):
                 self.lblOverdue.place(in_=self.lblListName,x=-5,y=100)
                 self.overdueFrame.place(in_=self.lblOverdue,y=30)
 
-                if len(self.taskList)>0:
+                if len(self.taskList) >=1:
                     self.lblOtherTasks.place(in_=self.lblOverdue,y=280)
-                    #self.taskFrame.configure(height=500)
                     self.taskFrame.place(in_=self.lblOtherTasks,y=30)
-                    
+                    #self.taskFrame.configure(height=500)
             else:
                 if len(self.taskList) >=1:
                     self.lblOtherTasks.place(in_=self.lblListName,x=-5,y=100)
@@ -233,7 +229,7 @@ class List(CTkFrame):
             self.lblNoTasks.place(x=25,y=150)
     
     def renameMainWin(self):
-        self.mainWindow.title(f"{self.listName.capitalize()} - Tickd")
+        self.mainWindow.title("Today - Tickd")
         
 
     #--------------------# Task entry and button functions #------------------#
@@ -246,8 +242,6 @@ class List(CTkFrame):
         """This ensures that the attribute entries are always displayed if they are clicked on, especially since
         when you click out of another attribute entry, it removes the entries, so this places them back."""
         self.placeAttributeEntries()
-        print("yes")
-        
         
 
     def attributeLeave(self):
@@ -315,7 +309,7 @@ class List(CTkFrame):
 
                     # Adds extra attributes to be altered later if desired.
                     attributes["description"] = ""
-                    attributes["listName"] = self.listName
+                    attributes["listName"] = "inbox"
                     
                     # All the attributes are brought together to create a task dictionary
                     # to be written to the task list JSON file.
@@ -323,7 +317,7 @@ class List(CTkFrame):
                     self.resetEntry(["entryTask","entryDate","entryTime","dropdownPriority"])
 
                     # Task is written to the specified list.
-                    uploadTask(self.userPath,taskDict,listName=self.listName)
+                    uploadTask(self.userPath,taskDict,listName="inbox")
 
 
                     
@@ -332,37 +326,6 @@ class List(CTkFrame):
 
 
                     print([x.attributes["title"] for x in self.taskList])
-
-    def orderList(self,listToSort):
-        """Orders list in terms of priority."""
-        
-        # These variables are necessary to know where to place the lower priority tasks.
-        # e.g. P2 tasks will be placed after P1, indicated by the noOfP1 index.
-        noOfP1 = 0
-        noOfP2 = 0
-        noOfP3 = 0
-
-        for each in listToSort:
-            if each.attributes["priority"] == "P1":
-                noOfP1 +=1
-            elif each.attributes["priority"] == "P2":
-                noOfP2 +=1
-            elif each.attributes["priority"] == "P3":
-                noOfP3 +=1
-            else:
-                pass
-
-        for each in listToSort.copy():
-            listToSort.remove(each)
-            if each.attributes["priority"] == "P1":
-                listToSort.insert(0,each)
-            elif each.attributes["priority"] == "P2":
-                listToSort.insert(noOfP1+1,each)
-            elif each.attributes["priority"] == "P3":
-                listToSort.insert(noOfP2+noOfP3+1,each)
-            else:
-                listToSort.insert(len(listToSort)-1,each)
-
 
     def placeNewTask(self,taskDict):
         newTask = Task(self.taskFrame,taskDict,self.accent,command=self.taskCompleted,font=self.globalFontName)
@@ -407,78 +370,58 @@ class List(CTkFrame):
 
 
     def taskCompleted(self,taskID):
-        # Retrieving all of the data for the list.
-        taskListData = loadTaskList(self.userPath,self.listName)
+        taskListData = loadTaskList(self.userPath,"inbox")
 
-
-        # Selecting the tasks part (tasks is a sub-dictionary)
-        # (in each list there are two parts, shared and tasks)
         allTasksDict = taskListData["tasks"]
-
-
-        # Trying to select the completed tasks part
-        # (completed is a sub-dictionary of the tasks dict)
         try:
             completedTasksDict = taskListData["completed"]
         except:
             taskListData["completed"] = {}
             completedTasksDict = taskListData["completed"]
-
         
-        # Attempting to find the individual task dictionary for the completed
-        # task, searching by its taskID.
+                
         taskDict = ""
         for each in allTasksDict.copy():
-            if each == taskID:
-            # Dictionary key for each task in allTasksDict is the taskID
+            if each == taskID: # Dictionary key for each task in allTasksDict is the taskID
                 taskDict = allTasksDict[each]
                 allTasksDict.pop(each)
 
         taskDict["completed"] = "True"
-        
 
-        # Rewriting the task to the completed section.
         completedTasksDict[taskID] = taskDict
 
-
-        # Rewriting each of the full list JSON with the amended details.
-        # taskListData is the dictionary of the entire list from before.
         taskListData["tasks"] = allTasksDict
         taskListData["completed"] = completedTasksDict
 
-
-        # Saving the changes by writing them to the JSON file.
-        updateTaskListData(taskListData,self.userPath,self.listName)
-
-
-        # Checking if task is in the overdue section.
-        # Then marking it as complete.
+        updateTaskListData(taskListData,self.userPath,"inbox")
+        
         if taskID in self.overdueDict:
             for each in self.overdueList.copy():
                 if each.attributes["taskID"] == taskID:
                     each.attributes["completed"] = "True"
         else:
-            # Otherwise, marking the task in the regular taskList as complete.
             for each in self.taskList:
                 if each.attributes["taskID"] == taskID:
                     each.attributes["completed"] = "True"
-
-        # Removing the details panel for the completed task.
+        
         self.detailPanels[taskID].place_forget()
         self.detailPanels.pop(taskID)
         self.currentDisplayed = ""
-
-        # Removes the task from the screen and edits text for list title.
         self.removeIfCompleted()
 
         #print(self.taskList)
         
 
-    """def removeIfCompleted(self):
+    def removeIfCompleted(self):
         for each in self.taskList:
             if each.attributes["completed"] == "True":
                 print(f"Removing {each.attributes["title"]}")
-                self.placeTasks(self.taskList.index(each))
+                self.placeTasks(self.taskList.index(each),overdue=False)
+        
+        for each in self.overdueList:
+            if each.attributes["completed"] == "True":
+                print(f"Removing {each.attributes["title"]}")
+                self.placeTasks(self.overdueList.index(each),overdue=True)
         
         self.lblOtherTasks.configure(text=f" {self.listName.capitalize()} - {len(self.taskList)}")
         
@@ -490,79 +433,25 @@ class List(CTkFrame):
             self.lblNoTasks.place(x=25,y=150)
 
 
-    def placeTasks(self,removedIndex):
+    def placeTasks(self,removedIndex,overdue:bool):
         print("hello")
         # Removes completed task by index
         # Then places all tasks again after the one which has been removed.
 
-        
-        for each in range(removedIndex,len(self.taskList)):
-            self.taskList[each].grid_forget()
-
-        self.taskList.pop(removedIndex)
-        
-
-        for each in range(removedIndex,len(self.taskList)): # Starts with index which was removed
-            task = self.taskList[each]
-            task.grid(row=each,column=0,pady=10)"""
-    
-    def removeIfCompleted(self):
-        # First checks if task in regular task list
-        for each in self.taskList:
-            if each.attributes["completed"] == "True":
-                print(f"Removing {each.attributes["title"]}")
-
-                # Runs placeTasks procedure, passing in index of item and if it is overdue or not.
-                self.placeTasks(self.taskList.index(each),overdue=False)
-
-                # Edits list title
-                self.lblOtherTasks.configure(text=f" {self.listName.capitalize()} - {len(self.taskList)}")
-
-        # Then checks if it is in overdue list.
-        for each in self.overdueList:
-            if each.attributes["completed"] == "True":
-                print(f"Removing {each.attributes["title"]}")
-
-                # Same as above except for overdue lists
-                self.placeTasks(self.overdueList.index(each),overdue=True)
-                self.lblOverdue.configure(text=f"OVERDUE - {len(self.overdueList)}")
-
-        # Removes overdue list frame if there are no more overdue lists.
-        if len(self.overdueList) == 0:
-            self.lblOverdue.place_forget()
-            self.lblOtherTasks.place(in_=self.lblListName,x=-5,y=100)
-
-
-        # Removes both the regular task frame and the overdue task frame if there are no tasks remaining.
-        # Also displays the "You have no tasks" label.
-        if len(self.taskList) == 0 and len(self.overdueList) == 0:
-            self.taskFrame.place_forget()
-            self.lblOtherTasks.place_forget()
-            self.overdueFrame.place_forget()
-            self.lblOverdue.place_forget()
-            self.lblNoTasks.place(x=25,y=150)
-
-
-    def placeTasks(self,removedIndex,overdue:bool):
-        # Removes completed task by index
-        # Then places all tasks again after the one which has been removed.
-
-
-        # Sets which task is being edited.
         if overdue:
             list = self.overdueList
         else:
             list = self.taskList
-
-        # Removes tasks from the completed task to the end of the list.
+        
         for each in range(removedIndex,len(list)):
             list[each].grid_forget()
 
-        # Removes the completed task from the list.
-        list.pop(removedIndex)
-       
+        if not overdue:
+            self.taskList.pop(removedIndex)
+        else:
+            self.overdueList.pop(removedIndex)
+        
 
-        # Replaces the other previously removed tasks.
         for each in range(removedIndex,len(list)): # Starts with index which was removed
             task = list[each]
             task.grid(row=each,column=0,pady=10)

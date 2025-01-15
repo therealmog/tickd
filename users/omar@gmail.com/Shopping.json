@@ -1,0 +1,27 @@
+{
+    "shared": "no",
+    "tasks": {
+        "edzHdu": {
+            "title": "Bananas",
+            "date": "15/1/2025",
+            "taskID": "edzHdu",
+            "completed": "False",
+            "time": "10:25",
+            "priority": "",
+            "description": "Just get the freshest ones, preferably from Ecuador.",
+            "listName": "Shopping"
+        }
+    },
+    "completed": {
+        "ZNjKHW": {
+            "title": "apples",
+            "date": "",
+            "taskID": "ZNjKHW",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "Shopping"
+        }
+    }
+}
