@@ -8,7 +8,7 @@ def getListImgs(size:tuple=(35,35)):
         e.g. today.png -> 'Today', my lists.png -> 'My lists'"""
 
     imgs = {}
-    imgNames = ["today","inbox","leaderboard","my lists","starred","tick","toggle theme","add","share","rename","delete"]
+    imgNames = ["today","inbox","leaderboard","my lists","starred","tick","toggle theme","add","share","rename","delete","dark mode","light mode"]
     for each in imgNames:
         img = CTkImage(Image.open(f"icons//{each}.png"),size=size)
         imgs[each.capitalize()] = img

@@ -6,6 +6,7 @@ from lib.uploadTask import uploadTask
 from lib.getValueWindow import GetValueWin
 from lib.checkDate import checkDate
 from lib.checkTime import checkTime
+from tkinter import messagebox
 
 
 class DetailsPanel(CTkFrame):
@@ -24,6 +25,7 @@ class DetailsPanel(CTkFrame):
         self.userPath = userPath
         self.origin = origin
         self.taskObj = taskObj      
+
         
         
 
@@ -92,31 +94,63 @@ class DetailsPanel(CTkFrame):
         
         self.flagAttributeEditing = False
 
-        changeDateArgs = {"attributeName":"date",
+        self.changeDateArgs = {"attributeName":"date",
                           "assigningFunc":self.updateTaskInfo,
                           "assigningFuncArgs":{"attributeName":"date"},
                           "validationFunc":checkDate,
                           "maxChars":8,
-                          "accent":self.accent}
+                          "accent":self.accent,
+                          "flagFunc":self.flagFuncAttrEditing}
         
-        changeTimeArgs = {"attributeName":"time",
+        self.changeTimeArgs = {"attributeName":"time",
                           "assigningFunc":self.updateTaskInfo,
                           "assigningFuncArgs":{"attributeName":"time"},
                           "validationFunc":checkTime,
                           "maxChars":5,
-                          "accent":self.accent}
+                          "accent":self.accent,
+                          "flagFunc":self.flagFuncAttrEditing}
         
-        changeNameArgs = {"attributeName":"name",
+        self.changeNameArgs = {"attributeName":"name",
                           "assigningFunc":self.updateTaskInfo,
                           "assigningFuncArgs":{"attributeName":"name"},
-                          "accent":self.accent}
+                          "validationFunc":self.checkNewTitle,
+                          "accent":self.accent,
+                          "previousVal":self.taskName,
+                          "flagFunc":self.flagFuncAttrEditing}
         
-        self.lblDate.bind("<Button-1>",lambda event,customTitle=f"Change the date for {self.taskName}",
-                          kwargs=changeDateArgs:GetValueWin(customTitle=customTitle,**kwargs))
-        self.lblTime.bind("<Button-1>",lambda event,customTitle=f"Change the time for {self.taskName}",
-                          kwargs=changeTimeArgs:GetValueWin(customTitle=customTitle,**kwargs))
-        self.lblTaskName.bind("<Button-1>",lambda event,customTitle=f"Change the name of {self.taskName}",
-                              kwargs=changeNameArgs:GetValueWin(customTitle=customTitle,**kwargs))
+        self.bindAttributeWins()
+        
+        
+
+    def bindAttributeWins(self):
+        changeDateText = f"Change the date for '{self.taskName}'"
+        changeTimeText = f"Change the time for '{self.taskName}'"
+        changeNameText = f"Change the name of '{self.taskName}'"
+
+        self.lblTaskName.unbind("<Button-1>")
+        self.lblDate.unbind("<Button-1>")
+        self.lblTime.unbind("<Button-1>")
+
+        self.lblDate.bind("<Button-1>",lambda event,customTitle=changeDateText,
+                          kwargs=self.changeDateArgs:self.checkAttributeEditing(customTitle,kwargs))
+        self.lblTime.bind("<Button-1>",lambda event,customTitle=changeTimeText,
+                          kwargs=self.changeTimeArgs:self.checkAttributeEditing(customTitle,kwargs))
+        self.lblTaskName.bind("<Button-1>",lambda event,customTitle=changeNameText,
+                              kwargs=self.changeNameArgs:self.checkAttributeEditing(customTitle,kwargs))
+
+    def checkAttributeEditing(self,customTitle,kwargs):
+        # Checks to see if a previous editing window exists.
+
+        if self.flagAttributeEditing:
+            # Previous window already open
+            messagebox.showinfo("Window already active",
+                                "Another attribute is currently being edited.\nPlease close the previous window to open another one.")
+        else:
+            # Sets flag to True so that another window cannot be opened.
+            self.flagAttributeEditing = True
+            # Calls new GetValueWin instance
+            GetValueWin(customTitle=customTitle,**kwargs)
+                
 
 
     def placeWidgets(self):
@@ -145,10 +179,16 @@ class DetailsPanel(CTkFrame):
             self.taskName = newData
             self.lblTaskName.configure(text=newData)
             self.taskAttributes["title"] = newData
+            self.changeNameArgs["previousVal"] = newData
         
 
         uploadTask(self.userPath,self.taskAttributes,listName=self.taskAttributes["listName"])
         self.taskObj.refreshData()
+        self.bindAttributeWins()
+
+    def flagFuncAttrEditing(self):
+        self.flagAttributeEditing = not self.flagAttributeEditing
+
 
     def getTaskButton(self):
         taskButton = Checkbox(self,x=20,y=20,size=(50,50),command=self.taskButtonCommand,\
@@ -162,6 +202,12 @@ class DetailsPanel(CTkFrame):
         if self.taskTime == "":
             self.lblTime.configure(text="no time")
     
+    def checkNewTitle(self,newTitle):
+        if newTitle.strip() == "":
+            message = "Invalid name entered."
+            return False,message
+        else:
+            return newTitle,None
     
     def checkTitleLength(self):
         # Reduces title font size if the title is greater than a certain length

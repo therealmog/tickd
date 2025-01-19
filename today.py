@@ -206,10 +206,12 @@ class Today(CTkFrame):
         self.taskList = getTasksAllLists(self.taskFrame,self.userPath,self.accent,command=self.taskCompleted,fontName=self.globalFontName,displayListName=True)
         todayObj = date.today()
 
+        print(self.taskList)
         for each in self.taskList:
-            dateSplit = each.attributes["date"]
+            dateSplit = each.attributes["date"].split("/")
             if len(dateSplit) == 3:
-                dateObj = date(int(dateSplit[2]),int(dateSplit[1]),int(dateSplit[0]))
+                print(dateSplit)
+                dateObj = date(int(dateSplit[-1]),int(dateSplit[1]),int(dateSplit[0]))
                 if dateObj == todayObj:
                     print(f"Task {each.attributes["title"]} is due today.")
                 else:
@@ -237,6 +239,7 @@ class Today(CTkFrame):
             # First, tasks are ordered.
             self.orderList(self.taskList)
 
+            print(self.taskList)
             # grid method used to display tasks in scrollable frame
             self.taskList[0].grid(row=0,column=0,pady=(5,10))
             
@@ -397,6 +400,7 @@ class Today(CTkFrame):
         
         # These variables are necessary to know where to place the lower priority tasks.
         # e.g. P2 tasks will be placed after P1, indicated by the noOfP1 index.
+        length = len(listToSort)
         noOfP1 = 0
         noOfP2 = 0
         noOfP3 = 0
@@ -410,18 +414,17 @@ class Today(CTkFrame):
                 noOfP3 +=1
             else:
                 pass
-
-        for each in listToSort.copy():
-            listToSort.remove(each)
+        
+        for each in listToSort.copy():            
             if each.attributes["priority"] == "P1":
+                listToSort.remove(each)
                 listToSort.insert(0,each)
             elif each.attributes["priority"] == "P2":
+                listToSort.remove(each)
                 listToSort.insert(noOfP1+1,each)
             elif each.attributes["priority"] == "P3":
+                listToSort.remove(each)
                 listToSort.insert(noOfP2+noOfP3+1,each)
-            else:
-                listToSort.insert(len(listToSort)-1,each)
-
 
     def placeNewTask(self,taskDict):
         newTask = Task(self.taskFrame,taskDict,self.accent,command=self.taskCompleted,font=self.globalFontName)

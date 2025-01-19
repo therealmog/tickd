@@ -57,14 +57,12 @@ def getTasks(master,userPath,listName,accent,command,fontName="Bahnschrift",disp
 def getTasksAllLists(master,userPath,accent,command,fontName="Bahnschrift",displayListName=False):
     # Find all lists from user directory.
     userLists = glob(f"{userPath}//*.json")
+    
     allTasksList = []
     for each in userLists:
-        if "inbox.json" in each:
-            userLists.remove(each)
-        else:
-            taskList = getTasks(master,userPath,None,accent,command,fontName,displayListName,path=each)
-            for each in taskList:
-                allTasksList.append(taskList)
+        taskList = getTasks(master,userPath,None,accent,command,fontName,displayListName,path=each)
+        for each in taskList:
+            allTasksList.append(each)
 
     if len(allTasksList) == 0:
         print("No tasks found.")

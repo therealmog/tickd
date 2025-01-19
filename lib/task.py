@@ -123,7 +123,8 @@ class Task(CTkFrame):
 
         self.lblTitle.configure(text=self.attributes["title"])
         self.taskDate = self.getDate()
-        self.differenceStr = self.getTimeDifference()
+        if self.taskDate != "(no date)":
+            self.differenceStr = self.getTimeDifference()
         
         
 

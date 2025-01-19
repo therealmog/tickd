@@ -1,14 +1,24 @@
 {
     "shared": "no",
     "tasks": {
-        "edzHdu": {
-            "title": "Bananas",
-            "date": "15/1/2025",
-            "taskID": "edzHdu",
+        "NuQbYM": {
+            "title": "Trousers varungal AR MANIIII",
+            "date": "20/2/2025",
+            "taskID": "NuQbYM",
             "completed": "False",
-            "time": "10:25",
+            "time": "",
             "priority": "",
-            "description": "Just get the freshest ones, preferably from Ecuador.",
+            "description": "",
+            "listName": "Shopping"
+        },
+        "JebmNt": {
+            "title": "AR MANIIIIII",
+            "date": "20/2/2025",
+            "taskID": "JebmNt",
+            "completed": "False",
+            "time": "",
+            "priority": "",
+            "description": "",
             "listName": "Shopping"
         }
     },
@@ -21,6 +31,16 @@
             "time": "",
             "priority": "",
             "description": "",
+            "listName": "Shopping"
+        },
+        "edzHdu": {
+            "title": "bananes",
+            "date": "15/1/2025",
+            "taskID": "edzHdu",
+            "completed": "True",
+            "time": "10:25",
+            "priority": "",
+            "description": "Just get the freshest ones, preferably from Ecuador.",
             "listName": "Shopping"
         }
     }

@@ -188,21 +188,28 @@ class List(CTkFrame):
             self.entryTask.place(in_=self.logoPanel,x=-650,y=10)
 
     def renameList(self,newName):
-        self.flagRenaming = False
+        # Gets previous name and path.
         oldName = self.listName
         oldPath = f"{self.userPath}//{self.listName}.json"
+
+        # Creates new path
         newPath = f"{self.userPath}//{newName}.json"
+
+        # Renames class attribute and labels.
         self.listName = newName
-        self.lblListName.configure(text=self.listName.capitalize())
+        self.lblListName.configure(text=self.listName.capitalize()) # Top list label
 
         if self.taskList != False:
+            # Label above task frame
             self.lblOtherTasks.configure(text=f"{self.listName} - {len(self.taskList)}")
 
 
+        # Uses os module to rename JSON file.
         os.rename(oldPath,newPath)
         self.mainWindow.title(f"{newName.capitalize()} - Tickd")
 
-        # Changes value of button in myLists frame
+        # Changes value of button in MyLists frame
+        # Iterates through list of buttons in MyLists frame.
         for each in self.mainWindow.frameMyLists.customListsBtnsArray:
             if each._text == oldName:
                 each.configure(text=newName)
@@ -213,6 +220,8 @@ class List(CTkFrame):
     def checkRenameList(self):
         notAllowedValues = ["inbox","today","starred"]
         allowedToRename = True
+
+        # Checks if list is a Tickd default quickly by checking name. 
         for each in notAllowedValues:
             if self.listName.lower() == each:
                 allowedToRename = False
@@ -221,11 +230,15 @@ class List(CTkFrame):
             messagebox.showerror("Cannot rename this list","This list cannot be renamed since it is a Tickd default.")
         else:
             if self.flagRenaming:
-                messagebox.showerror("window already active","Rename window already active. Please close it before opening another one.")
+                messagebox.showerror("Window already active",
+                                     "Rename window already active. Please close it before opening another one.")
             else:
                 self.flagRenaming = True
                 winTitle = f"Rename '{self.listName}'"
-                GetValueWin("list name",assigningFunc=self.renameList,validationFunc=checkListName,validationFuncArgs={"userPath":self.userPath},accent=self.accent,flagFunc=self.changeFlagRenaming,customTitle=winTitle)
+                # Calls a GetValueWin object
+                GetValueWin(attributeName="list name",assigningFunc=self.renameList,validationFunc=checkListName,
+                            validationFuncArgs={"userPath":self.userPath},accent=self.accent,
+                            flagFunc=self.changeFlagRenaming,customTitle=winTitle)
     
     def changeFlagRenaming(self):
        self.flagRenaming = not self.flagRenaming
@@ -233,7 +246,7 @@ class List(CTkFrame):
     def loadTasks(self): # Should only be run once at the start of the program
 
         # Gets a list of Task objects.
-        self.taskList = getTasks(self.taskFrame,self.userPath,self.listName,self.accent,command=self.taskCompleted,fontName=self.globalFontName)
+        self.taskList = getTasks(self.taskFrame,self.userPath,self.listName,self.accent,command=self.taskCompleted,fontName=self.globalFontName,displayListName=True)
                
         # Creates the list for details panels
         self.detailPanels = {} # taskID:detailPanelObj
@@ -254,7 +267,7 @@ class List(CTkFrame):
                     self.taskList.remove(each)
 
                     # Creates a new Task object with the same details as the removed object.
-                    overdueTask = Task(self.overdueFrame,each.attributes,accent=self.accent,font=self.globalFontName,command=self.taskCompleted)
+                    overdueTask = Task(self.overdueFrame,each.attributes,accent=self.accent,font=self.globalFontName,command=self.taskCompleted,displayListName=True)
 
                     # New object added to overdue list and details panel binded.
                     self.overdueList.append(overdueTask)
@@ -430,9 +443,9 @@ class List(CTkFrame):
         check1 = messagebox.askyesnocancel("Are you sure?",f"Are you sure you would like to delete the list '{self.listName}'?")
         
         if check1:
-            check2 = messagebox.askyesnocancel("Confirm list deletion","Your list will be permanently deleted.\nAre you sure you would like to continue and delete this list?")
+            check2 = messagebox.askyesnocancel("Confirm list deletion",
+                                               "Your list will be permanently deleted.\nAre you sure you would like to continue and delete this list?")
             if check2:
-                messagebox.showwarning("List deletion confirmed.","Commencing list deletion\nPress 'OK' to confirm, or quit the app now to cancel list deletion.")
                 self.deleteListFromFolder()
 
                 # Remove from buttons in "My lists"

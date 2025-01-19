@@ -120,12 +120,12 @@ class App(CTk):
         self.frameInbox = List(self,email=self.userEmail,userPath=self.userPath,
                                todaysDate=self.todaysDate,userAccent=self.accent,
                                listName="inbox")
-        """self.frameToday = Today(self,email=self.userEmail,userPath=self.userPath,
-                                todaysDate=self.todaysDate,userAccent=self.accent)"""
+        self.frameToday = Today(self,email=self.userEmail,userPath=self.userPath,
+                                todaysDate=self.todaysDate,userAccent=self.accent)
         
         self.frameMyLists = MyLists(self,email=self.userEmail,userPath=self.userPath,todaysDate=self.todaysDate,userAccent=self.accent)
 
-        framesToAdd = {"today":self.dummyFrame,
+        framesToAdd = {"today":self.frameToday,
                        "myLists":self.frameMyLists,
                        "starred":self.dummyFrame,
                        "leaderboard":self.dummyFrame,
@@ -134,7 +134,11 @@ class App(CTk):
         for each in framesToAdd:
             self.frames[each] = framesToAdd[each]
         
-        self.preferencesMenuDict = {"Toggle theme":lambda:self.mode(),
+        if self._get_appearance_mode() == "light":
+            themeToSet = "Dark mode"
+        else:
+            themeToSet = "Light mode"
+        self.preferencesMenuDict = {f"{themeToSet}":lambda:self.mode(),
                                     "Accent colour":lambda msg="hello":print(msg)}
         self.preferencesMenu = Menu(self,self.preferencesMenuDict,self.accent,topLabel=f"{self.userName}",bottomLabel="Your preferences.")
         
@@ -162,8 +166,14 @@ class App(CTk):
     def mode(self):
         if get_appearance_mode().lower() == "light":
             set_appearance_mode("dark")
+            themeToSet = "Light mode"
         else:
             set_appearance_mode("light")
+            themeToSet = "Dark mode"
+            
+        self.preferencesMenuDict = {f"{themeToSet}":lambda:self.mode(),
+                                    "Accent colour":lambda msg="hello":print(msg)}
+        self.preferencesMenu = Menu(self,self.preferencesMenuDict,self.accent,topLabel=f"{self.userName}",bottomLabel="Your preferences.")
 
     def frameDimensions(self):
         print(f"Width: {self.winfo_screenwidth()}, Height: {self.winfo_screenheight()}")
@@ -197,10 +207,11 @@ class App(CTk):
                 self.currentFrame.entryTask.place_forget()
 
                 # Adjusts height so that both overdueFrame and taskFrame fit in.
-                if len(self.currentFrame.overdueList) >0:
-                    self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.4)
-                else:
-                    self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.7)
+                if isinstance(self.currentFrame,List):
+                    if len(self.currentFrame.overdueList) >0:
+                        self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.4)
+                    else:
+                        self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.7)
 
         if self.winfo_width() > 1505:
             if isinstance(self.currentFrame,Today) or isinstance(self.currentFrame,List):
@@ -208,10 +219,11 @@ class App(CTk):
                 self.currentFrame.entryTask.place(in_=self.currentFrame.logoPanel,x=-750,y=10)
 
                 # Similar code to above.
-                if len(self.currentFrame.overdueList) >0:
-                    self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.4)
-                else:
-                    self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.7)
+                if isinstance(self.currentFrame,List):
+                    if len(self.currentFrame.overdueList) >0:
+                        self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.4)
+                    else:
+                        self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.7)
         """except:
             # Used to avoid an error where resizeFrame tries to run on the window when it doesn't exist.
             pass"""
@@ -235,8 +247,10 @@ class App(CTk):
             
 
             self.logoPanel = CTkLabel(self.currentFrame,text="",image=self.imgLogo,cursor="hand2")
-
+            
             self.preferencesMenu = self.preferencesMenu
+            
+            self.logoPanel.unbind("<Button-1>")
             self.logoPanel.bind("<Button-1>",lambda event:self.logoClicked())
                         
             self.menu.place(x=20,y=30)

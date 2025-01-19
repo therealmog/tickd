@@ -6,19 +6,24 @@ from tkinter import messagebox
 
 class GetValueWin(CTkToplevel):
     def __init__(self,attributeName,assigningFunc,assigningFuncArgs=None,listName=None,validationFunc=None,validationFuncArgs=None,\
-                 fontName="Bahnschrift",maxChars=None,customTitle=None,accent="dodgerblue2",flagFunc=None):
+                 fontName="Bahnschrift",maxChars=None,customTitle=None,accent="dodgerblue2",flagFunc=None,previousVal=None):
         """Takes in an input and changes the value of an attribute.
 
         Pass in the assigning function (assigningFunc) that will be run once the input has been taken in.
         Any arguments for the assigningFunc or the validationFunc should be put into a dictionary with the correct keyword names.
 
         You can also include f-strings into the custom title and they will be formatted.
-        Just make sure that they take into account what the actual variable name will be (e.g. attributeName -> self.attributeName)"""
+        Just make sure that they take into account what the actual variable name will be (e.g. attributeName -> self.attributeName)
+        
+        Add a previousVal to be inserted into the box, which can then be edited further."""
         
         super().__init__()
         
-        self.geometry("400x150")
+        self.geometry("450x150")
         self.iconbitmap("logo//tickd.ico")
+
+        # Sets placement of window slightly offset so that it's not in the corner of the screen.
+        self.geometry(f"+1000+400")
 
         if listName != None:
             self.listName = listName
@@ -31,6 +36,7 @@ class GetValueWin(CTkToplevel):
         self.accent = accent
         self.assigningFunc = assigningFunc
         self.flagFunc = flagFunc
+        self.previousVal = previousVal
 
         if validationFunc != None:
             # Allows for validation to be run once input has been received.
@@ -43,6 +49,7 @@ class GetValueWin(CTkToplevel):
         self.assigningFuncArgs = assigningFuncArgs
         
 
+        # Setting window title
         if customTitle == None:
             self.title(f"Change the {self.attributeName} - Tickd")
         else:
@@ -66,6 +73,7 @@ class GetValueWin(CTkToplevel):
         self.entryAttribute.configure(validate="key",validatecommand=validateCharsCmd)
 
         self.bind("<Return>",lambda event: self.submit())
+        self.bind("<Escape>",lambda event:self.destroy())
 
         """self.entryAttribute.bind("<FocusIn>",lambda event: self.enter())
                 self.entryAttribute.bind("<FocusOut>",lambda event: self.leave())"""
@@ -84,20 +92,30 @@ class GetValueWin(CTkToplevel):
 
     def widgets(self):
         globalFontName = self.fontName
-        if self.customTitle == None:
-            self.titleText = textwrap.fill(f"Change the {self.attributeName}",50)
-        else:
-            self.titleText = textwrap.fill(f"{self.customTitle}",50)
-        print(self.titleText)
-        self.lblTitle = CTkLabel(self,text=self.titleText,font=(globalFontName,20),anchor=W)
 
+        # textwrap.fill() adjusts the line lengths of the characters
+        if self.customTitle == None:
+            self.titleText = textwrap.fill(f"Change the {self.attributeName}",40)
+        else:
+            self.titleText = textwrap.fill(f"{self.customTitle}",40)
+
+        self.lblTitle = CTkLabel(self,text=self.titleText,font=(globalFontName,20),anchor=W,justify="left")
+
+        # Width of entry box can depend on if character limit set.
         if self.maxChars != None:
             self.entrywidth = self.maxChars * 15
         else:
-            self.entrywidth=280
-        self.entryAttribute = CTkEntry(self,font=(globalFontName,22),placeholder_text=f"{self.attributeName}",width=self.entrywidth)
+            self.entrywidth=350
+        self.entryAttribute = CTkEntry(self,font=(globalFontName,22),placeholder_text=f"{self.attributeName}",width=self.entrywidth,corner_radius=15)
 
         self.btnSubmit = SubmitButton(self,command=self.submit,colour=self.accent,buttonSize=(28,28))
+
+        # If a previous value is specified, it is inserted into the entry box.
+        if self.previousVal != None:
+            self.entryAttribute.insert(0,self.previousVal)
+        
+        self.entryAttribute.focus()
+
 
     def placeWidgets(self):
         self.lblTitle.place(x=15,y=25)

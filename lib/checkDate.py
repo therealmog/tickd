@@ -72,7 +72,7 @@ def checkDate(userInput):
                 if int(day)>31:
                     message = "Invalid day entered"
                     return False,message
-                elif int(day)>28 and int(month) != 2 and int(year)%4 != 0: 
+                elif int(day)>28 and int(month) == 2 and int(year)%4 != 0: 
                     # i.e. day cannot be greater than 28 if month is February and not a leap year
                     message = "Invalid day"
                     return False,message
@@ -88,10 +88,14 @@ def checkDate(userInput):
                     month = int(month)
                     month = str(month) #same as with day, to remove preceding zero
                 
-                if datetime.date(int(year),int(month),int(day)) < today:
-                    message = "Your due date cannot be in the past."
-                    return False,message
-                else:
-                    date = f"{day}/{month}/{year}"
-                    return date,None # None is for message               
+                try:
+                    if datetime.date(int(year),int(month),int(day)) < today:
+                        message = "Your due date cannot be in the past."
+                        return False,message
+                    else:
+                        date = f"{day}/{month}/{year}"
+                        return date,None # None is for message
+                except ValueError:
+                    message = "Invalid date entered."
+                    return False,message        
                     
