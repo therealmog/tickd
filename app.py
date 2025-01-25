@@ -8,6 +8,9 @@ from myLists import MyLists
 from lib.accentsConfig import getAccent
 from lib.menu import Menu
 from listClass import List
+from starred import Starred
+from changeAccentWin import ChangeAccentWin
+from tkinter import messagebox
 import cProfile
 import pstats
 
@@ -70,6 +73,7 @@ class App(CTk):
         self.widgets()
         self.placeWidgets()
 
+
         # Menu dictionary is defined to be passed into MenuAndButton class.
         self.dictForMenu = {"Inbox":lambda:self.loadFrame("inbox"),
                             "Today":lambda:self.loadFrame("today"),
@@ -125,9 +129,12 @@ class App(CTk):
         
         self.frameMyLists = MyLists(self,email=self.userEmail,userPath=self.userPath,todaysDate=self.todaysDate,userAccent=self.accent)
 
+        self.frameStarred = Starred(self,email=self.userEmail,userPath=self.userPath,
+                                todaysDate=self.todaysDate,userAccent=self.accent)
+
         framesToAdd = {"today":self.frameToday,
                        "myLists":self.frameMyLists,
-                       "starred":self.dummyFrame,
+                       "starred":self.frameStarred,
                        "leaderboard":self.dummyFrame,
                        "inbox":self.frameInbox}
         
@@ -138,8 +145,10 @@ class App(CTk):
             themeToSet = "Dark mode"
         else:
             themeToSet = "Light mode"
+
+        self.flagNewAccent = False
         self.preferencesMenuDict = {f"{themeToSet}":lambda:self.mode(),
-                                    "Accent colour":lambda msg="hello":print(msg)}
+                                    "Accent colour":lambda:self.createNewAccentWin()}
         self.preferencesMenu = Menu(self,self.preferencesMenuDict,self.accent,topLabel=f"{self.userName}",bottomLabel="Your preferences.")
         
         self.logoMenuIsOpen = False
@@ -172,8 +181,17 @@ class App(CTk):
             themeToSet = "Dark mode"
             
         self.preferencesMenuDict = {f"{themeToSet}":lambda:self.mode(),
-                                    "Accent colour":lambda msg="hello":print(msg)}
+                                    "Accent colour":self.createNewAccentWin}
         self.preferencesMenu = Menu(self,self.preferencesMenuDict,self.accent,topLabel=f"{self.userName}",bottomLabel="Your preferences.")
+
+    def flagFuncAccent(self):
+        self.flagNewAccent = not self.flagNewAccent
+    
+    def createNewAccentWin(self):
+        if self.flagNewAccent:
+            messagebox.showinfo("Window already active","Another accent colour window is already active.")            
+        else:
+            ChangeAccentWin(self,self.userEmail,self.globalFontName,self.flagFuncAccent)
 
     def frameDimensions(self):
         print(f"Width: {self.winfo_screenwidth()}, Height: {self.winfo_screenheight()}")
@@ -202,7 +220,7 @@ class App(CTk):
 
         # When the window width is below a certain value.
         if self.winfo_width() < 1505:
-            if isinstance(self.currentFrame,Today) or isinstance(self.currentFrame,List):
+            if isinstance(self.currentFrame,Today) or isinstance(self.currentFrame,List) or isinstance(self.currentFrame,Starred):
                 # Removes entry box from view, since it does not fit in the window correctly.
                 self.currentFrame.entryTask.place_forget()
 
@@ -214,12 +232,12 @@ class App(CTk):
                         self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.7)
 
         if self.winfo_width() > 1505:
-            if isinstance(self.currentFrame,Today) or isinstance(self.currentFrame,List):
+            if isinstance(self.currentFrame,Today) or isinstance(self.currentFrame,List) or isinstance(self.currentFrame,Starred):
                 # Places entry task back if there is enough space to display it.
                 self.currentFrame.entryTask.place(in_=self.currentFrame.logoPanel,x=-750,y=10)
 
                 # Similar code to above.
-                if isinstance(self.currentFrame,List):
+                if isinstance(self.currentFrame,List) or isinstance(self.currentFrame,Starred):
                     if len(self.currentFrame.overdueList) >0:
                         self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.4)
                     else:

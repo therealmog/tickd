@@ -8,7 +8,7 @@ from lib.checkDate import checkDate
 from lib.checkTime import checkTime
 from lib.task import Task
 from lib.loadTaskList import loadTaskList
-from lib.getTasks import getTasks
+from lib.getTasks import getTasks,getTasksAllLists
 from lib.uploadTask import uploadTask
 from lib.updateTaskListData import updateTaskListData
 from lib.detailsPanel import DetailsPanel
@@ -21,20 +21,21 @@ from lib.checkListName import checkListName
 
 
 
-class List(CTkFrame):
+class Starred(CTkFrame):
     
     globalFontName = "Bahnschrift"
     textgrey="#9e9f9f"
-    def __init__(self,mainWindow,email,userPath,todaysDate,userAccent="dodgerblue2",listName="inbox",):
-        """The class for generating frames for individual lists."""
+    def __init__(self,mainWindow,email,userPath,todaysDate,userAccent="dodgerblue2"):
+        """The class for the Starred view"""
         
         
         super().__init__(mainWindow,width=1400,height=900,fg_color=("white","gray9"),border_color="gray7",border_width=5)
         
         self.mainWindow = mainWindow
+        self.mainWindow.title("Starred - Tickd")
 
         self.userPath = userPath
-        self.listName = listName
+        self.listName = "Starred"
         self.email = email
 
 
@@ -51,20 +52,6 @@ class List(CTkFrame):
         else:
             self.todaysDate = todaysDate.strftime("%A, %d %B %Y")
 
-
-        # Indicates whether list is renameable, shareable, or deleteable.
-        # Keeping these as 3 separate variables allows them to be toggled separately.
-        # e.g. a list could be renameable and deleteable, but not shareable.
-        # However, at the moment I have not made any lists like that so they are all toggled at the same time.
-        if self.listName.lower() == "inbox" or self.listName.lower() == "starred":
-            # If these are toggled, the respective buttons are made for these.
-            self.renameable = False
-            self.shareable = False
-            self.deleteable = False
-        else:
-            self.renameable = True
-            self.shareable = True
-            self.deleteable = True
 
         self.widgets()
         self.placeWidgets()
@@ -100,19 +87,6 @@ class List(CTkFrame):
         self.lblListName.bind("<Button-1>",lambda event:self.checkRenameList())
 
         
-        smallerListImgs = getListImgs((20,20))
-        if self.renameable:
-            self.btnRename = CTkButton(self,text="Rename list",font=(self.globalFontName,20),width=130,image=smallerListImgs["Rename"],compound="left",command=self.checkRenameList,
-                                       fg_color=self.accent)
-        
-        if self.shareable:
-            self.btnShare = CTkButton(self,text="Share list",font=(self.globalFontName,20),width=130,image=smallerListImgs["Share"],compound="left",
-                                      fg_color=self.accent)
-
-        if self.deleteable:
-            self.btnDelete = CTkButton(self,text="Delete list",font=(self.globalFontName,20),width=130,image=smallerListImgs["Delete"],compound="left",command=self.deleteList,
-                                       fg_color=self.accent)
-
         self.lblDate = CTkLabel(self,text=self.todaysDate,font=(globalFontName,20)) 
         self.imgLogo = CTkImage(light_image=Image.open("logo//whiteBGLogo.png"),dark_image=Image.open("logo//blackBGLogo.png"),size=(155,49))
         self.logoPanel = CTkLabel(self,text="",image=self.imgLogo)
@@ -124,7 +98,7 @@ class List(CTkFrame):
         self.dropdownPriority = CTkOptionMenu(self,values=["priority","P1","P2","P3"],font=(globalFontName,22),dropdown_font=(globalFontName,20),corner_radius=20,fg_color=("#f9f9fa","#353639"),button_color=("#f9f9fa","#353639"),text_color=self.textgrey,command=self.priorityCallback)
         self.btnTaskSubmit = SubmitButton(self,colour=self.accent,buttonSize=(35,35),command=self.taskSubmitted,radius=60)
         
-        self.lblNoTasks = CTkLabel(self,text="You have no tasks.",font=(globalFontName,40))
+        self.lblNoTasks = CTkLabel(self,text="You have no starred tasks.",font=(globalFontName,40))
 
         """self.sampleDetailsPanel = DetailsPanel(self,{"title": "Welcome!", "date": "16/10/2024", "taskID": "TjAiDX", "completed": "False", "time": "", "priority": "", "description": ""},
                                                self.taskCompleted,{"taskID":"TjAiDX"})"""
@@ -158,10 +132,6 @@ class List(CTkFrame):
 
         self.currentAttribute = ""
 
-        if self.renameable and self.deleteable and self.shareable:
-            self.btnRename.place(in_=self.lblListName,y=55)
-            self.btnDelete.place(in_=self.btnRename,x=160)
-            self.btnShare.place(in_=self.btnDelete,x=145)
         
 
     def frameDimensions(self):
@@ -188,28 +158,21 @@ class List(CTkFrame):
             self.entryTask.place(in_=self.logoPanel,x=-650,y=10)
 
     def renameList(self,newName):
-        # Gets previous name and path.
+        self.flagRenaming = False
         oldName = self.listName
         oldPath = f"{self.userPath}//{self.listName}.json"
-
-        # Creates new path
         newPath = f"{self.userPath}//{newName}.json"
-
-        # Renames class attribute and labels.
         self.listName = newName
-        self.lblListName.configure(text=self.listName.capitalize()) # Top list label
+        self.lblListName.configure(text=self.listName.capitalize())
 
         if self.taskList != False:
-            # Label above task frame
             self.lblOtherTasks.configure(text=f"{self.listName} - {len(self.taskList)}")
 
 
-        # Uses os module to rename JSON file.
         os.rename(oldPath,newPath)
         self.mainWindow.title(f"{newName.capitalize()} - Tickd")
 
-        # Changes value of button in MyLists frame
-        # Iterates through list of buttons in MyLists frame.
+        # Changes value of button in myLists frame
         for each in self.mainWindow.frameMyLists.customListsBtnsArray:
             if each._text == oldName:
                 each.configure(text=newName)
@@ -220,8 +183,6 @@ class List(CTkFrame):
     def checkRenameList(self):
         notAllowedValues = ["inbox","today","starred"]
         allowedToRename = True
-
-        # Checks if list is a Tickd default quickly by checking name. 
         for each in notAllowedValues:
             if self.listName.lower() == each:
                 allowedToRename = False
@@ -230,15 +191,11 @@ class List(CTkFrame):
             messagebox.showerror("Cannot rename this list","This list cannot be renamed since it is a Tickd default.")
         else:
             if self.flagRenaming:
-                messagebox.showerror("Window already active",
-                                     "Rename window already active. Please close it before opening another one.")
+                messagebox.showerror("window already active","Rename window already active. Please close it before opening another one.")
             else:
                 self.flagRenaming = True
                 winTitle = f"Rename '{self.listName}'"
-                # Calls a GetValueWin object
-                GetValueWin(attributeName="list name",assigningFunc=self.renameList,validationFunc=checkListName,
-                            validationFuncArgs={"userPath":self.userPath},accent=self.accent,
-                            flagFunc=self.changeFlagRenaming,customTitle=winTitle)
+                GetValueWin("list name",assigningFunc=self.renameList,validationFunc=checkListName,validationFuncArgs={"userPath":self.userPath},accent=self.accent,flagFunc=self.changeFlagRenaming,customTitle=winTitle)
     
     def changeFlagRenaming(self):
        self.flagRenaming = not self.flagRenaming
@@ -246,8 +203,21 @@ class List(CTkFrame):
     def loadTasks(self): # Should only be run once at the start of the program
 
         # Gets a list of Task objects.
-        self.taskList = getTasks(self.taskFrame,self.userPath,self.listName,self.accent,command=self.taskCompleted,fontName=self.globalFontName,displayListName=True)
-               
+        self.taskList = getTasksAllLists(self.taskFrame,self.userPath,self.accent,command=self.taskCompleted,fontName=self.globalFontName,displayListName=True)
+
+        print(self.taskList)
+        if self.taskList != False:
+            for each in self.taskList:
+                # Checking if starred
+                try:
+                    if each.attributes["starred"] != "True":
+                        self.taskList.remove(each)
+                except KeyError:
+                    self.taskList.remove(each)
+                
+            
+
+
         # Creates the list for details panels
         self.detailPanels = {} # taskID:detailPanelObj
         self.currentDisplayed = "" # stores taskID of task with details panel displayed.
@@ -334,7 +304,7 @@ class List(CTkFrame):
             self.lblNoTasks.place(x=25,y=150)
     
     def renameMainWin(self):
-        self.mainWindow.title(f"{self.listName.capitalize()} - Tickd")
+        self.mainWindow.title("Starred - Tickd")
         
 
     #--------------------# Task entry and button functions #------------------#
@@ -347,6 +317,7 @@ class List(CTkFrame):
         """This ensures that the attribute entries are always displayed if they are clicked on, especially since
         when you click out of another attribute entry, it removes the entries, so this places them back."""
         self.placeAttributeEntries()
+        print("yes")
         
         
 
@@ -415,8 +386,8 @@ class List(CTkFrame):
 
                     # Adds extra attributes to be altered later if desired.
                     attributes["description"] = ""
-                    attributes["listName"] = self.listName
-                    attributes["starred"] = "False"
+                    attributes["listName"] = "inbox"
+                    attributes["starred"] = "True"
                     
                     # All the attributes are brought together to create a task dictionary
                     # to be written to the task list JSON file.
@@ -424,7 +395,7 @@ class List(CTkFrame):
                     self.resetEntry(["entryTask","entryDate","entryTime","dropdownPriority"])
 
                     # Task is written to the specified list.
-                    uploadTask(self.userPath,taskDict,listName=self.listName)
+                    uploadTask(self.userPath,taskDict,listName="inbox")
 
 
                     
@@ -432,41 +403,15 @@ class List(CTkFrame):
                     self.placeNewTask(taskDict)
 
 
-                    #print([x.attributes["title"] for x in self.taskList])
+                    print([x.attributes["title"] for x in self.taskList])
     
-    def deleteListFromFolder(self):
-        path = f"{self.userPath}//{self.listName}.json"
-
-        os.remove(path)
-
-
-    def deleteList(self):
-        check1 = messagebox.askyesnocancel("Are you sure?",f"Are you sure you would like to delete the list '{self.listName}'?")
-        
-        if check1:
-            check2 = messagebox.askyesnocancel("Confirm list deletion",
-                                               "Your list will be permanently deleted.\nAre you sure you would like to continue and delete this list?")
-            if check2:
-                self.deleteListFromFolder()
-
-                # Remove from buttons in "My lists"
-                for each in self.mainWindow.frameMyLists.customListsBtnsArray:
-                    if each._text == self.listName:
-                        each.place_forget()
-                        self.mainWindow.frameMyLists.customListsBtnsArray.remove(each)
-                        self.mainWindow.frameMyLists.placeCustomLists()
-                        break
-                self.mainWindow.loadFrame("myLists")
-                
-
-            else:
-                messagebox.showinfo("List not deleted.","Your list has not been deleted.")
 
     def orderList(self,listToSort):
         """Orders list in terms of priority."""
         
         # These variables are necessary to know where to place the lower priority tasks.
         # e.g. P2 tasks will be placed after P1, indicated by the noOfP1 index.
+        length = len(listToSort)
         noOfP1 = 0
         noOfP2 = 0
         noOfP3 = 0
@@ -480,18 +425,17 @@ class List(CTkFrame):
                 noOfP3 +=1
             else:
                 pass
-
-        for each in listToSort.copy():
-            listToSort.remove(each)
+        
+        for each in listToSort.copy():            
             if each.attributes["priority"] == "P1":
+                listToSort.remove(each)
                 listToSort.insert(0,each)
             elif each.attributes["priority"] == "P2":
+                listToSort.remove(each)
                 listToSort.insert(noOfP1+1,each)
             elif each.attributes["priority"] == "P3":
+                listToSort.remove(each)
                 listToSort.insert(noOfP2+noOfP3+1,each)
-            else:
-                listToSort.insert(len(listToSort)-1,each)
-
 
     def placeNewTask(self,taskDict):
         newTask = Task(self.taskFrame,taskDict,self.accent,command=self.taskCompleted,font=self.globalFontName)
@@ -546,7 +490,7 @@ class List(CTkFrame):
 
     def taskCompleted(self,taskID):
         # Retrieving all of the data for the list.
-        taskListData = loadTaskList(self.userPath,self.listName)
+        taskListData = loadTaskList(self.userPath,"inbox")
 
 
         # Selecting the tasks part (tasks is a sub-dictionary)
@@ -586,7 +530,7 @@ class List(CTkFrame):
 
 
         # Saving the changes by writing them to the JSON file.
-        updateTaskListData(taskListData,self.userPath,self.listName)
+        updateTaskListData(taskListData,self.userPath,"inbox")
 
 
         # Checking if task is in the overdue section.
@@ -609,13 +553,14 @@ class List(CTkFrame):
         # Removes the task from the screen and edits text for list title.
         self.removeIfCompleted()
 
+        #print(self.taskList)
         
     
     def removeIfCompleted(self):
         # First checks if task in regular task list
         for each in self.taskList:
             if each.attributes["completed"] == "True":
-                #print(f"Removing {each.attributes["title"]}")
+                print(f"Removing {each.attributes["title"]}")
 
                 # Runs placeTasks procedure, passing in index of item and if it is overdue or not.
                 self.placeTasks(self.taskList.index(each),overdue=False)
@@ -626,7 +571,7 @@ class List(CTkFrame):
         # Then checks if it is in overdue list.
         for each in self.overdueList:
             if each.attributes["completed"] == "True":
-                #print(f"Removing {each.attributes["title"]}")
+                print(f"Removing {each.attributes["title"]}")
 
                 # Same as above except for overdue lists
                 self.placeTasks(self.overdueList.index(each),overdue=True)

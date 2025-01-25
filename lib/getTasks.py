@@ -61,8 +61,12 @@ def getTasksAllLists(master,userPath,accent,command,fontName="Bahnschrift",displ
     allTasksList = []
     for each in userLists:
         taskList = getTasks(master,userPath,None,accent,command,fontName,displayListName,path=each)
-        for each in taskList:
-            allTasksList.append(each)
+        if taskList == False:
+            print("No tasks found.")
+            return False
+        else:
+            for each in taskList:
+                allTasksList.append(each)
 
     if len(allTasksList) == 0:
         print("No tasks found.")

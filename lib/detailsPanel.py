@@ -185,6 +185,7 @@ class DetailsPanel(CTkFrame):
         uploadTask(self.userPath,self.taskAttributes,listName=self.taskAttributes["listName"])
         self.taskObj.refreshData()
         self.bindAttributeWins()
+        self.flagFuncAttrEditing()
 
     def flagFuncAttrEditing(self):
         self.flagAttributeEditing = not self.flagAttributeEditing

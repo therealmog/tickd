@@ -98,7 +98,7 @@ class Today(CTkFrame):
         self.dropdownPriority = CTkOptionMenu(self,values=["priority","P1","P2","P3"],font=(globalFontName,22),dropdown_font=(globalFontName,20),corner_radius=20,fg_color=("#f9f9fa","#353639"),button_color=("#f9f9fa","#353639"),text_color=self.textgrey,command=self.priorityCallback)
         self.btnTaskSubmit = SubmitButton(self,colour=self.accent,buttonSize=(35,35),command=self.taskSubmitted,radius=60)
         
-        self.lblNoTasks = CTkLabel(self,text="You have no tasks.",font=(globalFontName,40))
+        self.lblNoTasks = CTkLabel(self,text="You have no tasks due for today.",font=(globalFontName,40))
 
         """self.sampleDetailsPanel = DetailsPanel(self,{"title": "Welcome!", "date": "16/10/2024", "taskID": "TjAiDX", "completed": "False", "time": "", "priority": "", "description": ""},
                                                self.taskCompleted,{"taskID":"TjAiDX"})"""
@@ -207,18 +207,19 @@ class Today(CTkFrame):
         todayObj = date.today()
 
         print(self.taskList)
-        for each in self.taskList:
-            dateSplit = each.attributes["date"].split("/")
-            if len(dateSplit) == 3:
-                print(dateSplit)
-                dateObj = date(int(dateSplit[-1]),int(dateSplit[1]),int(dateSplit[0]))
-                if dateObj == todayObj:
-                    print(f"Task {each.attributes["title"]} is due today.")
+        if self.taskList != False:
+            for each in self.taskList:
+                dateSplit = each.attributes["date"].split("/")
+                if len(dateSplit) == 3:
+                    print(dateSplit)
+                    dateObj = date(int(dateSplit[-1]),int(dateSplit[1]),int(dateSplit[0]))
+                    if dateObj == todayObj:
+                        print(f"Task {each.attributes["title"]} is due today.")
+                    else:
+                        self.taskList.remove(each)
                 else:
+                    print(f"Date not set for {each.attributes["title"]}")
                     self.taskList.remove(each)
-            else:
-                print(f"Date not set for {each.attributes["title"]}")
-                self.taskList.remove(each)
             
 
 
@@ -306,66 +307,55 @@ class Today(CTkFrame):
         if title == "":
             messagebox.showinfo("Cannot create task","Please enter a task title before submitting.")
         else: # Start to interpret attributes
-            dateInput = self.entryDate.get()
-            dateInput = dateInput.strip()
-            if dateInput == "":
-                # No date has been entered.
-                date = "" 
-            else:
-                date,message = checkDate(userInput=dateInput)
+            
+            # Adding date to the task attributes dict.
+            attributes["date"] = date.today().strftime("%d/%m/%Y")
 
-            if date == False: # Date is set as False by checkDate function
-                # Displays error message
-                messagebox.showerror("Invalid date",message)
+            # Getting the input from the time entry box.
+            timeInput = self.entryTime.get()
+            if timeInput == "":
+                time = ""
+            else:
+                # Validates time input.
+                time,message = checkTime(userInput=timeInput)
+
+            if time == False:
+                # Displays error message for time.
                 #self.messageVar.set(message)
+                messagebox.showerror("Invalid time",message)
             else:
-                # Adding date to the task attributes dict.
-                attributes["date"] = date
-
-                # Getting the input from the time entry box.
-                timeInput = self.entryTime.get()
-                if timeInput == "":
-                    time = ""
-                else:
-                    # Validates time input.
-                    time,message = checkTime(userInput=timeInput)
-
-                if time == False:
-                    # Displays error message for time.
-                    #self.messageVar.set(message)
-                    messagebox.showerror("Invalid time",message)
-                else:
-                    # Adds time to the attributes dict.
-                    attributes["time"] = time                
+                # Adds time to the attributes dict.
+                attributes["time"] = time                
+            
                 
-                    
-                    if self.dropdownPriority.get() != "priority":
-                        # Since priority comes from option menu, it can be added straight
-                        # to the attributes dict.
-                        attributes["priority"] = self.dropdownPriority.get()
-                    else:
-                        attributes["priority"] = ""
-                    
+                if self.dropdownPriority.get() != "priority":
+                    # Since priority comes from option menu, it can be added straight
+                    # to the attributes dict.
+                    attributes["priority"] = self.dropdownPriority.get()
+                else:
+                    attributes["priority"] = ""
+                
 
-                    # Adds extra attributes to be altered later if desired.
-                    attributes["description"] = ""
-                    attributes["listName"] = "inbox"
-                    
-                    # All the attributes are brought together to create a task dictionary
-                    # to be written to the task list JSON file.
-                    taskDict = createTaskDict(title,date,attributes)
-                    self.resetEntry(["entryTask","entryDate","entryTime","dropdownPriority"])
+                # Adds extra attributes to be altered later if desired.
+                attributes["description"] = ""
+                attributes["listName"] = "inbox"
+                attributes["starred"] = "False"
+                
+                # All the attributes are brought together to create a task dictionary
+                # to be written to the task list JSON file.
+                taskDict = createTaskDict(title,date,attributes)
+                self.resetEntry(["entryTask","entryDate","entryTime","dropdownPriority"])
 
-                    # Task is written to the specified list.
-                    uploadTask(self.userPath,taskDict,listName="inbox")
-
-
-                    
-                    # Task is placed onto the screen.
-                    self.placeNewTask(taskDict)
+                # Task is written to the specified list.
+                uploadTask(self.userPath,taskDict,listName="inbox")
 
 
-                    print([x.attributes["title"] for x in self.taskList])
+                
+                # Task is placed onto the screen.
+                self.placeNewTask(taskDict)
+
+
+                print([x.attributes["title"] for x in self.taskList])
     
     def deleteListFromFolder(self):
         path = f"{self.userPath}//{self.listName}.json"

@@ -1,27 +1,6 @@
 {
     "shared": "no",
-    "tasks": {
-        "NuQbYM": {
-            "title": "Trousers varungal AR MANIIII",
-            "date": "20/2/2025",
-            "taskID": "NuQbYM",
-            "completed": "False",
-            "time": "",
-            "priority": "",
-            "description": "",
-            "listName": "Shopping"
-        },
-        "JebmNt": {
-            "title": "AR MANIIIIII",
-            "date": "20/2/2025",
-            "taskID": "JebmNt",
-            "completed": "False",
-            "time": "",
-            "priority": "",
-            "description": "",
-            "listName": "Shopping"
-        }
-    },
+    "tasks": {},
     "completed": {
         "ZNjKHW": {
             "title": "apples",
@@ -41,6 +20,26 @@
             "time": "10:25",
             "priority": "",
             "description": "Just get the freshest ones, preferably from Ecuador.",
+            "listName": "Shopping"
+        },
+        "JebmNt": {
+            "title": "AR MANIIIIII",
+            "date": "20/2/2025",
+            "taskID": "JebmNt",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "Shopping"
+        },
+        "NuQbYM": {
+            "title": "Trousers varungal AR MANIIII",
+            "date": "20/2/2025",
+            "taskID": "NuQbYM",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
             "listName": "Shopping"
         }
     }
