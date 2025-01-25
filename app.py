@@ -246,7 +246,15 @@ class App(CTk):
             # Used to avoid an error where resizeFrame tries to run on the window when it doesn't exist.
             pass"""
         
-    
+    def checkOverdueAll(self):
+        for each in self.frames:
+            frame = self.frames[each]
+            try:
+                if not isinstance(frame,Today) and not isinstance(frame,MyLists):
+                    frame.checkNotOverdue()
+            except:
+                pass
+
     def loadFrame(self,frameName):
         # Removes current frame from the screen
         self.currentFrame.place_forget()

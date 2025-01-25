@@ -3,10 +3,11 @@ from customtkinter import *
 from lib.checkbox_customTk import Checkbox
 from datetime import date,timedelta
 from lib.getListImgs import getListImgs
+from lib.getTaskDict import getTaskDict
 
 class Task(CTkFrame):
 
-    def __init__(self,master,attributes:dict,accent="dodgerblue2",font="Bahnschrift",size=30,command=None,displayListName=False):
+    def __init__(self,master,attributes:dict,userPath,accent="dodgerblue2",font="Bahnschrift",size=30,command=None,displayListName=False):
         super().__init__(master=master,width=400,height=67,fg_color=("white","gray13"),border_color="gray15",\
                          border_width=3,cursor="hand2")
 
@@ -15,6 +16,9 @@ class Task(CTkFrame):
         self.accent = accent
         self.attributes = attributes
         self.command = command
+        self.taskID = self.attributes["taskID"]
+        self.userPath = userPath
+        self.listName = self.attributes["listName"]
 
         # Task becomes bigger and displays list name underneath title
         self.displayListName = displayListName
@@ -118,12 +122,18 @@ class Task(CTkFrame):
             else:
                 self.lblDate.configure(text=self.taskDate)
 
-    def refreshData(self):
         # Makes sure that labels and messages are up to date with details, etc.
+    def refreshData(self):
+        self.attributes = getTaskDict(self.taskID,self.userPath,self.listName)
 
         self.lblTitle.configure(text=self.attributes["title"])
         self.taskDate = self.getDate()
         if self.taskDate != "(no date)":
+            if self.taskDateObj != None:
+                if self.taskDateObj < date.today():
+                    self.lblDate.configure(text_color="red")
+                else:
+                    self.lblDate.configure(text_color="white")
             self.differenceStr = self.getTimeDifference()
         
         

@@ -10,7 +10,7 @@ from tkinter import messagebox
 
 
 class DetailsPanel(CTkFrame):
-    def __init__(self,master,origin,taskObj,userPath,taskAttributes,taskButtonCommand,commandArgs,\
+    def __init__(self,master,origin,mainWindow,taskObj,userPath,taskAttributes,taskButtonCommand,commandArgs,\
                  fontName="Bahnschrift",accent="dodgerblue2"):
         super().__init__(master,width=800,height=500,border_width=3,border_color="grey5")
 
@@ -24,7 +24,8 @@ class DetailsPanel(CTkFrame):
         self.accent = accent
         self.userPath = userPath
         self.origin = origin
-        self.taskObj = taskObj      
+        self.taskObj = taskObj   
+        self.mainWindow = mainWindow   
 
         
         
@@ -184,6 +185,7 @@ class DetailsPanel(CTkFrame):
 
         uploadTask(self.userPath,self.taskAttributes,listName=self.taskAttributes["listName"])
         self.taskObj.refreshData()
+        self.mainWindow.checkOverdueAll()
         self.bindAttributeWins()
         self.flagFuncAttrEditing()
 

@@ -40,7 +40,7 @@ def getTasks(master,userPath,listName,accent,command,fontName="Bahnschrift",disp
             for each in taskDict:
                 if taskDict[each]["completed"] == "False":
                     # A Task object is created for each item in the task list.    
-                    taskObj = Task(master,accent=accent,attributes=taskDict[each],font=fontName,command=command,displayListName=displayListName)
+                    taskObj = Task(master,accent=accent,attributes=taskDict[each],userPath=userPath,font=fontName,command=command,displayListName=displayListName)
                     taskList.append(taskObj)
             
 

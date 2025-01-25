@@ -237,7 +237,7 @@ class Starred(CTkFrame):
                     self.taskList.remove(each)
 
                     # Creates a new Task object with the same details as the removed object.
-                    overdueTask = Task(self.overdueFrame,each.attributes,accent=self.accent,font=self.globalFontName,command=self.taskCompleted,displayListName=True)
+                    overdueTask = Task(self.overdueFrame,each.attributes,userPath=self.userPath,accent=self.accent,font=self.globalFontName,command=self.taskCompleted,displayListName=True)
 
                     # New object added to overdue list and details panel binded.
                     self.overdueList.append(overdueTask)
@@ -438,7 +438,7 @@ class Starred(CTkFrame):
                 listToSort.insert(noOfP2+noOfP3+1,each)
 
     def placeNewTask(self,taskDict):
-        newTask = Task(self.taskFrame,taskDict,self.accent,command=self.taskCompleted,font=self.globalFontName)
+        newTask = Task(self.taskFrame,taskDict,self.userPath,self.accent,command=self.taskCompleted,font=self.globalFontName)
         
         if bool(self.taskList) == False:
             self.lblNoTasks.place_forget()
@@ -460,8 +460,26 @@ class Starred(CTkFrame):
 
         self.lblOtherTasks.configure(text=f" {self.listName.capitalize()} - {len(self.taskList)}")
     
+    def checkNotOverdue(self):
+        # Looks through tasks in overdueList to check if they are still overdue.
+        todayObj = date.today()
+
+        for each in self.overdueList.copy():
+            try:
+                taskDateSplit = each.attributes["date"].split("/")
+                taskDateObj = date(int(taskDateSplit[-1]),int(taskDateSplit[1]),int(taskDateSplit[0]))
+                
+                if taskDateObj >= todayObj:
+                    # Not overdue, moves to taskFrame
+                    self.placeNewTask(each.attributes)
+                    self.overdueList.remove(each)
+                    
+
+            except:
+                print("Date doesn't exist")
+
     def setDetailsPanel(self,task,taskID):
-        self.detailPanels[taskID] = DetailsPanel(self,self,task,self.userPath,task.attributes,self.taskCompleted,{"taskID":taskID},self.globalFontName,self.accent)
+        self.detailPanels[taskID] = DetailsPanel(self,self,self.mainWindow,task,self.userPath,task.attributes,self.taskCompleted,{"taskID":taskID},self.globalFontName,self.accent)
         task.bind("<Button-1>",lambda event,taskID=taskID:self.showDetailsPanel(taskID))
         task.lblTitle.bind("<Button-1>",lambda event,taskID=taskID:self.showDetailsPanel(taskID),
                            )

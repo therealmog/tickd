@@ -29,7 +29,7 @@ class ChangeAccentWin(CTkToplevel):
 
         self.grab_set()
         self.lift()
-        self.after(1000,self.grab_release())
+        self.after(1000,self.grab_release)
 
     def close_window(self):
         if self.flagFunc != None:
@@ -46,7 +46,7 @@ class ChangeAccentWin(CTkToplevel):
                                  font=(globalFontName,30))
         
         self.lblPreview = CTkLabel(self.frameWin,text="Preview:",
-                                 font=(globalFontName,25))
+                                 font=(globalFontName,15))
         
         imgLogo = CTkImage(Image.open("logo//whiteBGLogo.png"),
                            Image.open("logo//blackBGLogo.png"),
@@ -112,7 +112,7 @@ class ChangeAccentWin(CTkToplevel):
             self.btnSave.place_forget()
 
 
-        self.colourLbl = CTkLabel(self.frameWin,text="This is the colour",font=(self.font,25),
+        self.colourLbl = CTkLabel(self.frameWin,text="This is the colour",font=(self.font,30),
                                   text_color=colour)
         self.hoverLbl = CTkLabel(self.frameWin,text="Hover over me!",font=(self.font,25),
                                  text_color=("black","white"),cursor="hand2")
@@ -125,10 +125,11 @@ class ChangeAccentWin(CTkToplevel):
                                                "taskID":"asdojajsd",
                                                "time":"",
                                                "priority":"",
-                                               "description":""},accent=colour,
+                                               "description":"",
+                                               "listName":""},userPath=None,accent=colour,
                                                size=30)
         
-        self.colourLbl.place(in_=self.lblPreview,y=50)
+        self.colourLbl.place(in_=self.lblPreview,y=40)
         self.hoverLbl.place(in_=self.colourLbl,y=50)
         self.previewTask.place(in_=self.hoverLbl,y=50)
     

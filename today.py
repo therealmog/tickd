@@ -417,7 +417,7 @@ class Today(CTkFrame):
                 listToSort.insert(noOfP2+noOfP3+1,each)
 
     def placeNewTask(self,taskDict):
-        newTask = Task(self.taskFrame,taskDict,self.accent,command=self.taskCompleted,font=self.globalFontName)
+        newTask = Task(self.taskFrame,taskDict,self.userPath,self.accent,command=self.taskCompleted,font=self.globalFontName)
         
         if bool(self.taskList) == False:
             self.lblNoTasks.place_forget()
@@ -440,7 +440,7 @@ class Today(CTkFrame):
         self.lblOtherTasks.configure(text=f" {self.listName.capitalize()} - {len(self.taskList)}")
     
     def setDetailsPanel(self,task,taskID):
-        self.detailPanels[taskID] = DetailsPanel(self,self,task,self.userPath,task.attributes,self.taskCompleted,{"taskID":taskID},self.globalFontName,self.accent)
+        self.detailPanels[taskID] = DetailsPanel(self,self,self.mainWindow,task,self.userPath,task.attributes,self.taskCompleted,{"taskID":taskID},self.globalFontName,self.accent)
         task.bind("<Button-1>",lambda event,taskID=taskID:self.showDetailsPanel(taskID))
         task.lblTitle.bind("<Button-1>",lambda event,taskID=taskID:self.showDetailsPanel(taskID),
                            )

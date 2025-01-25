@@ -267,7 +267,7 @@ class List(CTkFrame):
                     self.taskList.remove(each)
 
                     # Creates a new Task object with the same details as the removed object.
-                    overdueTask = Task(self.overdueFrame,each.attributes,accent=self.accent,font=self.globalFontName,command=self.taskCompleted,displayListName=True)
+                    overdueTask = Task(self.overdueFrame,each.attributes,userPath=self.userPath,accent=self.accent,font=self.globalFontName,command=self.taskCompleted,displayListName=True)
 
                     # New object added to overdue list and details panel binded.
                     self.overdueList.append(overdueTask)
@@ -347,7 +347,7 @@ class List(CTkFrame):
         """This ensures that the attribute entries are always displayed if they are clicked on, especially since
         when you click out of another attribute entry, it removes the entries, so this places them back."""
         self.placeAttributeEntries()
-        
+                
         
 
     def attributeLeave(self):
@@ -494,7 +494,7 @@ class List(CTkFrame):
 
 
     def placeNewTask(self,taskDict):
-        newTask = Task(self.taskFrame,taskDict,self.accent,command=self.taskCompleted,font=self.globalFontName)
+        newTask = Task(self.taskFrame,taskDict,self.userPath,self.accent,command=self.taskCompleted,font=self.globalFontName)
         
         if bool(self.taskList) == False:
             self.lblNoTasks.place_forget()
@@ -517,7 +517,7 @@ class List(CTkFrame):
         self.lblOtherTasks.configure(text=f" {self.listName.capitalize()} - {len(self.taskList)}")
     
     def setDetailsPanel(self,task,taskID):
-        self.detailPanels[taskID] = DetailsPanel(self,self,task,self.userPath,task.attributes,self.taskCompleted,{"taskID":taskID},self.globalFontName,self.accent)
+        self.detailPanels[taskID] = DetailsPanel(self,self,self.mainWindow,task,self.userPath,task.attributes,self.taskCompleted,{"taskID":taskID},self.globalFontName,self.accent)
         task.bind("<Button-1>",lambda event,taskID=taskID:self.showDetailsPanel(taskID))
         task.lblTitle.bind("<Button-1>",lambda event,taskID=taskID:self.showDetailsPanel(taskID),
                            )
@@ -671,6 +671,30 @@ class List(CTkFrame):
         for each in range(removedIndex,len(list)): # Starts with index which was removed
             task = list[each]
             task.grid(row=each,column=0,pady=10)
+        
+        if overdue and len(self.overdueList) == 0:
+            self.lblOverdue.place_forget()
+            self.lblOtherTasks.place(in_=self.lblListName,x=-5,y=100)
+    
+    def checkNotOverdue(self):
+        # Looks through tasks in overdueList to check if they are still overdue.
+        todayObj = date.today()
+
+        for each in self.overdueList.copy():
+            try:
+                taskDateSplit = each.attributes["date"].split("/")
+                taskDateObj = date(int(taskDateSplit[-1]),int(taskDateSplit[1]),int(taskDateSplit[0]))
+                
+                if taskDateObj >= todayObj:
+                    # Not overdue, moves to taskFrame
+                    self.placeNewTask(each.attributes)
+                    removedIndex = self.overdueList.index(each)
+                    self.placeTasks(removedIndex,True)
+                    
+
+            except:
+                print("Date doesn't exist")
+
      
 
     def priorityCallback(self,event):
@@ -693,6 +717,7 @@ class List(CTkFrame):
         # Places each entry by using the entries dictionary.
         entries = [self.entryDate,self.entryTime,self.dropdownPriority]
         entries[0].place(in_=self.entryTask,y=50)
+        entries[0].bind("<Return>",lambda event:self.taskSubmitted())
         for each in range(1,len(entries)):
             # Each entry is placed to the right of the previous, indicated by each-1
             entries[each].place(in_=entries[each-1],x=150)
