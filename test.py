@@ -23,6 +23,7 @@ def getTasks():
     
     print(tasks)
 
+root.mainloop()
 getTasks()
 
 

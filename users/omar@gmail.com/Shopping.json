@@ -41,6 +41,50 @@
             "priority": "",
             "description": "",
             "listName": "Shopping"
+        },
+        "TGjdzQ": {
+            "title": "Stir fry ingredients",
+            "date": "26/01/2025",
+            "taskID": "TGjdzQ",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "Shopping",
+            "starred": "False"
+        },
+        "KyTurX": {
+            "title": "Apples",
+            "date": "26/01/2025",
+            "taskID": "KyTurX",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "Shopping",
+            "starred": "False"
+        },
+        "yMvIku": {
+            "title": "Tomatoes",
+            "date": "26/01/2025",
+            "taskID": "yMvIku",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "Shopping",
+            "starred": "False"
+        },
+        "GIkpoi": {
+            "title": "Bananas",
+            "date": "26/01/2025",
+            "taskID": "GIkpoi",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "Shopping",
+            "starred": "False"
         }
     }
 }

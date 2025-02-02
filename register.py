@@ -8,14 +8,15 @@ from random import choice
 from datetime import date
 from lib.uploadTask import uploadTask
 from lib.genHash import genHash
+from tkinter import messagebox
 
 
 class Register(CTkToplevel):
     # This class doesn't have an __init__ function, to allow it to be stored in the Auth window.
     def initialise(self,imgBGPath=None,accent="dodgerblue2",origin=None):
         super().__init__()
-        self.geometry("650x600")
-        self.maxdims = [650,600]
+        self.geometry("620x400")
+        self.maxdims = [620,400]
         self.imagedims = [1280,1080]
         self.minsize(self.maxdims[0],self.maxdims[1])
         self.maxsize(self.maxdims[0],self.maxdims[1])
@@ -69,7 +70,7 @@ class Register(CTkToplevel):
             self.imgBG = getWallpaper.getFromPath(self.imgBGPath,(self.imagedims[0],self.imagedims[1]))
         self.panelImgBG = CTkLabel(self,text="",image=self.imgBG)
 """
-        self.frameRegister = CTkFrame(self,width=575,height=500,fg_color=("white","gray9"),border_color="gray7",border_width=5,corner_radius=20)
+        self.frameRegister = CTkFrame(self,width=575,height=380,fg_color=("white","gray9"),border_color="gray7",border_width=5,corner_radius=20)
         self.logoImg = CTkImage(dark_image=Image.open("logo//blackBGLogo.png"),light_image=Image.open("logo//whiteBGLogo.png"),size=(140,45))
         self.panelLogo = CTkLabel(self.frameRegister,text="",image=self.logoImg)
         self.registerLbl = CTkLabel(self.frameRegister,font=(globalFontName,35),text="Create your account.")
@@ -99,18 +100,17 @@ class Register(CTkToplevel):
         self.panelLogo.place(relx=0.35,y=20)
         self.registerLbl.place(in_=self.panelLogo,x=-85,y=45)
 
-        self.entryEmail.place(x=95,y=150)
+        self.entryEmail.place(x=95,y=120)
         self.lblEmail.place(in_=self.entryEmail,x=-50,y=-3)
-        self.entryPassword.place(in_=self.entryEmail,y=70)
+        self.entryPassword.place(in_=self.entryEmail,y=55)
         self.lblPassword.place(in_=self.entryPassword,x=-50,y=-3)
-        self.entryUsername.place(in_=self.entryPassword,y=70)
+        self.entryUsername.place(in_=self.entryPassword,y=55)
         self.lblUsername.place(in_=self.entryUsername,x=-50,y=-3)
 
         self.btnShowPassword.place(in_=self.entryPassword,x=405,y=2)
-        self.btnRegister.place(in_=self.entryUsername,x=45,y=100)
+        self.btnRegister.place(in_=self.entryUsername,x=45,y=70)
         self.btnCancel.place(in_=self.btnRegister,x=145)
 
-        self.setMessage("hello!!","limegreen")
         
     def createSampleTask(self):
         welcomeTaskDict = {"title":"Welcome to Tickd!",
@@ -119,7 +119,8 @@ class Register(CTkToplevel):
                                "completed":"False",
                                "time":"",
                                "priority":"",
-                               "taskID":"welcome"}
+                               "taskID":"welcome",
+                               "listName":"inbox"}
         uploadTask(self.userPath,welcomeTaskDict,"inbox")
     
     def showHide(self):
@@ -146,17 +147,20 @@ class Register(CTkToplevel):
         
         details,rememberMeIndex = getAllDetails()
         
-        emailEmpty, passwordEmpty,usernameEmpty = self.checkEmpty(email, password,username)
-        emailValid = self.checkEmail(email)
-        found,self.userDetails = self.checkDetailsFound(email,details)
+        empty = self.checkEmpty()
         
-
-        if emailEmpty == False and passwordEmpty == False and usernameEmpty == False:
+        if not empty:
+            emailValid = self.checkEmail(email)
+            found,self.userDetails = self.checkDetailsFound(email,details)
             if emailValid and found:
-                self.setMessage("An account already exists with this email.","red")
+                #self.setMessage("An account already exists with this email.","red")
+                messagebox.showinfo("Cannot create new account","An account already exists with this email.")
+                self.grabWin()
                 self.resetEntry(["entryEmail"])
             elif not emailValid:
-                self.setMessage("Please enter a valid email.","red")
+                #self.setMessage("Please enter a valid email.","red")
+                messagebox.showinfo("Cannot create new account","Please enter a valid email.")
+                self.grabWin()
                 self.entryEmail.focus_set()
                 self.resetEntry(["entryEmail"])
             else:
@@ -184,9 +188,12 @@ class Register(CTkToplevel):
                 self.userPath = f"users//{email}"
                 createUserFolder(self.userPath) # Creates new folder for the new user with one "inbox.json" list
                 self.createSampleTask()
-                self.setMessage("Account successfully created. Please log in.","limegreen")
+
+                messagebox.showinfo("Account created successfully.","Your account has been created.\nPlease log in using your details.")
                 self.origin.registerWinOpen = False
-                self.after(2000,self.destroy)
+                self.origin.entryEmail.insert(0,email)
+                self.origin.entryPassword.focus()
+                self.destroy()
         
 
 
@@ -204,29 +211,15 @@ class Register(CTkToplevel):
 
         return found, userDetails
     
-    def checkEmpty(self,email,password,username):
-        emailEmpty = False
-        passwordEmpty = False
-        usernameEmpty = False
-
-        email = email.strip()
-        username = username.strip()
-        
-        print(f"{email}, {password},{username}")
-        fields = {"email":email,"password":password,"username":username}
-        fieldsVars = {"email":emailEmpty,"password":passwordEmpty,"username":usernameEmpty}
-        for each in fields:
-            print(each)
-            if fields[each] == "":
-                print("empty")
-                fieldsVars[each] = True
-                self.setMessage(f"Please fill out all fields.","red")
-        emailEmpty = fieldsVars["email"]
-        passwordEmpty = fieldsVars["password"]
-        usernameEmpty = fieldsVars["username"]
-        print(f"{fieldsVars['email']} {passwordEmpty} {usernameEmpty}")
-        
-        return emailEmpty, passwordEmpty,usernameEmpty
+    def checkEmpty(self):        
+        userEntryTexts = [self.entryEmail.get(),self.entryPassword.get(),self.entryUsername.get()]
+        for each in userEntryTexts:
+            if each.strip() == "":
+                messagebox.showinfo("Cannot create new account","Please fill out all fields.")
+                self.grabWin()
+                return True
+        return False
+    
 
     def checkEmail(self,email):
         if "@" in email:
@@ -236,7 +229,9 @@ class Register(CTkToplevel):
             else:
                 return False
         else:
-            self.setMessage("Invalid email entered.","red")
+            #self.setMessage("Invalid email entered.","red")
+            messagebox.showinfo("Cannot create new account","Invalid email entered. Please try again.")
+            self.grabWin()
             return False
     
     def setMessage(self,message,colour = "white"):

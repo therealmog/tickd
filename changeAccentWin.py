@@ -12,10 +12,10 @@ class ChangeAccentWin(CTkToplevel):
     def __init__(self,master,email,font="Bahnschrift",flagFunc=None):
         super().__init__(master=master)
 
-        self.geometry("880x340")
+        self.geometry("500x480")
         self.title("Change your accent colour - Tickd")
-        self.minsize(880,340)
-        self.maxsize(880,340)
+        self.minsize(500,480)
+        self.maxsize(500,480)
         self.font = font
         self.email = email
         self.currentAccent = getAccent(email)
@@ -39,18 +39,21 @@ class ChangeAccentWin(CTkToplevel):
     
     def widgets(self):
         globalFontName = self.font
-        self.frameWin = CTkFrame(self,width=850,height=320,corner_radius=20,
-                                 border_width=4,border_color="grey4",)
+        self.frameWin = CTkFrame(self,width=470,height=460,corner_radius=20,
+                                 border_width=4,border_color="grey4",fg_color=("white","gray9"))
         
-        self.lblTitle = CTkLabel(self.frameWin,text="Change your accent colour",
-                                 font=(globalFontName,30))
+        self.lblTitle = CTkLabel(self.frameWin,text="Change your accent colour.",
+                                 font=(globalFontName,32))
+        
+        self.lblSubtitle = CTkLabel(self.frameWin,text="Select a colour to view its preview.",
+                                 font=(globalFontName,18))
         
         self.lblPreview = CTkLabel(self.frameWin,text="Preview:",
                                  font=(globalFontName,15))
         
         imgLogo = CTkImage(Image.open("logo//whiteBGLogo.png"),
                            Image.open("logo//blackBGLogo.png"),
-                           size=(132,42))
+                           size=(106,34))
         self.logoPanel = CTkLabel(self.frameWin,text="",image=imgLogo)
 
         
@@ -61,10 +64,10 @@ class ChangeAccentWin(CTkToplevel):
                             "Deep Pink":"deep pink",
                             "Dark Orange":"darkorange2"}
         
-        self.imgSave = CTkImage(Image.open("icons//save.png"),size=(30,30))
-        self.btnSave = CTkButton(self,text="save",font=(globalFontName,28),fg_color="grey24",\
-                                            command=lambda:self.setNewAccent(),width=70,image=self.imgSave)
-        self.tickImg = CTkImage(Image.open("logo//tick.png"),size=(35,35))
+        self.imgSave = CTkImage(Image.open("icons//save.png"),size=(35,35))
+        self.btnSave = CTkButton(self,text="",font=(globalFontName,28),fg_color="grey24",\
+                                            command=lambda:self.setNewAccent(),width=70,image=self.imgSave,corner_radius=20)
+        self.tickImg = CTkImage(Image.open("logo//tick.png"),size=(25,25))
         self.lblSave = CTkLabel(self,text="Saved description.",text_color="limegreen",font=(globalFontName,25),\
                                 image=self.tickImg,compound="left")
         
@@ -86,7 +89,8 @@ class ChangeAccentWin(CTkToplevel):
         self.chosen = self.options[0]
         self.coloursMenu = CTkOptionMenu(self.frameWin,font=(globalFontName,30),
                                          dropdown_font=(globalFontName,22),values=self.options,
-                                         width=240,
+                                         width=230,
+                                         fg_color=("white","gray24"),
                                          command=lambda event:self.createPreview(),
                                          dropdown_fg_color="grey24",
                                          corner_radius=20,
@@ -95,11 +99,12 @@ class ChangeAccentWin(CTkToplevel):
     def placeWidgets(self):
         self.frameWin.place(relx=0.5,rely=0.5, anchor="center")
 
-        self.lblTitle.place(x=30,y=20)
-        self.logoPanel.place(in_=self.lblTitle,x=670)
+        self.lblTitle.place(x=40,y=55)
+        self.logoPanel.place(in_=self.lblTitle,x=130,y=-30)
+        self.lblSubtitle.place(in_=self.lblTitle,x=45,y=70)
         
-        self.coloursMenu.place(x=40,y=80)
-        self.lblPreview.place(in_=self.coloursMenu,x=400)
+        self.coloursMenu.place(in_=self.lblSubtitle,x=20,y=35)
+        self.lblPreview.place(in_=self.lblTitle,y=180)
     
     def createPreview(self,colour=None):
         if colour==None:
@@ -107,18 +112,18 @@ class ChangeAccentWin(CTkToplevel):
             colour=self.accentsDict[self.chosen]
         
         if colour != self.currentAccent:
-            self.btnSave.place(in_=self.coloursMenu,x=70,y=70)
+            self.btnSave.place(in_=self.coloursMenu,x=240)
         else:
             self.btnSave.place_forget()
 
 
         self.colourLbl = CTkLabel(self.frameWin,text="This is the colour",font=(self.font,30),
                                   text_color=colour)
-        self.hoverLbl = CTkLabel(self.frameWin,text="Hover over me!",font=(self.font,25),
+        self.hoverLbl = CTkLabel(self.frameWin,text="Hover over me!",font=(self.font,22),
                                  text_color=("black","white"),cursor="hand2")
 
-        self.hoverLbl.bind("<Enter>",lambda event,colour=colour:self.hoverLbl.configure(text_color=colour))
-        self.hoverLbl.bind("<Leave>",lambda event,colour=("black","white"):self.hoverLbl.configure(text_color=colour))
+        self.hoverLbl.bind("<Enter>",lambda event,colour=colour:self.hoverLbl.configure(text_color=colour,font=(self.font,22,"underline")))
+        self.hoverLbl.bind("<Leave>",lambda event,colour=("black","white"):self.hoverLbl.configure(text_color=colour,font=(self.font,22)))
 
         self.previewTask = Task(self.frameWin,{"title":"Do your homework",
                                                "date":self.today.strftime("%d/%m/%Y"),
@@ -127,9 +132,9 @@ class ChangeAccentWin(CTkToplevel):
                                                "priority":"",
                                                "description":"",
                                                "listName":""},userPath=None,accent=colour,
-                                               size=30)
+                                               size=28)
         
-        self.colourLbl.place(in_=self.lblPreview,y=40)
+        self.colourLbl.place(in_=self.lblPreview,y=30)
         self.hoverLbl.place(in_=self.colourLbl,y=50)
         self.previewTask.place(in_=self.hoverLbl,y=50)
     
@@ -139,8 +144,9 @@ class ChangeAccentWin(CTkToplevel):
         if self.flagFunc != None:
             self.flagFunc()
 
-        messagebox.showinfo("New accent set","Your new accent colour has been set.\nPlease restart the app to see the changes.")
-        
+        messagebox.showinfo("New accent set","Your new accent colour has been set.")
+        self.master.createNewApp()
+
         self.destroy()
     
 

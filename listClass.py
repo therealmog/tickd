@@ -17,6 +17,7 @@ from lib.getOverdue import getOverdue
 from lib.getListImgs import getListImgs
 from lib.getValueWindow import GetValueWin
 import os
+import json
 from lib.checkListName import checkListName
 
 
@@ -214,6 +215,27 @@ class List(CTkFrame):
             if each._text == oldName:
                 each.configure(text=newName)
         
+        # Change listName attribute of each task
+        with open(newPath,"r") as f:
+            listData = json.load(f)
+        
+        try:
+            completedData = listData["completed"]
+            for each in completedData:
+                completedData[each]["listName"] = newName
+        except: pass
+
+        currentTasksData = listData["tasks"]
+
+        for each in currentTasksData:
+            currentTasksData[each]["listName"] = newName
+        
+        with open(newPath,"w") as f:
+            json.dump(listData,f,indent=4)
+        
+        
+        
+        
 
 
 
@@ -246,7 +268,7 @@ class List(CTkFrame):
     def loadTasks(self): # Should only be run once at the start of the program
 
         # Gets a list of Task objects.
-        self.taskList = getTasks(self.taskFrame,self.userPath,self.listName,self.accent,command=self.taskCompleted,fontName=self.globalFontName,displayListName=True)
+        self.taskList = getTasks(self.taskFrame,self.userPath,self.listName,self.accent,command=self.taskCompleted,fontName=self.globalFontName,displayListName=False)
                
         # Creates the list for details panels
         self.detailPanels = {} # taskID:detailPanelObj
@@ -254,6 +276,7 @@ class List(CTkFrame):
 
         # Creates a list for overdue task objects
         self.overdueList = []
+        self.overdueDict = {}
         
         # self.taskList = False indicates that there are no tasks.
         # If there are no tasks at all, there will be no overdue tasks either.
@@ -261,17 +284,17 @@ class List(CTkFrame):
             # Gathering overdue tasks
             self.overdueDict = getOverdue(self.taskList) # Returns a dictionary
 
-            
-            for each in self.taskList.copy():
-                if each.attributes["taskID"] in list(self.overdueDict.keys()):
-                    self.taskList.remove(each)
+            if len(self.overdueDict) > 0:
+                for each in self.taskList.copy():
+                    if each.attributes["taskID"] in list(self.overdueDict.keys()):
+                        self.taskList.remove(each)
 
-                    # Creates a new Task object with the same details as the removed object.
-                    overdueTask = Task(self.overdueFrame,each.attributes,userPath=self.userPath,accent=self.accent,font=self.globalFontName,command=self.taskCompleted,displayListName=True)
+                        # Creates a new Task object with the same details as the removed object.
+                        overdueTask = Task(self.overdueFrame,each.attributes,userPath=self.userPath,accent=self.accent,font=self.globalFontName,command=self.taskCompleted,displayListName=False)
 
-                    # New object added to overdue list and details panel binded.
-                    self.overdueList.append(overdueTask)
-                    self.setDetailsPanel(overdueTask,each.attributes["taskID"])
+                        # New object added to overdue list and details panel binded.
+                        self.overdueList.append(overdueTask)
+                        self.setDetailsPanel(overdueTask,each.attributes["taskID"])
 
             # Creates labels for the regular lists
             newOtherTasksText = f" {self.listName.capitalize()} - {len(self.taskList)}"
@@ -431,8 +454,10 @@ class List(CTkFrame):
                     # Task is placed onto the screen.
                     self.placeNewTask(taskDict)
 
-
-                    #print([x.attributes["title"] for x in self.taskList])
+                    # Checks all screens for any new tasks added.
+                    self.mainWindow.checkNewTasksAll()
+                    
+                    
     
     def deleteListFromFolder(self):
         path = f"{self.userPath}//{self.listName}.json"
@@ -591,15 +616,16 @@ class List(CTkFrame):
 
         # Checking if task is in the overdue section.
         # Then marking it as complete.
-        if taskID in self.overdueDict:
-            for each in self.overdueList.copy():
-                if each.attributes["taskID"] == taskID:
-                    each.attributes["completed"] = "True"
-        else:
-            # Otherwise, marking the task in the regular taskList as complete.
-            for each in self.taskList:
-                if each.attributes["taskID"] == taskID:
-                    each.attributes["completed"] = "True"
+        if len(self.overdueDict) != 0:
+            if taskID in self.overdueDict:
+                for each in self.overdueList.copy():
+                    if each.attributes["taskID"] == taskID:
+                        each.attributes["completed"] = "True"
+            else:
+                # Otherwise, marking the task in the regular taskList as complete.
+                for each in self.taskList:
+                    if each.attributes["taskID"] == taskID:
+                        each.attributes["completed"] = "True"
 
         # Removing the details panel for the completed task.
         self.detailPanels[taskID].place_forget()
@@ -608,6 +634,9 @@ class List(CTkFrame):
 
         # Removes the task from the screen and edits text for list title.
         self.removeIfCompleted()
+
+        # Checks other lists to remove completed tasks
+        self.mainWindow.updateTasks()
 
         
     
@@ -671,10 +700,20 @@ class List(CTkFrame):
         for each in range(removedIndex,len(list)): # Starts with index which was removed
             task = list[each]
             task.grid(row=each,column=0,pady=10)
+
+        if overdue:
+            self.lblOverdue.configure(text=f"OVERDUE - {len(self.overdueList)}")
+            if len(self.overdueList) == 0:
+                self.lblOverdue.place_forget()
+                self.lblOtherTasks.place(in_=self.lblListName,x=-5,y=100)
+        else:
+            self.lblOtherTasks.configure(text=f"{self.listName.capitalize()} - {len(self.taskList)}")
+            if len(self.taskList) == 0 and len(self.overdueList)==0:
+                self.lblOtherTasks.place_forget()
+                self.lblNoTasks.place(x=25,y=150)
+            
         
-        if overdue and len(self.overdueList) == 0:
-            self.lblOverdue.place_forget()
-            self.lblOtherTasks.place(in_=self.lblListName,x=-5,y=100)
+        
     
     def checkNotOverdue(self):
         # Looks through tasks in overdueList to check if they are still overdue.
@@ -688,6 +727,7 @@ class List(CTkFrame):
                 if taskDateObj >= todayObj:
                     # Not overdue, moves to taskFrame
                     self.placeNewTask(each.attributes)
+                    self.overdueDict.pop(each.attributes["taskID"])
                     removedIndex = self.overdueList.index(each)
                     self.placeTasks(removedIndex,True)
                     
@@ -723,6 +763,61 @@ class List(CTkFrame):
             entries[each].place(in_=entries[each-1],x=150)
             entries[each].bind("<Return>",lambda event:self.taskSubmitted())
     
+    def checkTasks(self):
+        # Refresh data of tasks.
+        # Check if any tasks have been completed and remove if they have
+
+        # Checks for completed tasks in regular list
+        if self.taskList != False:
+            for each in self.taskList:
+                each.refreshData()
+                if each.attributes["completed"] == "True":
+                    removedIndex = self.taskList.index(each)
+                    self.placeTasks(removedIndex,False)
+
+        # Checks for completed tasks in overdue list.
+        if self.overdueList != False: 
+            for each in self.overdueList:
+                each.refreshData()
+                if each.attributes["completed"] == "True":
+                    self.overdueDict.pop(each.attributes["taskID"])
+                    removedIndex = self.overdueList.index(each)
+                    self.placeTasks(removedIndex,True)
+
+    def checkNewTasksAdded(self):
+        # Checks to see if any new tasks have been added in a different screen.
+        # Checks for any new tasks to be added.
+        updatedList = getTasks(self.taskFrame,self.userPath,self.listName,
+                               self.accent,command=self.taskCompleted,
+                               fontName=self.globalFontName,displayListName=False)
+        if updatedList != False:
+            updatedListTaskIDs = [each.attributes["taskID"] for each in updatedList]
+            
+            if self.taskList != False:
+                for each in self.taskList:
+                    if each.attributes["taskID"] in updatedListTaskIDs:
+                        updatedListTaskIDs.remove(each.attributes["taskID"])
+
+            if self.overdueList != False:
+                for each in self.overdueList:
+                    if each.attributes["taskID"] in updatedListTaskIDs:
+                        updatedListTaskIDs.remove(each.attributes["taskID"])
+            
+            for taskID in updatedListTaskIDs:
+                # Adds new tasks.
+                # The index i matches with the index of the item in updatedList.
+                # These items are the ones which are going to be added.
+                # Saves the time taken to add all of the tasks again.
+
+                for each in updatedList:
+                    if each.attributes["taskID"] == taskID:
+                        newTaskDict = each.attributes
+                        print(newTaskDict)
+                        self.placeNewTask(newTaskDict)
+                        break
+        
+        
+
     def removeAttributeEntries(self):
         self.btnTaskSubmit.place_forget()
         self.btnTaskSubmit.unbind("<Return>")

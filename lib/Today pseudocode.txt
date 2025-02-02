@@ -1,0 +1,47 @@
+Today pseudocode
+
+    public procedure widgets():
+        lblTitle = large label with text "Today"
+        taskFrame = scrollable box to hold tasks
+
+        # {} indicates number of items.
+        frameLbl = label with text "Today - {}"
+
+        taskEntry = entry box with placeholder "Enter a task..."
+        submitBtn = button with tick mark
+    end public procedure
+
+    public procedure placeWidgets():
+        place lblTitle top left
+        place taskFrame below lblTitle
+        place frameLbl above taskFrame
+        place taskEntry top right
+        place submitBtn to the right of taskEntry
+    end public procedure
+
+    public procedure loadTasks():
+        taskList = []
+
+        for file in userFolder do
+            using json:
+                taskData = load file
+            for taskDict in taskData do
+                if taskDict["date"] == todaysDate then
+                    task = new Task(taskDict)
+                    taskList.append(task)
+                end if
+            end for
+        end for
+    end public procedure
+
+    public procedure placeTasks():
+        if len(taskList) >= 1 then
+            place taskList[0] in taskFrame
+            for i = 1 to len(taskList)-1 do
+                place taskList[i] in taskFrame below taskList[i-1]
+    end public procedure
+
+
+
+
+

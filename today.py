@@ -1,6 +1,6 @@
 from customtkinter import *
 from PIL import Image
-from datetime import date,timedelta
+from datetime import date,timedelta,datetime
 from lib.getDetails import getAllDetails,getDetailsIndividual,writeToAuthDetails
 from lib.submitBtn import SubmitButton
 from lib.createTaskDict import createTaskDict
@@ -51,6 +51,8 @@ class Today(CTkFrame):
             self.todaysDate = todaysDate
         else:
             self.todaysDate = todaysDate.strftime("%A, %d %B %Y")
+            self.strToday = todaysDate.strftime("%d/%m/%y")
+            self.strTodayLong = todaysDate.strftime("%d/%m/%Y")
 
 
         self.widgets()
@@ -76,6 +78,9 @@ class Today(CTkFrame):
 
         # Flag for when renaming the list
         self.flagRenaming = False
+
+        checkDateColourCmd = (self.register(self.dateColour),"%P")
+        self.entryDate.configure(validate="key",validatecommand=checkDateColourCmd)
 
     #------------------------# Widgets and placing #-------------------------#    
     def widgets(self):
@@ -132,7 +137,12 @@ class Today(CTkFrame):
 
         self.currentAttribute = ""
 
-        
+    def dateColour(self,userInput):
+        if userInput.lower().strip() == "today":
+            self.entryDate.configure(text_color=("black","white"))
+        else:
+            self.entryDate.configure(text_color="gray")
+        return True  
 
     def frameDimensions(self):
         print(f"Width: {self.winfo_screenwidth()}, Height: {self.winfo_screenheight()}")
@@ -205,19 +215,19 @@ class Today(CTkFrame):
         # Gets a list of Task objects.
         self.taskList = getTasksAllLists(self.taskFrame,self.userPath,self.accent,command=self.taskCompleted,fontName=self.globalFontName,displayListName=True)
         todayObj = date.today()
-
-        print(self.taskList)
+        
+        
         if self.taskList != False:
-            for each in self.taskList:
-                dateSplit = each.attributes["date"].split("/")
-                if len(dateSplit) == 3:
-                    print(dateSplit)
-                    dateObj = date(int(dateSplit[-1]),int(dateSplit[1]),int(dateSplit[0]))
-                    if dateObj == todayObj:
+            for each in self.taskList.copy():
+                try:
+                    taskDateObj = datetime.strptime(each.attributes["date"],"%d/%m/%Y")
+
+                    if taskDateObj.strftime("%d/%m/%y") == todayObj.strftime("%d/%m/%y"):
                         print(f"Task {each.attributes["title"]} is due today.")
                     else:
+                        print(f"Removing {each.attributes["title"]}")
                         self.taskList.remove(each)
-                else:
+                except ValueError:
                     print(f"Date not set for {each.attributes["title"]}")
                     self.taskList.remove(each)
             
@@ -240,25 +250,28 @@ class Today(CTkFrame):
             # First, tasks are ordered.
             self.orderList(self.taskList)
 
-            print(self.taskList)
             # grid method used to display tasks in scrollable frame
-            self.taskList[0].grid(row=0,column=0,pady=(5,10))
-            
-            taskID = self.taskList[0].attributes["taskID"]
-            self.setDetailsPanel(self.taskList[0],taskID)
-            i = 1 # Indicates column for taskFrame grid
-
-            for each in range(1,len(self.taskList)): # Starts with second item
-                task = self.taskList[each]
-                task.grid(row=i,column=0,pady=10)
-                i+=1
+            if len(self.taskList)>0:
+                self.taskList[0].grid(row=0,column=0,pady=(5,10))
                 
-                taskID = task.attributes["taskID"]
-                self.setDetailsPanel(task,taskID)
+                taskID = self.taskList[0].attributes["taskID"]
+                self.setDetailsPanel(self.taskList[0],taskID)
+                i = 1 # Indicates column for taskFrame grid
 
-                 
-            self.lblOtherTasks.place(in_=self.lblListName,x=-5,y=100)
-            self.taskFrame.place(in_=self.lblOtherTasks,y=35)
+                for each in range(1,len(self.taskList)): # Starts with second item
+                    task = self.taskList[each]
+                    task.grid(row=i,column=0,pady=10)
+                    i+=1
+                    
+                    taskID = task.attributes["taskID"]
+                    self.setDetailsPanel(task,taskID)
+
+                    
+                self.lblOtherTasks.place(in_=self.lblListName,x=-5,y=100)
+                self.taskFrame.place(in_=self.lblOtherTasks,y=35)
+            else:
+                # Since there are no tasks, label is placed.
+                self.lblNoTasks.place(x=25,y=150)
                 
             
             
@@ -267,6 +280,20 @@ class Today(CTkFrame):
             # Since there are no tasks, label is placed.
             self.lblNoTasks.place(x=25,y=150)
     
+    def checkTasks(self):
+        # Refresh data of tasks.
+        # Check if any tasks have been completed and remove if they have
+
+        if self.taskList != False:
+            for each in self.taskList:
+                each.refreshData()
+                if each.attributes["completed"] == "True":
+                    removedIndex = self.taskList.index(each)
+                    self.placeTasks(removedIndex,False)
+
+
+
+
     def renameMainWin(self):
         self.mainWindow.title(f"{self.listName.capitalize()} - Tickd")
         
@@ -344,7 +371,7 @@ class Today(CTkFrame):
                 # All the attributes are brought together to create a task dictionary
                 # to be written to the task list JSON file.
                 taskDict = createTaskDict(title,date,attributes)
-                self.resetEntry(["entryTask","entryDate","entryTime","dropdownPriority"])
+                
 
                 # Task is written to the specified list.
                 uploadTask(self.userPath,taskDict,listName="inbox")
@@ -354,8 +381,10 @@ class Today(CTkFrame):
                 # Task is placed onto the screen.
                 self.placeNewTask(taskDict)
 
+                self.mainWindow.checkNewTasksAll()
+                self.resetEntry(["entryTask","entryDate","entryTime","dropdownPriority"])
 
-                print([x.attributes["title"] for x in self.taskList])
+
     
     def deleteListFromFolder(self):
         path = f"{self.userPath}//{self.listName}.json"
@@ -416,8 +445,8 @@ class Today(CTkFrame):
                 listToSort.remove(each)
                 listToSort.insert(noOfP2+noOfP3+1,each)
 
-    def placeNewTask(self,taskDict):
-        newTask = Task(self.taskFrame,taskDict,self.userPath,self.accent,command=self.taskCompleted,font=self.globalFontName)
+    def placeNewTask(self,taskDict,displayListName=True):
+        newTask = Task(self.taskFrame,taskDict,self.userPath,self.accent,command=self.taskCompleted,font=self.globalFontName,displayListName=displayListName)
         
         if bool(self.taskList) == False:
             self.lblNoTasks.place_forget()
@@ -469,7 +498,12 @@ class Today(CTkFrame):
 
     def taskCompleted(self,taskID):
         # Retrieving all of the data for the list.
-        taskListData = loadTaskList(self.userPath,"inbox")
+        listName = ""
+        for each in self.taskList:
+            if each.attributes["taskID"] == taskID:
+                listName = each.attributes["listName"]
+
+        taskListData = loadTaskList(self.userPath,listName)
 
 
         # Selecting the tasks part (tasks is a sub-dictionary)
@@ -509,20 +543,12 @@ class Today(CTkFrame):
 
 
         # Saving the changes by writing them to the JSON file.
-        updateTaskListData(taskListData,self.userPath,"inbox")
+        updateTaskListData(taskListData,self.userPath,listName)
 
-
-        # Checking if task is in the overdue section.
-        # Then marking it as complete.
-        if taskID in self.overdueDict:
-            for each in self.overdueList.copy():
-                if each.attributes["taskID"] == taskID:
-                    each.attributes["completed"] = "True"
-        else:
-            # Otherwise, marking the task in the regular taskList as complete.
-            for each in self.taskList:
-                if each.attributes["taskID"] == taskID:
-                    each.attributes["completed"] = "True"
+        # Otherwise, marking the task in the regular taskList as complete.
+        for each in self.taskList:
+            if each.attributes["taskID"] == taskID:
+                each.attributes["completed"] = "True"
 
         # Removing the details panel for the completed task.
         self.detailPanels[taskID].place_forget()
@@ -531,6 +557,8 @@ class Today(CTkFrame):
 
         # Removes the task from the screen and edits text for list title.
         self.removeIfCompleted()
+
+        self.mainWindow.updateTasks()
 
         #print(self.taskList)
         
@@ -547,35 +575,26 @@ class Today(CTkFrame):
                 # Edits list title
                 self.lblOtherTasks.configure(text=f" {self.listName.capitalize()} - {len(self.taskList)}")
 
-        # Then checks if it is in overdue list.
-        for each in self.overdueList:
-            if each.attributes["completed"] == "True":
-                print(f"Removing {each.attributes["title"]}")
-
-                # Same as above except for overdue lists
-                self.placeTasks(self.overdueList.index(each),overdue=True)
-                self.lblOverdue.configure(text=f"OVERDUE - {len(self.overdueList)}")
-
-        # Removes overdue list frame if there are no more overdue lists.
-        if len(self.overdueList) == 0:
-            self.lblOverdue.place_forget()
-            self.lblOtherTasks.place(in_=self.lblListName,x=-5,y=100)
 
 
         # Removes both the regular task frame and the overdue task frame if there are no tasks remaining.
         # Also displays the "You have no tasks" label.
-        if len(self.taskList) == 0 and len(self.overdueList) == 0:
+        if len(self.taskList) == 0:
             self.taskFrame.place_forget()
             self.lblOtherTasks.place_forget()
-            self.overdueFrame.place_forget()
-            self.lblOverdue.place_forget()
             self.lblNoTasks.place(x=25,y=150)
 
+    def checkDateToday(self,dateStr:str):
+        if dateStr == self.strToday or dateStr == self.strTodayLong:
+            return True
+        else:
+            return False
 
     def placeTasks(self,removedIndex,overdue:bool):
         # Removes completed task by index
         # Then places all tasks again after the one which has been removed.
 
+        print(f"Removing tasks in {self.listName}")
 
         # Sets which task is being edited.
         if overdue:
@@ -595,6 +614,42 @@ class Today(CTkFrame):
         for each in range(removedIndex,len(list)): # Starts with index which was removed
             task = list[each]
             task.grid(row=each,column=0,pady=10)
+        
+        
+        self.lblOtherTasks.configure(text=f"{self.listName.capitalize()} - {len(self.taskList)}")
+        if len(self.taskList) == 0:
+            self.lblOtherTasks.place_forget()
+            self.lblNoTasks.place(x=25,y=150)
+    
+    def checkNewTasksAdded(self):
+        # Checks to see if any new tasks have been added in a different screen.
+        # Checks for any new tasks to be added.
+        print("boing!!!!!")
+        updatedList = getTasksAllLists(self.taskFrame,self.userPath,
+                               self.accent,command=self.taskCompleted,
+                               fontName=self.globalFontName,displayListName=True)
+        if updatedList != False:
+            updatedListTaskIDs = [each.attributes["taskID"] for each in updatedList]
+            
+            for each in self.taskList:
+                if each.attributes["taskID"] in updatedListTaskIDs:
+                    updatedListTaskIDs.remove(each.attributes["taskID"])
+            
+            for each in updatedList.copy():
+                if not self.checkDateToday(each.attributes["date"]):
+                    updatedList.remove(each)
+            
+            for taskID in updatedListTaskIDs:
+                # Adds new tasks.
+                # The index i matches with the index of the item in updatedList.
+                # These items are the ones which are going to be added.
+                # Saves the time taken to add all of the tasks again.
+
+                for each in updatedList:
+                    if each.attributes["taskID"] == taskID:
+                        newTaskDict = each.attributes
+                        print(newTaskDict)
+                        self.placeNewTask(newTaskDict,displayListName=True)
      
 
     def priorityCallback(self,event):
@@ -621,6 +676,9 @@ class Today(CTkFrame):
             # Each entry is placed to the right of the previous, indicated by each-1
             entries[each].place(in_=entries[each-1],x=150)
             entries[each].bind("<Return>",lambda event:self.taskSubmitted())
+        
+        if self.entryDate.get() == "":
+            self.entryDate.insert(0,"today")
     
     def removeAttributeEntries(self):
         self.btnTaskSubmit.place_forget()
@@ -630,6 +688,8 @@ class Today(CTkFrame):
         for each in range(0,len(entries)):
             entries[each].place_forget()
             entries[each].unbind("<Return>")
+        
+        
             
     def resetEntry(self,entries:list):
         entriesDict = self.entriesDict
@@ -638,8 +698,12 @@ class Today(CTkFrame):
                 valuesList = entriesDict[each]._values 
                 entriesDict[each].set(valuesList[0])
                 entriesDict[each].configure(text_color=self.textgrey)
+            elif each == "entryDate":
+                entriesDict[each].delete(0,"end")
+                entriesDict[each].insert(0,"today")
             else:
                 entriesDict[each].delete(0,"end")
+        self.entryTask.focus()
 
 
     def bindTaskEntry(self):

@@ -6,8 +6,6 @@ def getTasks(master,userPath,listName,accent,command,fontName="Bahnschrift",disp
         # Creates path for list
         if path == None:
             path = f"{userPath}//{listName}.json"
-        else:
-            path = path
         
         try:
             with open(path,"r") as f:
@@ -31,28 +29,28 @@ def getTasks(master,userPath,listName,accent,command,fontName="Bahnschrift",disp
                 theList = json.load(f)
             
         
-        try:
-            taskDict = theList["tasks"] # First attribute is always "shared", then comes the tasklist
-
-            taskList = []
-
-            # Returning a list of task objects
-            for each in taskDict:
-                if taskDict[each]["completed"] == "False":
-                    # A Task object is created for each item in the task list.    
-                    taskObj = Task(master,accent=accent,attributes=taskDict[each],userPath=userPath,font=fontName,command=command,displayListName=displayListName)
-                    taskList.append(taskObj)
-            
-
-            if len(taskList) == 0:
-                print("No tasks found.")
-                return False
-            else:
-                return taskList
         
-        except:
+        taskDict = theList["tasks"] # First attribute is always "shared", then comes the tasklist
+
+        taskList = []
+
+        # Returning a list of task objects
+        for each in taskDict:
+            if taskDict[each]["completed"] == "False":
+                # A Task object is created for each item in the task list.    
+                taskObj = Task(master,accent=accent,attributes=taskDict[each],userPath=userPath,font=fontName,command=command,displayListName=displayListName)
+                taskList.append(taskObj)
+        
+
+        if len(taskList) == 0:
             print("No tasks found.")
             return False
+        else:
+            return taskList
+        
+        """except:
+            print("No tasks found.")
+            return False"""
 
 def getTasksAllLists(master,userPath,accent,command,fontName="Bahnschrift",displayListName=False):
     # Find all lists from user directory.
@@ -61,10 +59,7 @@ def getTasksAllLists(master,userPath,accent,command,fontName="Bahnschrift",displ
     allTasksList = []
     for each in userLists:
         taskList = getTasks(master,userPath,None,accent,command,fontName,displayListName,path=each)
-        if taskList == False:
-            print("No tasks found.")
-            return False
-        else:
+        if taskList != False:
             for each in taskList:
                 allTasksList.append(each)
 
@@ -72,6 +67,7 @@ def getTasksAllLists(master,userPath,accent,command,fontName="Bahnschrift",displ
         print("No tasks found.")
         return False
     else:
+        print([each.attributes["title"] for each in allTasksList])
         return allTasksList      
     
 

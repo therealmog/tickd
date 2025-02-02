@@ -205,7 +205,7 @@ class Starred(CTkFrame):
         # Gets a list of Task objects.
         self.taskList = getTasksAllLists(self.taskFrame,self.userPath,self.accent,command=self.taskCompleted,fontName=self.globalFontName,displayListName=True)
 
-        print(self.taskList)
+        #print(self.taskList)
         if self.taskList != False:
             for each in self.taskList:
                 # Checking if starred
@@ -305,6 +305,17 @@ class Starred(CTkFrame):
     
     def renameMainWin(self):
         self.mainWindow.title("Starred - Tickd")
+    
+    def checkTasks(self):
+        # Refresh data of tasks.
+        # Check if any tasks have been completed and remove if they have
+
+        if self.taskList != False:
+            for each in self.taskList:
+                each.refreshData()
+                if each.attributes["completed"] == "True":
+                    removedIndex = self.taskList.index(each)
+                    self.placeTasks(removedIndex,False)
         
 
     #--------------------# Task entry and button functions #------------------#
@@ -403,7 +414,7 @@ class Starred(CTkFrame):
                     self.placeNewTask(taskDict)
 
 
-                    print([x.attributes["title"] for x in self.taskList])
+                    #print([x.attributes["title"] for x in self.taskList])
     
 
     def orderList(self,listToSort):

@@ -68,9 +68,9 @@ class Auth(CTk):
         self.lblEmail = CTkLabel(self.frameLogin,font=emojiFont,text="✉️")
         self.lblPassword = CTkLabel(self.frameLogin,font=emojiFont,text="🔒")
         
-        self.imgShowPassword = CTkImage(Image.open("icons//eyeicon newsized.png"),size=(32,24))
+        self.imgShowPassword = CTkImage(Image.open("icons//eyeIcon.png"),size=(32,24))
         self.btnShowPassword = CTkButton(self.frameLogin,image=self.imgShowPassword,text="",width=1,command=self.showHide,corner_radius=15,fg_color=self.accent)
-        self.imgHidePassword = CTkImage(Image.open("icons//eyeIcon off new sized.png"),size=(32,24))
+        self.imgHidePassword = CTkImage(Image.open("icons//eyeIconOff.png"),size=(32,24))
         self.btnHidePassword = CTkButton(self.frameLogin,image=self.imgHidePassword,text="",width=1,command=self.showHide,corner_radius=15)
         self.btnRegister = CTkButton(self.frameLogin,text="register",font=buttonFont,corner_radius=15,text_color=self.globalColour,border_color=("black","gray12"),fg_color=self.accent,border_width=2,command=self.createRegisterWindow)
         
@@ -393,4 +393,4 @@ class Auth(CTk):
             self.signIn(userDetails)
 
 
-auth = Auth()
+#auth = Auth()

@@ -124,55 +124,60 @@ class Task(CTkFrame):
 
         # Makes sure that labels and messages are up to date with details, etc.
     def refreshData(self):
-        self.attributes = getTaskDict(self.taskID,self.userPath,self.listName)
+        newAttrs = getTaskDict(self.taskID,self.userPath,self.listName)
 
-        self.lblTitle.configure(text=self.attributes["title"])
-        self.taskDate = self.getDate()
-        if self.taskDate != "(no date)":
-            if self.taskDateObj != None:
-                if self.taskDateObj < date.today():
-                    self.lblDate.configure(text_color="red")
-                else:
-                    self.lblDate.configure(text_color="white")
-            self.differenceStr = self.getTimeDifference()
-        
-        
-
-        # Adds the time to the date label if applicable.
-        if self.attributes["time"] != "":
-            self.lblDate.configure(text=f"{self.taskDate}, {self.attributes["time"]}")
+        if newAttrs == False:
+            self.attributes["completed"] = "True"
         else:
-            self.lblDate.configure(text=self.taskDate)
+            self.attributes = newAttrs
+            
+            self.lblTitle.configure(text=self.attributes["title"])
+            self.taskDate = self.getDate()
+            if self.taskDate != "(no date)":
+                if self.taskDateObj != None:
+                    if self.taskDateObj < date.today():
+                        self.lblDate.configure(text_color="red")
+                    else:
+                        self.lblDate.configure(text_color="white")
+                self.differenceStr = self.getTimeDifference()
+            
+            
 
-        # Assigns the priority colour, if applicable.
-        if self.attributes["priority"] != "":
-            priority = self.attributes["priority"]
-            if  priority == "P1":
-                self.configure(border_color="red")
-            elif priority == "P2":
-                self.configure(border_color="#db9d09")
+            # Adds the time to the date label if applicable.
+            if self.attributes["time"] != "":
+                self.lblDate.configure(text=f"{self.taskDate}, {self.attributes["time"]}")
             else:
-                self.configure(border_color="limegreen")
-        
-        if self.displayListName:
-            listImgs = getListImgs((20,20))
-            try:
-                listName = self.attributes["listName"]
+                self.lblDate.configure(text=self.taskDate)
 
-                iconFound = False
-                for each in listImgs:
-                    if listName.capitalize() == each:
-                        iconFound = True
-                        break
-                
-                if iconFound:
-                    self.lblListName = CTkLabel(self,text=f" {listName.capitalize()}",font=(self.font,self.size*0.6),image=listImgs[listName.capitalize()],compound="left")
+            # Assigns the priority colour, if applicable.
+            if self.attributes["priority"] != "":
+                priority = self.attributes["priority"]
+                if  priority == "P1":
+                    self.configure(border_color="red")
+                elif priority == "P2":
+                    self.configure(border_color="#db9d09")
                 else:
-                    self.lblListName = CTkLabel(self,text=listName.capitalize(),font=(self.font,self.size*0.6))
+                    self.configure(border_color="limegreen")
+            
+            if self.displayListName:
+                listImgs = getListImgs((20,20))
+                try:
+                    listName = self.attributes["listName"]
 
-            except KeyError:
-                print("List name not found.")
-                self.displayListName = False
+                    iconFound = False
+                    for each in listImgs:
+                        if listName.capitalize() == each:
+                            iconFound = True
+                            break
+                    
+                    if iconFound:
+                        self.lblListName = CTkLabel(self,text=f" {listName.capitalize()}",font=(self.font,self.size*0.6),image=listImgs[listName.capitalize()],compound="left")
+                    else:
+                        self.lblListName = CTkLabel(self,text=listName.capitalize(),font=(self.font,self.size*0.6))
+
+                except KeyError:
+                    print("List name not found.")
+                    self.displayListName = False
         
 
     

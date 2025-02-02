@@ -46,7 +46,7 @@ class App(CTk):
 
         # Calcuate today's date and put into "long date" format.
         self.today = date.today()
-        self.todaysDate = self.today.strftime("%A, %d %B %Y")
+        self.todaysDate = self.today
 
         # Define key object attributes
         # (Defined here since they are used repeatedly throughout the program)
@@ -191,6 +191,7 @@ class App(CTk):
         if self.flagNewAccent:
             messagebox.showinfo("Window already active","Another accent colour window is already active.")            
         else:
+            self.flagNewAccent = True
             ChangeAccentWin(self,self.userEmail,self.globalFontName,self.flagFuncAccent)
 
     def frameDimensions(self):
@@ -252,8 +253,31 @@ class App(CTk):
             try:
                 if not isinstance(frame,Today) and not isinstance(frame,MyLists):
                     frame.checkNotOverdue()
+                    frame.checkTasks()
             except:
                 pass
+
+    def updateTasks(self):
+        for each in self.frames:
+            frame = self.frames[each]
+
+            if not isinstance(frame,MyLists):
+                try:
+                    frame.checkTasks()
+                except AttributeError: pass
+            """try:
+                
+            except:
+                pass"""
+
+    def checkNewTasksAll(self):
+        for each in self.frames:
+            frame = self.frames[each]
+
+            if not isinstance(frame,MyLists):
+                try:
+                    frame.checkNewTasksAdded()
+                except AttributeError: pass
 
     def loadFrame(self,frameName):
         # Removes current frame from the screen
@@ -292,6 +316,10 @@ class App(CTk):
         except:
             # If the renameMainWin procedure doesn't exist, the window is renamed by default to the new frame name.
             self.title(f"{frameName}")
+    
+    def createNewApp(self):
+        self.destroy()
+        App(self.userEmail,self.userPath)
   
     
     

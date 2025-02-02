@@ -1,7 +1,6 @@
 # Collapsible floating menu and button
 from customtkinter import *
 from PIL import Image
-from lib.getListImgs import getListImgs
 from lib.menu import Menu
 
 class MenuAndButton(CTkFrame):

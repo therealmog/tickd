@@ -170,6 +170,7 @@ class DetailsPanel(CTkFrame):
             self.taskDate = newData
             self.lblDate.configure(text=newData)
             self.taskAttributes["date"] = newData
+            self.mainWindow.checkOverdueAll()
         elif attributeName == "time":
             self.taskTime = newData
             self.lblTime.configure(text=newData)
@@ -185,7 +186,7 @@ class DetailsPanel(CTkFrame):
 
         uploadTask(self.userPath,self.taskAttributes,listName=self.taskAttributes["listName"])
         self.taskObj.refreshData()
-        self.mainWindow.checkOverdueAll()
+        self.mainWindow.updateTasks()
         self.bindAttributeWins()
         self.flagFuncAttrEditing()
 
@@ -277,6 +278,7 @@ class DetailsPanel(CTkFrame):
         uploadTask(self.userPath,self.taskAttributes,listName)
         print(newDescription)
         self.lblSave.place(in_=self.entryDescription,y=255)
+        self.mainWindow.checkOverdueAll()
 
         # Removing both save and cancel buttons
         self.origin.bindEnterKey()
