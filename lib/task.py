@@ -122,7 +122,8 @@ class Task(CTkFrame):
             else:
                 self.lblDate.configure(text=self.taskDate)
 
-        # Makes sure that labels and messages are up to date with details, etc.
+    
+    # Makes sure that labels and messages are up to date with details, etc.
     def refreshData(self):
         newAttrs = getTaskDict(self.taskID,self.userPath,self.listName)
 
@@ -171,7 +172,8 @@ class Task(CTkFrame):
                             break
                     
                     if iconFound:
-                        self.lblListName = CTkLabel(self,text=f" {listName.capitalize()}",font=(self.font,self.size*0.6),image=listImgs[listName.capitalize()],compound="left")
+                        self.lblListName = CTkLabel(self,text=f" {listName.capitalize()}",font=(self.font,self.size*0.6),
+                                                    image=listImgs[listName.capitalize()],compound="left")
                     else:
                         self.lblListName = CTkLabel(self,text=listName.capitalize(),font=(self.font,self.size*0.6))
 

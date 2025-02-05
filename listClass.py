@@ -774,6 +774,8 @@ class List(CTkFrame):
                 if each.attributes["completed"] == "True":
                     removedIndex = self.taskList.index(each)
                     self.placeTasks(removedIndex,False)
+                else:
+                    self.detailPanels[each.attributes["taskID"]].refreshTaskDetails()
 
         # Checks for completed tasks in overdue list.
         if self.overdueList != False: 
@@ -783,6 +785,8 @@ class List(CTkFrame):
                     self.overdueDict.pop(each.attributes["taskID"])
                     removedIndex = self.overdueList.index(each)
                     self.placeTasks(removedIndex,True)
+                else:
+                    self.detailPanels[each.attributes["taskID"]].refreshTaskDetails()
 
     def checkNewTasksAdded(self):
         # Checks to see if any new tasks have been added in a different screen.

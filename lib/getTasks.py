@@ -38,36 +38,35 @@ def getTasks(master,userPath,listName,accent,command,fontName="Bahnschrift",disp
         for each in taskDict:
             if taskDict[each]["completed"] == "False":
                 # A Task object is created for each item in the task list.    
-                taskObj = Task(master,accent=accent,attributes=taskDict[each],userPath=userPath,font=fontName,command=command,displayListName=displayListName)
+                taskObj = Task(master,accent=accent,attributes=taskDict[each],
+                               userPath=userPath,font=fontName,command=command,
+                               displayListName=displayListName)
                 taskList.append(taskObj)
         
 
         if len(taskList) == 0:
-            print("No tasks found.")
             return False
         else:
             return taskList
         
-        """except:
-            print("No tasks found.")
-            return False"""
 
 def getTasksAllLists(master,userPath,accent,command,fontName="Bahnschrift",displayListName=False):
     # Find all lists from user directory.
     userLists = glob(f"{userPath}//*.json")
     
+    # Goes through every task list and adds any found uncompleted tasks to a list.
     allTasksList = []
     for each in userLists:
+        # Uses the getTasks function, passing in a path to access.
         taskList = getTasks(master,userPath,None,accent,command,fontName,displayListName,path=each)
         if taskList != False:
+            # If the list is not empty.
             for each in taskList:
                 allTasksList.append(each)
 
     if len(allTasksList) == 0:
-        print("No tasks found.")
         return False
     else:
-        print([each.attributes["title"] for each in allTasksList])
         return allTasksList      
     
 

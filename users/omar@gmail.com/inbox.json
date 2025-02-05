@@ -1,25 +1,14 @@
 {
     "shared": "no",
     "tasks": {
-        "RHBSJm": {
-            "title": "Guitar practice",
-            "date": "02/02/2025",
-            "taskID": "RHBSJm",
+        "JKxExK": {
+            "title": "Go to the gym",
+            "date": "05/02/2025",
+            "taskID": "JKxExK",
             "completed": "False",
-            "time": "",
+            "time": "19:00",
             "priority": "",
-            "description": "",
-            "listName": "inbox",
-            "starred": "False"
-        },
-        "FPoRXq": {
-            "title": "Practice Naruto song",
-            "date": "02/02/2025",
-            "taskID": "FPoRXq",
-            "completed": "False",
-            "time": "",
-            "priority": "",
-            "description": "",
+            "description": "Push session today\n\nBench press - 3 x 10\nTricep extension - 4 x 8\nPush ups - 3x 30 seconds",
             "listName": "inbox",
             "starred": "False"
         }
@@ -2238,6 +2227,105 @@
             "taskID": "qUzFAT",
             "completed": "True",
             "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "inbox",
+            "starred": "False"
+        },
+        "QojPMK": {
+            "title": "asdasd",
+            "date": "04/02/2025",
+            "taskID": "QojPMK",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "inbox",
+            "starred": "False"
+        },
+        "RHBSJm": {
+            "title": "Guitar practice",
+            "date": "02/02/2025",
+            "taskID": "RHBSJm",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "inbox",
+            "starred": "False"
+        },
+        "FPoRXq": {
+            "title": "Practice Naruto song",
+            "date": "04/02/2025",
+            "taskID": "FPoRXq",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "blah blahasdasd",
+            "listName": "inbox",
+            "starred": "False"
+        },
+        "UNIpUh": {
+            "title": "Eat brekkie",
+            "date": "04/02/2025",
+            "taskID": "UNIpUh",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "inbox",
+            "starred": "False"
+        },
+        "jJtpJO": {
+            "title": "aisdajoisd",
+            "date": "04/02/2025",
+            "taskID": "jJtpJO",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "inbox",
+            "starred": "False"
+        },
+        "AJxWZQ": {
+            "title": "bosh",
+            "date": "04/02/2025",
+            "taskID": "AJxWZQ",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "asasdasdasd",
+            "listName": "inbox",
+            "starred": "False"
+        },
+        "AZuevD": {
+            "title": "Hello",
+            "date": "05/02/2025",
+            "taskID": "AZuevD",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "inbox",
+            "starred": "False"
+        },
+        "dIScTl": {
+            "title": "hi",
+            "date": "05/02/2025",
+            "taskID": "dIScTl",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "inbox",
+            "starred": "False"
+        },
+        "wDSNBC": {
+            "title": "bosh",
+            "date": "05/02/2025",
+            "taskID": "wDSNBC",
+            "completed": "True",
+            "time": "10:00",
             "priority": "",
             "description": "",
             "listName": "inbox",

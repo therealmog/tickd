@@ -7,7 +7,7 @@ from lib.getValueWindow import GetValueWin
 from lib.checkDate import checkDate
 from lib.checkTime import checkTime
 from tkinter import messagebox
-
+from lib.getTaskDict import getTaskDict
 
 class DetailsPanel(CTkFrame):
     def __init__(self,master,origin,mainWindow,taskObj,userPath,taskAttributes,taskButtonCommand,commandArgs,\
@@ -171,6 +171,7 @@ class DetailsPanel(CTkFrame):
             self.lblDate.configure(text=newData)
             self.taskAttributes["date"] = newData
             self.mainWindow.checkOverdueAll()
+            
         elif attributeName == "time":
             self.taskTime = newData
             self.lblTime.configure(text=newData)
@@ -187,8 +188,27 @@ class DetailsPanel(CTkFrame):
         uploadTask(self.userPath,self.taskAttributes,listName=self.taskAttributes["listName"])
         self.taskObj.refreshData()
         self.mainWindow.updateTasks()
+        self.mainWindow.checkNewTasksAll()
         self.bindAttributeWins()
         self.flagFuncAttrEditing()
+
+    def refreshTaskDetails(self):
+        # Gets latest task details.
+        taskDict = getTaskDict(self.taskID,self.userPath,self.taskAttributes["listName"])
+
+        # Rewrites attributes with their latest versions.
+        self.lblTaskName.configure(text=taskDict["title"])
+        self.lblDate.configure(text=taskDict["date"])
+        self.lblTime.configure(text=taskDict["time"])
+
+        # Checks if date and/or time are blank, and replaces them with "no date/time".
+        self.checkAttributes()
+
+        self.lblTime.place(in_=self.lblDate,x=len(self.lblDate._text)*10+15)
+        
+        # Deletes old description and replaces it with latest version.
+        self.entryDescription.delete(1.0,END)
+        self.entryDescription.insert(1.0,taskDict["description"])
 
     def flagFuncAttrEditing(self):
         self.flagAttributeEditing = not self.flagAttributeEditing
@@ -278,7 +298,9 @@ class DetailsPanel(CTkFrame):
         uploadTask(self.userPath,self.taskAttributes,listName)
         print(newDescription)
         self.lblSave.place(in_=self.entryDescription,y=255)
-        self.mainWindow.checkOverdueAll()
+
+        # Update task details and details panel displayed on other screens.
+        self.mainWindow.updateTasks()
 
         # Removing both save and cancel buttons
         self.origin.bindEnterKey()
@@ -287,6 +309,7 @@ class DetailsPanel(CTkFrame):
 
         # Removing the save label after 1 second.
         self.after(1000,self.lblSave.place_forget)
+
 
 
 

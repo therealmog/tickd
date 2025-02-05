@@ -82,7 +82,7 @@ class ChangeAccentWin(CTkToplevel):
         
         self.chosen = self.currentAccent
 
-        self.createPreview(self.currentAccent)
+        
 
         
 
@@ -90,11 +90,13 @@ class ChangeAccentWin(CTkToplevel):
         self.coloursMenu = CTkOptionMenu(self.frameWin,font=(globalFontName,30),
                                          dropdown_font=(globalFontName,22),values=self.options,
                                          width=230,
-                                         fg_color=("white","gray24"),
+                                         fg_color=("white","gray24"),button_color="gray16",button_hover_color=self.chosen,
                                          command=lambda event:self.createPreview(),
                                          dropdown_fg_color="grey24",
-                                         corner_radius=20,
+                                         corner_radius=15,
                                          cursor="hand2")
+        
+        self.createPreview(self.currentAccent)
 
     def placeWidgets(self):
         self.frameWin.place(relx=0.5,rely=0.5, anchor="center")
@@ -111,6 +113,7 @@ class ChangeAccentWin(CTkToplevel):
             self.chosen=self.coloursMenu.get()
             colour=self.accentsDict[self.chosen]
         
+        self.coloursMenu.configure(button_hover_color=self.chosen)
         if colour != self.currentAccent:
             self.btnSave.place(in_=self.coloursMenu,x=240)
         else:
@@ -144,7 +147,7 @@ class ChangeAccentWin(CTkToplevel):
         if self.flagFunc != None:
             self.flagFunc()
 
-        messagebox.showinfo("New accent set","Your new accent colour has been set.")
+        messagebox.showinfo("New accent set","Your new accent colour has been set.\nClick 'OK' to restart the app.")
         self.master.createNewApp()
 
         self.destroy()

@@ -176,7 +176,7 @@ class Today(CTkFrame):
         self.lblListName.configure(text=self.listName.capitalize())
 
         if self.taskList != False:
-            self.lblOtherTasks.configure(text=f"{self.listName} - {len(self.taskList)}")
+            self.lblOtherTasks.configure(text=f" {self.listName} - {len(self.taskList)}")
 
 
         os.rename(oldPath,newPath)
@@ -218,16 +218,22 @@ class Today(CTkFrame):
         
         
         if self.taskList != False:
+            # Iterates through a copy of the list.
             for each in self.taskList.copy():
                 try:
+                    # Creates a datetime object from the string representation.
                     taskDateObj = datetime.strptime(each.attributes["date"],"%d/%m/%Y")
 
+                    # Compares the string representations of today's date and the task date.
+                    # This has to be done rather than comparing both objects, since one is
+                    # a datetime object and the other is a date object.
                     if taskDateObj.strftime("%d/%m/%y") == todayObj.strftime("%d/%m/%y"):
                         print(f"Task {each.attributes["title"]} is due today.")
                     else:
                         print(f"Removing {each.attributes["title"]}")
                         self.taskList.remove(each)
                 except ValueError:
+                    # Error occurs when program tries to convert a blank string into a datetime object. 
                     print(f"Date not set for {each.attributes["title"]}")
                     self.taskList.remove(each)
             
@@ -286,11 +292,15 @@ class Today(CTkFrame):
 
         if self.taskList != False:
             for each in self.taskList:
+                # Refreshes data for each task.
                 each.refreshData()
-                if each.attributes["completed"] == "True":
+                # Checks if task completed or its date is not today's date.
+                if each.attributes["completed"] == "True" or not self.checkDateToday(each.attributes["date"]):
                     removedIndex = self.taskList.index(each)
                     self.placeTasks(removedIndex,False)
-
+                else:
+                    # Also refreshes its details panel.
+                    self.detailPanels[each.attributes["taskID"]].refreshTaskDetails()
 
 
 
@@ -616,7 +626,7 @@ class Today(CTkFrame):
             task.grid(row=each,column=0,pady=10)
         
         
-        self.lblOtherTasks.configure(text=f"{self.listName.capitalize()} - {len(self.taskList)}")
+        self.lblOtherTasks.configure(text=f" {self.listName.capitalize()} - {len(self.taskList)}")
         if len(self.taskList) == 0:
             self.lblOtherTasks.place_forget()
             self.lblNoTasks.place(x=25,y=150)
@@ -631,6 +641,7 @@ class Today(CTkFrame):
         if updatedList != False:
             updatedListTaskIDs = [each.attributes["taskID"] for each in updatedList]
             
+            # Removes any taskIDs of tasks that are already there.
             for each in self.taskList:
                 if each.attributes["taskID"] in updatedListTaskIDs:
                     updatedListTaskIDs.remove(each.attributes["taskID"])
@@ -646,7 +657,7 @@ class Today(CTkFrame):
                 # Saves the time taken to add all of the tasks again.
 
                 for each in updatedList:
-                    if each.attributes["taskID"] == taskID:
+                    if each.attributes["taskID"] == taskID and self.checkDateToday(each.attributes["date"]):
                         newTaskDict = each.attributes
                         print(newTaskDict)
                         self.placeNewTask(newTaskDict,displayListName=True)

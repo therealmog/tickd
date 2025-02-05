@@ -259,16 +259,22 @@ class App(CTk):
 
     def updateTasks(self):
         for each in self.frames:
+            # Selects each frame one by one.
             frame = self.frames[each]
 
+            # Every frame, except for the 'My lists' frame, is called.
             if not isinstance(frame,MyLists):
                 try:
+                    # Runs the checkTasks function in every frame.
                     frame.checkTasks()
-                except AttributeError: pass
-            """try:
-                
-            except:
-                pass"""
+                except AttributeError:
+                    # Just in case the frame does not have a checkTasks function.
+                    # This ensures that the updating keeps going.
+                    pass
+
+
+
+    """and not isinstance(frame,Starred)"""
 
     def checkNewTasksAll(self):
         for each in self.frames:

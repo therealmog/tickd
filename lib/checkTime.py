@@ -1,3 +1,9 @@
+def checkInt(val):
+    try:
+        val = int(val)
+        return True
+    except ValueError:
+        return False
 
 def checkTime(userInput):
     # Get input from entry box and remove any whitespace.
@@ -26,7 +32,7 @@ def checkTime(userInput):
         minute = userInput[2:]
 
     # Another alternative: H:MM (user hasn't inputted a leading zero)
-    elif len(userInput) == 4 and userInput[0] != "0":
+    elif len(userInput) == 4 and userInput[0] != "0" and not checkInt(userInput[1]):
         userInput = "0" + userInput
         print(userInput)
 
@@ -42,6 +48,9 @@ def checkTime(userInput):
             # Separates hour and minute
             hour = timeSections[0]
             minute = timeSections[1]
+    elif len(userInput) == 4:
+        hour = userInput[0:2]
+        minute = userInput[2:]
 
     else:
         message = "Invalid time entered."
