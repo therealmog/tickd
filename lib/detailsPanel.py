@@ -150,7 +150,7 @@ class DetailsPanel(CTkFrame):
             # Sets flag to True so that another window cannot be opened.
             self.flagAttributeEditing = True
             # Calls new GetValueWin instance
-            GetValueWin(customTitle=customTitle,**kwargs)
+            GetValueWin(customTitle=customTitle,fontName=self.fontName,**kwargs)
                 
 
 
@@ -249,6 +249,7 @@ class DetailsPanel(CTkFrame):
     
     def bindEventListeners(self):
         for each in self.hoverWidgets:
+            # Binding occurring directly with widget.
             self.hoverWidgets[each].bind("<Enter>",lambda event,widgetName=each:self.onhover(widgetName))
             self.hoverWidgets[each].bind("<Leave>",lambda event,widgetName=each:self.onhoverexit(widgetName))
 

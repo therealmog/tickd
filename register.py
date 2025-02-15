@@ -22,9 +22,10 @@ class Register(CTkToplevel):
         self.maxsize(self.maxdims[0],self.maxdims[1])
         self.title("Register - Tickd")
         
-        self.origin = origin
         # This is to access the attributes of the Auth window class.
-
+        self.origin = origin
+        
+        # Sets custom function to run when close window (x) button clicked.
         self.protocol("WM_DELETE_WINDOW",lambda:self.close_window())
 
         set_appearance_mode("dark")
@@ -57,7 +58,10 @@ class Register(CTkToplevel):
         self.mainloop()
 
     def close_window(self):
+        # Sets flag back to False.
         self.origin.registerWinOpen = False
+
+        # Kills window.
         self.destroy()
 
     def widgets(self):
@@ -102,9 +106,11 @@ class Register(CTkToplevel):
 
         self.entryEmail.place(x=95,y=120)
         self.lblEmail.place(in_=self.entryEmail,x=-50,y=-3)
-        self.entryPassword.place(in_=self.entryEmail,y=55)
+
+        # Previously, y gaps between entries were around 70.
+        self.entryPassword.place(in_=self.entryEmail,y=55) # Changed to 55
         self.lblPassword.place(in_=self.entryPassword,x=-50,y=-3)
-        self.entryUsername.place(in_=self.entryPassword,y=55)
+        self.entryUsername.place(in_=self.entryPassword,y=55) # Also changed to 55
         self.lblUsername.place(in_=self.entryUsername,x=-50,y=-3)
 
         self.btnShowPassword.place(in_=self.entryPassword,x=405,y=2)
@@ -153,12 +159,12 @@ class Register(CTkToplevel):
             emailValid = self.checkEmail(email)
             found,self.userDetails = self.checkDetailsFound(email,details)
             if emailValid and found:
-                #self.setMessage("An account already exists with this email.","red")
+                # Message box used instead of calling setMessage procedure
                 messagebox.showinfo("Cannot create new account","An account already exists with this email.")
                 self.grabWin()
                 self.resetEntry(["entryEmail"])
             elif not emailValid:
-                #self.setMessage("Please enter a valid email.","red")
+                # Message box also used here
                 messagebox.showinfo("Cannot create new account","Please enter a valid email.")
                 self.grabWin()
                 self.entryEmail.focus_set()
@@ -194,9 +200,7 @@ class Register(CTkToplevel):
                 self.origin.entryEmail.insert(0,email)
                 self.origin.entryPassword.focus()
                 self.destroy()
-        
-
-
+ 
     #-------# Entry validation funcs #-------#
 
     def checkDetailsFound(self,email,details):

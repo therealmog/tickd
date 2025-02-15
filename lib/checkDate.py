@@ -59,7 +59,7 @@ def checkDate(userInput):
                         message = "Your date cannot be in the past."
                         return False,message
                     else:
-                        year = "20"+year
+                        year = str(2000+int(year))
                 elif len(year)==3:
                     message = "Invalid year."
                     return False,message

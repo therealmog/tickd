@@ -22,10 +22,8 @@ from lib.checkListName import checkListName
 
 
 class Today(CTkFrame):
-    
-    globalFontName = "Bahnschrift"
     textgrey="#9e9f9f"
-    def __init__(self,mainWindow,email,userPath,todaysDate,userAccent="dodgerblue2"):
+    def __init__(self,mainWindow,email,userPath,todaysDate,userAccent="dodgerblue2",fontName="Bahnschrift"):
         """The class for the Today view"""
         
         
@@ -37,6 +35,7 @@ class Today(CTkFrame):
         self.userPath = userPath
         self.listName = "Today"
         self.email = email
+        self.globalFontName = fontName
 
 
         self.accent = userAccent
@@ -109,8 +108,10 @@ class Today(CTkFrame):
                                                self.taskCompleted,{"taskID":"TjAiDX"})"""
         self.entries = [self.entryDate,self.dropdownPriority,self.entryTime]
 
+        # For the colours, a tuple can be specified in the form (lightmodeColour,darkmodeColour)
         self.taskFrame = CTkScrollableFrame(self,width=410,height=720,fg_color=("white","#191616"))
         self.overdueFrame = CTkScrollableFrame(self,width=410,height=200,fg_color=("white","#191616"))
+        
         self.lblOverdue = CTkLabel(self,text="OVERDUE",font=(globalFontName,30))
 
         listImgs = getListImgs()
@@ -205,7 +206,8 @@ class Today(CTkFrame):
             else:
                 self.flagRenaming = True
                 winTitle = f"Rename '{self.listName}'"
-                GetValueWin("list name",assigningFunc=self.renameList,validationFunc=checkListName,validationFuncArgs={"userPath":self.userPath},accent=self.accent,flagFunc=self.changeFlagRenaming,customTitle=winTitle)
+                GetValueWin("list name",assigningFunc=self.renameList,validationFunc=checkListName,validationFuncArgs={"userPath":self.userPath},accent=self.accent,
+                            flagFunc=self.changeFlagRenaming,customTitle=winTitle,font=self.globalFontName)
     
     def changeFlagRenaming(self):
        self.flagRenaming = not self.flagRenaming

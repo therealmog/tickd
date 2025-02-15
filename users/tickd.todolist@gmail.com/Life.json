@@ -1,0 +1,16 @@
+{
+    "shared": "no",
+    "tasks": {
+        "SSaRnI": {
+            "title": "Get a job",
+            "date": "6/2/2027",
+            "taskID": "SSaRnI",
+            "completed": "False",
+            "time": "",
+            "priority": "",
+            "description": "Not really sure what I want to do, but hopefully it will be fulfilling and will get me lots of money.",
+            "listName": "Life",
+            "starred": "False"
+        }
+    }
+}

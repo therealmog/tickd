@@ -136,16 +136,6 @@
             "completed": "True",
             "time": "13:00",
             "priority": ""
-        },
-        "vILsaU": {
-            "title": "bonjour ",
-            "date": "16/12/2024",
-            "taskID": "vILsaU",
-            "completed": "False",
-            "time": "",
-            "priority": "",
-            "description": "",
-            "listName": "inbox"
         }
     },
     "completed": {
@@ -274,6 +264,16 @@
             "title": "CS - recursion blurt",
             "date": "12:35",
             "taskID": "iXlVIn",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "inbox"
+        },
+        "vILsaU": {
+            "title": "bonjour ",
+            "date": "16/12/2024",
+            "taskID": "vILsaU",
             "completed": "True",
             "time": "",
             "priority": "",

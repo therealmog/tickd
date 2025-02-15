@@ -16,9 +16,8 @@ from PIL import Image
 
 class MyLists(CTkFrame):
     
-    globalFontName = "Bahnschrift"
     textgrey="#9e9f9f"
-    def __init__(self,mainWindow,email,userPath,todaysDate,userAccent="dodgerblue2"):
+    def __init__(self,mainWindow,email,userPath,todaysDate,userAccent="dodgerblue2",fontName="Bahnschrift"):
         """The 'My lists' frame class."""
         
         
@@ -31,6 +30,7 @@ class MyLists(CTkFrame):
         self.listName = "My lists"
         self.email = email
         self.todaysDate = todaysDate
+        self.globalFontName = fontName
 
         """self.today = date.today()
         self.todaysDate = self.today.strftime("%A, %d %B %Y")
@@ -180,7 +180,8 @@ class MyLists(CTkFrame):
             listName = each.replace(f"{self.userPath}\\","")
             listName = listName.replace(".json","")
             
-            listFrame = List(self.mainWindow,self.email,self.userPath,self.todaysDate,getAccent(self.email),listName=listName)
+            listFrame = List(self.mainWindow,self.email,self.userPath,self.todaysDate,getAccent(self.email),listName=listName,
+                             fontName=self.globalFontName)
             self.mainWindow.frames[listName] = listFrame
             print(self.mainWindow.frames)
             listBtn = CTkButton(self,text=f"{listName}",font=(globalFontName,30),width=280,fg_color="grey28",hover_color="grey24",border_width=3,border_color="grey5",corner_radius=60,compound="left",cursor="hand2",command=lambda listName=listName:self.mainWindow.loadFrame(listName))

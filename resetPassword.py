@@ -151,7 +151,6 @@ class ResetPassword(CTkToplevel):
         self.after(1000,lambda: self.grab_release())
 
     def resetClicked(self):
-        print("Hello")
         newPasswordTxt = self.entryPassword.get().strip()
         
         details,rememberMeIndex = getAllDetails()
@@ -185,9 +184,7 @@ class ResetPassword(CTkToplevel):
             messagebox.showinfo("Reset successful.","Password successfully reset. Please log in.")
             self.after(500,self.close_window)
         
-
-
-    #-------# Entry validation funcs #-------#
+  #-------# Entry validation funcs #-------#
 
     def checkDetailsFound(self,email,details):
         found = False
@@ -248,6 +245,8 @@ class ResetPassword(CTkToplevel):
 
         if codeInput == self.code:
             messagebox.showinfo("Verification successful.","Your identity has been verified.\nPlease enter your new password.")
+
+            # Sets up password entry: removes verify btn and code entry, adds lock symbol, entry and reset btn. 
             self.btnVerify.place_forget()
             self.lblEntry.configure(text="🔒")
             self.entryCode.place_forget()
@@ -256,6 +255,7 @@ class ResetPassword(CTkToplevel):
             self.btnReset.place(in_=self.entryPassword,x=125,y=50)
             self.btnShowPassword.place(in_=self.entryPassword,x=385,y=2)
         else:
+            # Shows error if entered code is incorrect.
             messagebox.showerror("Can't reset password.","Invalid code entered.")
     
     def resetEntry(self,entries:list):

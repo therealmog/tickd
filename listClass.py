@@ -23,10 +23,8 @@ from lib.checkListName import checkListName
 
 
 class List(CTkFrame):
-    
-    globalFontName = "Bahnschrift"
     textgrey="#9e9f9f"
-    def __init__(self,mainWindow,email,userPath,todaysDate,userAccent="dodgerblue2",listName="inbox",):
+    def __init__(self,mainWindow,email,userPath,todaysDate,userAccent="dodgerblue2",listName="inbox",fontName="Bahnschrift"):
         """The class for generating frames for individual lists."""
         
         
@@ -37,6 +35,7 @@ class List(CTkFrame):
         self.userPath = userPath
         self.listName = listName
         self.email = email
+        self.globalFontName = fontName
 
 
         self.accent = userAccent
@@ -50,6 +49,7 @@ class List(CTkFrame):
         if isinstance(todaysDate,str):
             self.todaysDate = todaysDate
         else:
+            self.todayObj = todaysDate
             self.todaysDate = todaysDate.strftime("%A, %d %B %Y")
 
 
@@ -96,6 +96,8 @@ class List(CTkFrame):
         globalFontName = self.globalFontName
         
         print("Bonjour.")
+        
+
         self.lblListName = CTkLabel(self,text=self.listName.capitalize(),font=(globalFontName,40),cursor="pencil")
 
         self.lblListName.bind("<Button-1>",lambda event:self.checkRenameList())
@@ -131,6 +133,7 @@ class List(CTkFrame):
                                                self.taskCompleted,{"taskID":"TjAiDX"})"""
         self.entries = [self.entryDate,self.dropdownPriority,self.entryTime]
 
+        # Defining scrollable task frame.
         self.taskFrame = CTkScrollableFrame(self,width=410,height=720,fg_color=("white","#191616"))
         self.overdueFrame = CTkScrollableFrame(self,width=410,height=200,fg_color=("white","#191616"))
         self.lblOverdue = CTkLabel(self,text="OVERDUE",font=(globalFontName,30))
@@ -149,6 +152,7 @@ class List(CTkFrame):
     def placeWidgets(self):
         #self.place(relx=0.5,rely=0.5,anchor="center")
         #self.panelImgBG.place(x=0,y=0)
+
         
         self.lblListName.place(x=125,y=50)
         self.lblDate.place(in_=self.lblListName,x=0,y=-25)
@@ -260,7 +264,7 @@ class List(CTkFrame):
                 # Calls a GetValueWin object
                 GetValueWin(attributeName="list name",assigningFunc=self.renameList,validationFunc=checkListName,
                             validationFuncArgs={"userPath":self.userPath},accent=self.accent,
-                            flagFunc=self.changeFlagRenaming,customTitle=winTitle)
+                            flagFunc=self.changeFlagRenaming,customTitle=winTitle,fontName=self.globalFontName)
     
     def changeFlagRenaming(self):
        self.flagRenaming = not self.flagRenaming
@@ -406,6 +410,8 @@ class List(CTkFrame):
             if date == False: # Date is set as False by checkDate function
                 # Displays error message
                 messagebox.showerror("Invalid date",message)
+                self.entryDate.select_range(0,END)
+                self.entryDate.focus()
                 #self.messageVar.set(message)
             else:
                 # Adding date to the task attributes dict.
@@ -456,6 +462,9 @@ class List(CTkFrame):
 
                     # Checks all screens for any new tasks added.
                     self.mainWindow.checkNewTasksAll()
+        
+        # Brings focus back to task entry after submitting task.
+        self.entryTask.focus()
                     
                     
     
@@ -681,7 +690,6 @@ class List(CTkFrame):
         # Removes completed task by index
         # Then places all tasks again after the one which has been removed.
 
-
         # Sets which task is being edited.
         if overdue:
             list = self.overdueList
@@ -695,7 +703,6 @@ class List(CTkFrame):
         # Removes the completed task from the list.
         list.pop(removedIndex)
        
-
         # Replaces the other previously removed tasks.
         for each in range(removedIndex,len(list)): # Starts with index which was removed
             task = list[each]
@@ -763,6 +770,18 @@ class List(CTkFrame):
             entries[each].place(in_=entries[each-1],x=150)
             entries[each].bind("<Return>",lambda event:self.taskSubmitted())
     
+    def checkDateOverdue(self,dateStr:str):
+        # Uses date objects, not datetime.
+        dateSplit = dateStr.split("/")
+        if len(dateSplit) != 3:
+            raise ValueError(f"Incorrect date format: [{dateStr}]")
+        else:
+            dateObj = date(int(dateSplit[-1]),int(dateSplit[1]),int(dateSplit[0]))
+            if dateObj < self.todayObj:
+                return True
+            else:
+                return False
+
     def checkTasks(self):
         # Refresh data of tasks.
         # Check if any tasks have been completed and remove if they have
@@ -779,12 +798,16 @@ class List(CTkFrame):
 
         # Checks for completed tasks in overdue list.
         if self.overdueList != False: 
-            for each in self.overdueList:
+            for each in self.overdueList.copy():
                 each.refreshData()
                 if each.attributes["completed"] == "True":
                     self.overdueDict.pop(each.attributes["taskID"])
                     removedIndex = self.overdueList.index(each)
                     self.placeTasks(removedIndex,True)
+                elif not self.checkDateOverdue(each.attributes["date"]):
+                    self.placeTasks(self.overdueList.index(each),True)
+                    self.placeNewTask(taskDict=each.attributes)
+                    self.lblOverdue.configure(text=f"OVERDUE - {len(self.overdueList)}")
                 else:
                     self.detailPanels[each.attributes["taskID"]].refreshTaskDetails()
 

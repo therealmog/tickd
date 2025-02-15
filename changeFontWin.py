@@ -1,27 +1,26 @@
-# Change accent colour window
-
 from customtkinter import *
 from lib.task import Task
 from PIL import Image
-from lib.accentsConfig import getAccent,setAccent
+from lib.accentsConfig import getAccent,getFont,setFont
 from datetime import date
 from tkinter import messagebox
-import os
+import textwrap
 
-class ChangeAccentWin(CTkToplevel):
+class ChangeFontWin(CTkToplevel):
     def __init__(self,master,email,font="Bahnschrift",flagFunc=None):
         super().__init__(master=master)
 
         # Sets window size and title.
-        self.geometry("500x480")
-        self.title("Change your accent colour - Tickd")
-        self.minsize(500,480)
-        self.maxsize(500,480)
+        self.geometry("550x480")
+        self.title("Change your display font - Tickd")
+        self.minsize(550,480)
+        self.maxsize(550,480)
 
         # Defines class attributes
         self.font = font
         self.email = email
-        self.currentAccent = getAccent(email)
+        self.currentFont = getFont(email)
+        self.accent = getAccent(email)
         self.today = date.today()
         self.flagFunc = flagFunc
         
@@ -44,13 +43,13 @@ class ChangeAccentWin(CTkToplevel):
     
     def widgets(self):
         globalFontName = self.font
-        self.frameWin = CTkFrame(self,width=470,height=460,corner_radius=20,
+        self.frameWin = CTkFrame(self,width=515,height=460,corner_radius=20,
                                  border_width=4,border_color="grey4",fg_color=("white","gray9"))
         
-        self.lblTitle = CTkLabel(self.frameWin,text="Change your accent colour.",
-                                 font=(globalFontName,32))
+        self.lblTitle = CTkLabel(self.frameWin,text="Change your display font.",
+                                 font=(globalFontName,30))
         
-        self.lblSubtitle = CTkLabel(self.frameWin,text="Select a colour to view its preview.",
+        self.lblSubtitle = CTkLabel(self.frameWin,text="Select a font to view its preview.",
                                  font=(globalFontName,18))
         
         self.lblPreview = CTkLabel(self.frameWin,text="Preview:",
@@ -62,16 +61,17 @@ class ChangeAccentWin(CTkToplevel):
         self.logoPanel = CTkLabel(self.frameWin,text="",image=imgLogo)
 
         
-        self.accentsDict = {"Crimson":"crimson",
-                            "Dodger Blue":"dodgerblue2",
-                            "Lime":"lime",
-                            "Sky Blue":"skyblue",
-                            "Deep Pink":"deep pink",
-                            "Dark Orange":"darkorange2"}
+        self.fontsDict = {"Bahnschrift (default)":"Bahnschrift",
+                            "Georgia":"Georgia",
+                            "Franklin Gothic Demi":"Franklin Gothic Demi",
+                            "Cascadia Code":"Cascadia Code",
+                            "Century Gothic":"Century Gothic",
+                            "Calibri":"Calibri",
+                            "Wingdings":"Wingdings"}
         
         self.imgSave = CTkImage(Image.open("icons//save.png"),size=(35,35))
         self.btnSave = CTkButton(self,text="",font=(globalFontName,28),fg_color="grey24",
-                                            command=lambda:self.setNewAccent(),width=70,
+                                            command=lambda:self.setNewFont (),width=70,
                                             image=self.imgSave,corner_radius=20)
         self.tickImg = CTkImage(Image.open("logo//tick.png"),size=(25,25))
         self.lblSave = CTkLabel(self,text="Saved description.",text_color="limegreen",
@@ -80,30 +80,25 @@ class ChangeAccentWin(CTkToplevel):
         # Defines options for the option menu
         self.options = []
         
-        for each in self.accentsDict:
-            # options should always have user's currently chosen accent colour first.
-            if self.currentAccent == self.accentsDict[each]:
+        for each in self.fontsDict:
+            # options should always have user's currently chosen accent font first.
+            if self.currentFont == self.fontsDict[each]:
                 self.options.insert(0,each)
             else:
                 self.options.append(each)
-        self.chosen = self.currentAccent
-
-        
-
-        
 
         self.chosen = self.options[0]
-        self.coloursMenu = CTkOptionMenu(self.frameWin,font=(globalFontName,30),
+        self.fontsMenu = CTkOptionMenu(self.frameWin,font=(globalFontName,25),
                                          dropdown_font=(globalFontName,22),values=self.options,
-                                         width=230,
-                                         fg_color=("grey","gray24"),button_color="gray16",button_hover_color=self.chosen,
+                                         width=300,
+                                         fg_color=("grey","gray24"),button_color="gray16",button_hover_color=self.accent,
                                          dropdown_text_color="white",
                                          command=lambda event:self.createPreview(),
                                          dropdown_fg_color=("grey","grey16"),
                                          corner_radius=15,
                                          cursor="hand2")
         
-        self.createPreview(self.currentAccent)
+        self.createPreview(self.currentFont)
 
     def placeWidgets(self):
         self.frameWin.place(relx=0.5,rely=0.5, anchor="center")
@@ -112,42 +107,40 @@ class ChangeAccentWin(CTkToplevel):
         self.logoPanel.place(in_=self.lblTitle,x=130,y=-30)
         self.lblSubtitle.place(in_=self.lblTitle,x=45,y=70)
         
-        self.coloursMenu.place(in_=self.lblSubtitle,x=20,y=35)
+        self.fontsMenu.place(in_=self.lblSubtitle,x=20,y=35)
         self.lblPreview.place(in_=self.lblTitle,y=180)
     
-    def createPreview(self,colour=None):
-        # If preview needs to be created (not being called by options menu), a colour can be specified.
-        # Otherwise, if no colour is specified (colour is None) then colour is the current item in the options menu.
-        if colour==None:
-            self.chosen=self.coloursMenu.get()
-            colour=self.accentsDict[self.chosen]
+    def createPreview(self,newFont=None):
+        # If preview needs to be created (not being called by options menu), a font can be specified.
+        # Otherwise, if no font is specified (font is None) then font is the current item in the options menu.
+        if newFont==None:
+            self.chosen=self.fontsMenu.get()
+            newFont=self.fontsDict[self.chosen]
         
-        # Sets hover colour of menu to chosen colour.
-        self.coloursMenu.configure(button_hover_color=self.chosen)
-
-        # Places save button if chosen colour is not the same as user's currently set accent colour.
-        if colour != self.currentAccent:
-            self.btnSave.place(in_=self.coloursMenu,x=240)
+        # Places save button if chosen font is not the same as user's currently set accent font.
+        if newFont != self.currentFont:
+            self.btnSave.place(in_=self.fontsMenu,x=240)
         else:
             self.btnSave.place_forget()
 
         try:
-            self.colourLbl.place_forget()
+            self.fontLbl.place_forget()
         except:
             pass
-
-        # Defines two labels: one static label to show the colour, and one which can be hovered over.
-        # Hovering over second label changes its colour and makes it underlined.
-        self.colourLbl = CTkLabel(self.frameWin,text="This is the colour",font=(self.font,30),
-                                  text_color=colour)
-        self.hoverLbl = CTkLabel(self.frameWin,text="Hover over me!",font=(self.font,22),
-                                 text_color=("black","white"),cursor="hand2")
-
-        # Binding for the hover text.
-        self.hoverLbl.bind("<Enter>",lambda event,colour=colour:
-                           self.hoverLbl.configure(text_color=colour,font=(self.font,22,"underline")))
-        self.hoverLbl.bind("<Leave>",lambda event,colour=("black","white"):
-                           self.hoverLbl.configure(text_color=colour,font=(self.font,22)))
+        
+        # Defines two labels: one static label to show the font.
+        
+        # Defines a wraplength depending on the font being used.
+        if "Cascadia" in newFont:
+            wraplength = 30
+        elif "Century" in newFont:
+            wraplength = 35
+        else:
+            wraplength = 40
+        
+        wrappedText = textwrap.fill("Grumpy wizards make toxic brew for the evil Queen and Jack.",wraplength)
+        self.fontLbl = CTkLabel(self.frameWin,text=wrappedText,
+                                font=(newFont,25),text_color=("black","white"),justify="left")
 
         # Creates a small preview task
         self.previewTask = Task(self.frameWin,{"title":"Do your homework",
@@ -156,26 +149,25 @@ class ChangeAccentWin(CTkToplevel):
                                                "time":"",
                                                "priority":"",
                                                "description":"",
-                                               "listName":""},userPath=None,font=self.font,
-                                               accent=colour,size=28)
+                                               "listName":""},userPath=None,font=newFont,
+                                               accent=self.accent,size=28)
         
         # Places label and preview task.
-        self.colourLbl.place(in_=self.lblPreview,y=30)
-        self.hoverLbl.place(in_=self.colourLbl,y=50)
-        self.previewTask.place(in_=self.hoverLbl,y=50)
+        self.fontLbl.place(in_=self.lblPreview,y=30)
+        self.previewTask.place(in_=self.fontLbl,y=100)
     
-    def setNewAccent(self):
-        # Runs procedure to set accent, passing in user email and actual colour name (stored in dictionary accentsDict).
-        setAccent(self.email,self.accentsDict[self.coloursMenu.get()])
+    def setNewFont(self):
+        # Runs procedure to set accent, passing in user email and actual font name (stored in dictionary fontsDict).
+        setFont(self.email,self.fontsDict[self.fontsMenu.get()])
         
         # Changes value of flag in app window by calling specified function.
         if self.flagFunc != None:
             self.flagFunc()
 
-        # Creates a message box to notify the user that the colour has been set.
-        messagebox.showinfo("New accent set","Your new accent colour has been set.\nClick 'OK' to restart the app.")
+        # Creates a message box to notify the user that the font has been set.
+        messagebox.showinfo("New font set","Your new display font has been set.\nClick 'OK' to restart the app.")
         
-        # Restarts the app to recreate all widgets with new accent colour.
+        # Restarts the app to recreate all widgets with new accent font.
         self.master.createNewApp()
 
         # Closes this window.

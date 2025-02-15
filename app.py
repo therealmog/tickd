@@ -1,28 +1,32 @@
 from customtkinter import *
+from PIL import Image
 from datetime import date,timedelta
 from lib.getDetails import getAllDetails,getDetailsIndividual,writeToAuthDetails
 from lib.uploadTask import uploadTask
 from lib.menuAndButton import MenuAndButton
 from today import Today
 from myLists import MyLists
-from lib.accentsConfig import getAccent
+from lib.accentsConfig import getAccent,getFont
 from lib.menu import Menu
 from listClass import List
 from starred import Starred
 from changeAccentWin import ChangeAccentWin
+from changeFontWin import ChangeFontWin
 from tkinter import messagebox
 import cProfile
 import pstats
 
 
-from PIL import Image
+
 
 class App(CTk):
     # Key class attributes are defined here.
-    globalFontName = "Bahnschrift"
+
     textgrey="#9e9f9f"
-    def __init__(self,email,userPath):
+    def __init__(self,email,userPath,theme="dark"):
         """Main app container for Tickd."""
+
+        #import_packages(["customtkinter","pillow"])
 
         # NOTE: Debugging purposes, profiler used.
         """with cProfile.Profile() as profile:"""
@@ -34,7 +38,7 @@ class App(CTk):
         self.geometry(f"{self.winfo_screenwidth()}x{self.winfo_screenheight()}")
         self.minsize(750,800)
         
-        set_appearance_mode("dark")
+        set_appearance_mode(theme)
         print(self.winfo_screenwidth(),"by",self.winfo_screenheight())
 
         self.maxdims = [2000,1100]
@@ -52,6 +56,8 @@ class App(CTk):
         # (Defined here since they are used repeatedly throughout the program)
         self.userEmail = email
         self.userPath = userPath
+
+        self.globalFontName = getFont(email)
         
         self.userDetails,self.userIndex = getDetailsIndividual(email)
         try:
@@ -88,6 +94,7 @@ class App(CTk):
         # Inbox frame is loaded.
         self.loadFrame("inbox")
 
+        # Binding changing window size to calling resizeFrame procedure.
         self.bind("<Configure>",lambda event:self.resizeFrame())
 
         self.protocol("WM_DELETE_WINDOW",lambda: self.close_window())
@@ -108,11 +115,18 @@ class App(CTk):
     def widgets(self):
         globalFontName = self.globalFontName
         
+        self.imgWallpaper = CTkImage(Image.open("wallpapers//dark6.png"),size=(1920,1080))
+        self.panelWallpaper = CTkLabel(self,text="",image=self.imgWallpaper)
+
         frameX,frameY = self.frameDimensions()
         self.dummyFrame = CTkFrame(self,width=frameX,height=frameY,fg_color=("white","gray9"),border_color="gray7",border_width=5,corner_radius=20)
         self.currentFrame = self.dummyFrame
-
-        self.imgLogo = CTkImage(light_image=Image.open("logo//whiteBGLogo.png"),dark_image=Image.open("logo//blackBGLogo.png"),size=(155,49))
+        
+        # Different images specified for light and dark mode.
+        self.imgLogo = CTkImage(light_image=Image.open("logo//whiteBGLogo.png"),
+                                dark_image=Image.open("logo//blackBGLogo.png"),size=(155,49))
+        
+        
         self.logoPanel = CTkLabel(self.currentFrame,text="",image=self.imgLogo,cursor="hand2")
         
         self.lblNoTasks = CTkLabel(self.currentFrame,text="Load a content frame.",font=(globalFontName,40))
@@ -123,11 +137,14 @@ class App(CTk):
         #-----------------# Regular app frames #------------------#
         self.frameInbox = List(self,email=self.userEmail,userPath=self.userPath,
                                todaysDate=self.todaysDate,userAccent=self.accent,
-                               listName="inbox")
+                               listName="inbox",fontName=self.globalFontName)
         self.frameToday = Today(self,email=self.userEmail,userPath=self.userPath,
-                                todaysDate=self.todaysDate,userAccent=self.accent)
+                                todaysDate=self.todaysDate,userAccent=self.accent,
+                                fontName=self.globalFontName)
         
-        self.frameMyLists = MyLists(self,email=self.userEmail,userPath=self.userPath,todaysDate=self.todaysDate,userAccent=self.accent)
+        self.frameMyLists = MyLists(self,email=self.userEmail,userPath=self.userPath,
+                                    todaysDate=self.todaysDate,userAccent=self.accent,
+                                    fontName=self.globalFontName)
 
         self.frameStarred = Starred(self,email=self.userEmail,userPath=self.userPath,
                                 todaysDate=self.todaysDate,userAccent=self.accent)
@@ -147,9 +164,12 @@ class App(CTk):
             themeToSet = "Light mode"
 
         self.flagNewAccent = False
+        self.flagNewFont = False
         self.preferencesMenuDict = {f"{themeToSet}":lambda:self.mode(),
-                                    "Accent colour":lambda:self.createNewAccentWin()}
-        self.preferencesMenu = Menu(self,self.preferencesMenuDict,self.accent,topLabel=f"{self.userName}",bottomLabel="Your preferences.")
+                                    "Accent colour":lambda:self.createNewAccentWin(),
+                                    "Display font":lambda:self.createNewFontWin()}
+        self.preferencesMenu = Menu(self,self.preferencesMenuDict,self.accent,topLabel=f"{self.userName}",bottomLabel="Your preferences.",
+                                    font=self.globalFontName)
         
         self.logoMenuIsOpen = False
 
@@ -161,6 +181,7 @@ class App(CTk):
     def placeWidgets(self):
         # Not many widgets are placed here, since most of the functionality
         # lies within the currentFrame, placed here in the middle of the screen.
+        self.panelWallpaper.place(x=0,y=0)
         self.currentFrame.place(relx=0.5,rely=0.5,anchor="center")
         
         self.logoPanel.place(relx=0.98,y=40,anchor=E)
@@ -173,19 +194,28 @@ class App(CTk):
         self.destroy()
 
     def mode(self):
+        # Checks current mode
         if get_appearance_mode().lower() == "light":
             set_appearance_mode("dark")
             themeToSet = "Light mode"
         else:
             set_appearance_mode("light")
             themeToSet = "Dark mode"
-            
+        
+        # Redefines preferences menu with correct label. 
         self.preferencesMenuDict = {f"{themeToSet}":lambda:self.mode(),
-                                    "Accent colour":self.createNewAccentWin}
-        self.preferencesMenu = Menu(self,self.preferencesMenuDict,self.accent,topLabel=f"{self.userName}",bottomLabel="Your preferences.")
+                                    "Accent colour":self.createNewAccentWin,
+                                    "Display font":self.createNewFontWin}
+        self.preferencesMenu = Menu(self,self.preferencesMenuDict,self.accent,
+                                    topLabel=f"{self.userName}",bottomLabel="Your preferences.",
+                                    font=self.globalFontName)
 
     def flagFuncAccent(self):
         self.flagNewAccent = not self.flagNewAccent
+    
+    def flagFuncFont(self):
+        self.flagNewFont = not self.flagNewFont
+
     
     def createNewAccentWin(self):
         if self.flagNewAccent:
@@ -193,6 +223,13 @@ class App(CTk):
         else:
             self.flagNewAccent = True
             ChangeAccentWin(self,self.userEmail,self.globalFontName,self.flagFuncAccent)
+
+    def createNewFontWin(self):
+        if self.flagNewFont:
+            messagebox.showinfo("Window already active","Another display font window is already active.")            
+        else:
+            self.flagNewFont = True
+            ChangeFontWin(self,self.userEmail,self.globalFontName,self.flagFuncFont)
 
     def frameDimensions(self):
         print(f"Width: {self.winfo_screenwidth()}, Height: {self.winfo_screenheight()}")
@@ -211,7 +248,6 @@ class App(CTk):
 
 
     def resizeFrame(self):
-        """try:"""
         # Frame size calculated based on size of window at that time.
         frameX = 0.95*self.winfo_width()
         frameY = 0.95*self.winfo_height()
@@ -221,6 +257,7 @@ class App(CTk):
 
         # When the window width is below a certain value.
         if self.winfo_width() < 1505:
+            # All of these classes (Today, List and Starred) have an entry to move and remove.
             if isinstance(self.currentFrame,Today) or isinstance(self.currentFrame,List) or isinstance(self.currentFrame,Starred):
                 # Removes entry box from view, since it does not fit in the window correctly.
                 self.currentFrame.entryTask.place_forget()
@@ -243,9 +280,7 @@ class App(CTk):
                         self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.4)
                     else:
                         self.currentFrame.taskFrame.configure(height=self.winfo_height()*0.7)
-        """except:
-            # Used to avoid an error where resizeFrame tries to run on the window when it doesn't exist.
-            pass"""
+
         
     def checkOverdueAll(self):
         for each in self.frames:
@@ -299,7 +334,8 @@ class App(CTk):
             # Redefines the menu, logoPanel and preferencesMenu.
             # This ensures that they can be displayed above the new frame, since they have been defined "last"
             self.menu = MenuAndButton(self.currentFrame,self.dictForMenu,\
-                                      origin=self,userName=self.userName,accent=self.accent)
+                                      origin=self,userName=self.userName,accent=self.accent,
+                                      font=self.globalFontName)
             
 
             self.logoPanel = CTkLabel(self.currentFrame,text="",image=self.imgLogo,cursor="hand2")
