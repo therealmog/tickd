@@ -10,7 +10,6 @@ from lib.uploadTask import uploadTask
 from lib.genHash import genHash
 from tkinter import messagebox
 
-
 class Register(CTkToplevel):
     # This class doesn't have an __init__ function, to allow it to be stored in the Auth window.
     def initialise(self,imgBGPath=None,accent="dodgerblue2",origin=None):
@@ -259,7 +258,6 @@ class Register(CTkToplevel):
         
         self.lblEmail.focus_set()
 
-    
     
 
 #register = Register()

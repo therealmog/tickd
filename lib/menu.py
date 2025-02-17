@@ -12,7 +12,10 @@ class Menu(CTkFrame):
         self.menuItems = []
         self.globalFontName = font
 
-        lblFont = (self.globalFontName,32)
+        if font == "Cascadia Code":
+            lblFont = (self.globalFontName,28)
+        else:
+            lblFont = (self.globalFontName,32)
             
             # There are two labels available to be displayed.
         self.lblTop = CTkLabel(self,text=topLabel,font=(self.globalFontName,15))
@@ -25,6 +28,9 @@ class Menu(CTkFrame):
             size = 30
         else:
             size = 25
+        
+        if lblFont == "Cascadia Code":
+            size -= 10
 
         self.lblBottom = CTkLabel(self,text=bottomLabel,font=(self.globalFontName,size),wraplength=250,justify="left")
 

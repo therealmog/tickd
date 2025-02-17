@@ -8,8 +8,8 @@ from lib.getTaskDict import getTaskDict
 class Task(CTkFrame):
 
     def __init__(self,master,attributes:dict,userPath,accent="dodgerblue2",font="Bahnschrift",size=30,command=None,displayListName=False):
-        super().__init__(master=master,width=400,height=67,fg_color=("white","gray13"),border_color="gray15",\
-                         border_width=3,cursor="hand2")
+        super().__init__(master=master,width=400,height=67,fg_color=("white","gray13"),border_color=("gray","gray15"),\
+                         border_width=3,cursor="hand2",corner_radius=10)
 
         self.font = font
         self.size = size

@@ -1,4 +1,4 @@
-from accentsConfig import setFont
+from lib.aestheticsConfig import setFont
 import json
 
 userEmails = []

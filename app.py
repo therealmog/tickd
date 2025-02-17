@@ -6,12 +6,11 @@ from lib.uploadTask import uploadTask
 from lib.menuAndButton import MenuAndButton
 from today import Today
 from myLists import MyLists
-from lib.accentsConfig import getAccent,getFont
+from lib.aestheticsConfig import getAccent,getFont
 from lib.menu import Menu
 from listClass import List
 from starred import Starred
-from changeAccentWin import ChangeAccentWin
-from changeFontWin import ChangeFontWin
+from aesthetics import ChangeAccentWin, ChangeFontWin, ChangeWallpaperWin
 from tkinter import messagebox
 import cProfile
 import pstats
@@ -57,6 +56,7 @@ class App(CTk):
         self.userEmail = email
         self.userPath = userPath
 
+        # Gets user's font from preferences file.
         self.globalFontName = getFont(email)
         
         self.userDetails,self.userIndex = getDetailsIndividual(email)
@@ -165,9 +165,11 @@ class App(CTk):
 
         self.flagNewAccent = False
         self.flagNewFont = False
+        self.flagNewWallpaper = False
         self.preferencesMenuDict = {f"{themeToSet}":lambda:self.mode(),
                                     "Accent colour":lambda:self.createNewAccentWin(),
-                                    "Display font":lambda:self.createNewFontWin()}
+                                    "Display font":lambda:self.createNewFontWin(),
+                                    "App wallpaper":lambda:self.createNewWallpaperWin()}
         self.preferencesMenu = Menu(self,self.preferencesMenuDict,self.accent,topLabel=f"{self.userName}",bottomLabel="Your preferences.",
                                     font=self.globalFontName)
         
@@ -201,11 +203,14 @@ class App(CTk):
         else:
             set_appearance_mode("light")
             themeToSet = "Dark mode"
+
+        
         
         # Redefines preferences menu with correct label. 
         self.preferencesMenuDict = {f"{themeToSet}":lambda:self.mode(),
                                     "Accent colour":self.createNewAccentWin,
-                                    "Display font":self.createNewFontWin}
+                                    "Display font":self.createNewFontWin,
+                                    "App wallpaper":self.createNewWallpaperWin}
         self.preferencesMenu = Menu(self,self.preferencesMenuDict,self.accent,
                                     topLabel=f"{self.userName}",bottomLabel="Your preferences.",
                                     font=self.globalFontName)
@@ -215,6 +220,9 @@ class App(CTk):
     
     def flagFuncFont(self):
         self.flagNewFont = not self.flagNewFont
+    
+    def flagFuncWallpaper(self):
+        self.flagNewWallpaper = not self.flagNewWallpaper
 
     
     def createNewAccentWin(self):
@@ -230,6 +238,13 @@ class App(CTk):
         else:
             self.flagNewFont = True
             ChangeFontWin(self,self.userEmail,self.globalFontName,self.flagFuncFont)
+
+    def createNewWallpaperWin(self):
+        if self.flagNewWallpaper:
+            messagebox.showinfo("Window already active","Another wallpaper changing window is already active.")            
+        else:
+            self.flagNewWallpaper = True
+            ChangeWallpaperWin(self,self.userEmail,self.globalFontName,self.accent,self.flagFuncWallpaper)
 
     def frameDimensions(self):
         print(f"Width: {self.winfo_screenwidth()}, Height: {self.winfo_screenheight()}")
@@ -369,5 +384,5 @@ class App(CTk):
      
 
 
-app = App(email="omar@gmail.com",userPath="users//omar@gmail.com")
-#app = App(email="amoghg75@yahoo.com",userPath="users//amoghg75@yahoo.com")
+#app = App(email="omar@gmail.com",userPath="users//omar@gmail.com")
+app = App(email="amoghg75@yahoo.com",userPath="users//amoghg75@yahoo.com")

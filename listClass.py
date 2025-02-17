@@ -120,10 +120,13 @@ class List(CTkFrame):
         self.imgLogo = CTkImage(light_image=Image.open("logo//whiteBGLogo.png"),dark_image=Image.open("logo//blackBGLogo.png"),size=(155,49))
         self.logoPanel = CTkLabel(self,text="",image=self.imgLogo)
         self.entryTask = CTkEntry(self,placeholder_text="Enter a task...",font=(globalFontName,30),width=650,corner_radius=20)
+        self.entryTask.bind("<FocusIn>",lambda event,attribute="title":self.bindAttrEntries(attribute))
         
 
         self.entryDate = CTkEntry(self,placeholder_text="date",font=(globalFontName,22),corner_radius=20,border_width=0)
+        self.entryDate.bind("<FocusIn>",lambda event,attribute="date":self.bindAttrEntries(attribute))
         self.entryTime = CTkEntry(self,placeholder_text="time",font=(globalFontName,22),corner_radius=20,border_width=0)
+        self.entryTime.bind("<FocusIn>",lambda event,attribute="time":self.bindAttrEntries(attribute))
         self.dropdownPriority = CTkOptionMenu(self,values=["priority","P1","P2","P3"],font=(globalFontName,22),dropdown_font=(globalFontName,20),corner_radius=20,fg_color=("#f9f9fa","#353639"),button_color=("#f9f9fa","#353639"),text_color=self.textgrey,command=self.priorityCallback)
         self.btnTaskSubmit = SubmitButton(self,colour=self.accent,buttonSize=(35,35),command=self.taskSubmitted,radius=60)
         
@@ -759,16 +762,16 @@ class List(CTkFrame):
         self.btnTaskSubmit.place(in_=self.entryTask,x=650)
 
         # Ensures that enter key can be used to submit task
-        self.bindEnterKey()
+        # self.bindEnterKey()
 
         # Places each entry by using the entries dictionary.
         entries = [self.entryDate,self.entryTime,self.dropdownPriority]
         entries[0].place(in_=self.entryTask,y=50)
-        entries[0].bind("<Return>",lambda event:self.taskSubmitted())
+        #entries[0].bind("<Return>",lambda event:self.taskSubmitted())
         for each in range(1,len(entries)):
             # Each entry is placed to the right of the previous, indicated by each-1
             entries[each].place(in_=entries[each-1],x=150)
-            entries[each].bind("<Return>",lambda event:self.taskSubmitted())
+            #entries[each].bind("<Return>",lambda event:self.taskSubmitted())
     
     def checkDateOverdue(self,dateStr:str):
         # Uses date objects, not datetime.
@@ -872,6 +875,21 @@ class List(CTkFrame):
         for each in self.entries:
             each.bind("<FocusIn>",lambda event:self.attributeEntered())
             each.bind("<FocusOut>",lambda event:self.attributeLeave())
+    
+    def bindAttrEntries(self,attribute):
+        entries = {"title":self.entryTask,
+                   "date":self.entryDate,
+                   "time":self.entryTime,}
 
+        # Finds attribute entry and binds enter key pressed.
+        entryToBind = entries[attribute]
+        entryToBind.bind("<Return>",lambda event:self.taskSubmitted())
+
+        # Removes attribute from dictionary.
+        entries.pop(attribute)
+
+        # Unbinds every other attribute entry.
+        for each in entries:
+            entries[each].unbind("<Return>")
 
 #today = Today(mainWindow=None,email="omar@gmail.com",userPath="users//omar@gmail.com",theme="dark",listName="inbox")

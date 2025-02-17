@@ -6,7 +6,7 @@ from lib.detailsPanel import DetailsPanel
 from lib.getListImgs import getListImgs
 import glob
 from listClass import List
-from lib.accentsConfig import getAccent,setAccent
+from lib.aestheticsConfig import getAccent,setAccent
 from lib.getValueWindow import GetValueWin
 from tkinter import messagebox
 from lib.checkListName import checkListName
@@ -65,8 +65,8 @@ class MyLists(CTkFrame):
         self.logoPanel = CTkLabel(self,text="",image=self.imgLogo)
         
         
-        self.btnOwnedByMe = CTkButton(self,text="Owned by me",font=(globalFontName,35),command=lambda btn="ownedByMe":self.topButtonCallback(btn),fg_color="grey",hover=False,border_width=5,border_color="grey5",corner_radius=60)
-        self.btnSharedWithMe = CTkButton(self,text="Shared with me",font=(globalFontName,35),command=lambda btn="sharedWithMe":self.topButtonCallback(btn),fg_color="grey",hover=False,border_width=5,border_color="grey5",corner_radius=60)
+        self.btnOwnedByMe = CTkButton(self,text="Owned by me",font=(globalFontName,35),command=lambda btn="ownedByMe":self.topButtonCallback(btn),fg_color="grey28",hover=False,border_width=5,border_color="grey5",corner_radius=60)
+        self.btnSharedWithMe = CTkButton(self,text="Shared with me",font=(globalFontName,35),command=lambda btn="sharedWithMe":self.topButtonCallback(btn),fg_color="grey28",hover=False,border_width=5,border_color="grey5",corner_radius=60)
 
         #---------# System lists #---------#
 
@@ -158,10 +158,10 @@ class MyLists(CTkFrame):
     def topButtonCallback(self,btn):
         if btn == "ownedByMe":
             self.btnOwnedByMe.configure(fg_color=self.accent)
-            self.btnSharedWithMe.configure(fg_color="grey")
+            self.btnSharedWithMe.configure(fg_color="grey28")
         else:
             self.btnSharedWithMe.configure(fg_color=self.accent)
-            self.btnOwnedByMe.configure(fg_color="grey")
+            self.btnOwnedByMe.configure(fg_color="grey28")
 
     def getCustomLists(self):
         globalFontName = self.globalFontName

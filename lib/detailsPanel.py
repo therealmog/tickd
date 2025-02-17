@@ -238,14 +238,29 @@ class DetailsPanel(CTkFrame):
 
         length = len(self.taskName)
         self.titleFontSize = 30
-        if length > 30:
+
+        if length > 40:
+            # Creates multiplier for every 10 extra characters.
+            # Reduces size by 3px * multiplier
+            difference = 40 - length
+            if difference < 10:
+                multiplier = 1
+            else:
+                multiplier = difference // 10 
+                if multiplier > 9:
+                    multiplier = 9
+
+            self.titleFontSize = 30 - (3*multiplier)
+        self.lblTaskName.configure(font=(self.fontName,self.titleFontSize))
+
+        """if length > 30:
             if length > 30 and length < 40:
                 self.titleFontSize = 25
             elif length > 40 and length <=45:
                 self.titleFontSize = 20
             else:
-                self.titleFontSize = 18
-            self.lblTaskName.configure(font=(self.fontName,self.titleFontSize))
+                self.titleFontSize = 18"""
+        
     
     def bindEventListeners(self):
         for each in self.hoverWidgets:

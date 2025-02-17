@@ -36,7 +36,7 @@ class Checkbox(CTkBaseClass):
         self.checkedImgPanel.place(in_=self.relWidget,x=self.x,y=self.y)
         
         if self.command != None:
-            self.after(300,lambda:self.command(**self.commandArgs))
+            self.after(200,lambda:self.command(**self.commandArgs))
             
 
     def setEmpty(self,_):

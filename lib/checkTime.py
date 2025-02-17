@@ -26,12 +26,8 @@ def checkTime(userInput):
             hour = timeSections[0]
             minute = timeSections[1]
 
-    # Alternative format: HHMM (still valid)
-    elif len(userInput) == 4 and userInput[0] == "0":
-        hour = userInput[0:2]
-        minute = userInput[2:]
 
-    # Another alternative: H:MM (user hasn't inputted a leading zero)
+    # H:MM (user hasn't inputted a leading zero)
     elif len(userInput) == 4 and userInput[0] != "0" and not checkInt(userInput[1]):
         userInput = "0" + userInput
         print(userInput)
@@ -48,6 +44,8 @@ def checkTime(userInput):
             # Separates hour and minute
             hour = timeSections[0]
             minute = timeSections[1]
+    
+    # Alternative format: HHMM (still valid)
     elif len(userInput) == 4:
         hour = userInput[0:2]
         minute = userInput[2:]

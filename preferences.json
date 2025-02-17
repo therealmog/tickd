@@ -1,7 +1,9 @@
 {
     "amoghg75@yahoo.com": {
-        "accent": "dodgerblue2",
-        "font": "Bahnschrift"
+        "accent": "darkorange2",
+        "font": "Georgia",
+        "lightBG": "1",
+        "darkBG": "2"
     },
     "tickd@gmail.com": {
         "accent": "dodgerblue2",
@@ -9,7 +11,7 @@
     },
     "omar@gmail.com": {
         "accent": "crimson",
-        "font": "Franklin Gothic Demi"
+        "font": "Bahnschrift"
     },
     "ajayng@tickd.co.uk": {
         "accent": "dodgerblue2",

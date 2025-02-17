@@ -64,3 +64,27 @@ def setFont(email,newFont="Bahnschrift"):
         # Overwrites file with the updated details.
         with open("preferences.json","w") as f:
             json.dump(details,f,indent=4)
+
+def getWallpapersNum(email):
+    with open("preferences.json","r") as f:
+        # Loads all details from preferences file
+        details = json.load(f)
+
+    # Dictionary keys for the program to iterate over.
+    wallpaperKeys = ["lightBG","darkBG"]
+
+    # Contains found wallpaper names under keys "lightBG" and "darkBG"
+    foundWallpapers = {}
+
+    user = details[email]
+    for key in wallpaperKeys:
+        try:
+            wall = user[key]
+            foundWallpapers[key] = wall
+        
+        except KeyError:       
+            # Defaults to none if key not found.
+            foundWallpapers[key] = "none"
+    
+    # Returns lightBG,darkBG
+    return foundWallpapers["lightBG"],foundWallpapers["darkBG"]
