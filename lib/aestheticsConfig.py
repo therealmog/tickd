@@ -88,3 +88,26 @@ def getWallpapersNum(email):
     
     # Returns lightBG,darkBG
     return foundWallpapers["lightBG"],foundWallpapers["darkBG"]
+
+def setWallpapers(email,light=None,dark=None):
+    if light == None and dark == None:
+        raise Exception("You have not entered any parameters, please try again.")
+
+    wallpapersToSet = {"lightBG":light,"darkBG":dark}
+
+    for each in wallpapersToSet.copy():
+        if wallpapersToSet[each] == None:
+            wallpapersToSet.pop(each)
+    
+    with open("preferences.json","r") as f:
+        # Loads all details from preferences file
+        details = json.load(f)
+
+    user = details[email]
+    for each in wallpapersToSet:
+        # Dictionary keys in wallpapersToSet match keys in preferences dict.
+        user[each] = wallpapersToSet[each]
+    
+    # Overwrites file with the updated details.
+    with open("preferences.json","w") as f:
+        json.dump(details,f,indent=4)
