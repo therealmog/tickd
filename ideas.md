@@ -20,12 +20,8 @@
 <ol>
     <li>Slicker "remember me" interface</li>
 
-    <ul>
-        <li>Maybe something to do with a little menu to confirm that you want to login.</li>
-        <li>Also, with current setup (15/03/25), when yes is clicked, the login screen is loaded, but this shouldn't happen,
-            or a confirmation screen should be shown that the user is logging in.
-        </li>
-    </ul>
+    - Maybe something to do with a little menu to confirm that you want to login.
+    - Also, with current setup (15/03/25), when yes is clicked, the login screen is loaded, but this shouldn't happen, or a confirmation screen should be shown that the user is logging in.
 
     <li>[Item]</li>
 
