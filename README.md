@@ -12,3 +12,15 @@
 
 <h2>The structure</h2>
 <p>Every 'page' in the app is its own class instance.<br>For example, the authentication screen is first declared in the main program as the object named "auth".<br><br>This makes it very easy to quickly get values entered in one screen and then pass them onto a another screen.</p>
+
+<br>
+
+<p>There are 3 main components to the application</p>
+<ol>
+  <li>App window</li>
+    - Essentially the 'master' window of the app, acts as a container for the content frames of the app.
+    - Also contains a few functions used to refresh data, since this object will contain all of the frames of the app, allowing it to call any methods for any of those frames.
+  <img src="sample_imgs//appwindow.png" width=700>
+  <li>List frames</li>
+  <li>Task objects</li>
+</ol>
