@@ -1,6 +1,8 @@
 <h1>Stuff that could be added:</h1>
 <br>
 
+<!--View on GitHub: -->
+
 <!--Add an ordered list for each section in this format:
 
 <h2>[Section title]</h2>
