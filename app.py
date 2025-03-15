@@ -1,12 +1,12 @@
 from customtkinter import *
 from PIL import Image
 from datetime import date,timedelta
-from lib.getDetails import getAllDetails,getDetailsIndividual,writeToAuthDetails
-from lib.uploadTask import uploadTask
+from lib.getDetails import getDetailsIndividual
 from lib.menuAndButton import MenuAndButton
 from today import Today
 from myLists import MyLists
-from lib.aestheticsConfig import getAccent,getFont
+from lib.aestheticsConfig import getAccent,getFont,getWallpapersNum
+from lib.getWallpaper import getFromNum
 from lib.menu import Menu
 from listClass import List
 from starred import Starred
@@ -14,6 +14,7 @@ from aesthetics import ChangeAccentWin, ChangeFontWin, ChangeWallpaperWin
 from tkinter import messagebox
 import cProfile
 import pstats
+from sharinglists import SharedListContainer
 
 
 
@@ -25,13 +26,10 @@ class App(CTk):
     def __init__(self,email,userPath,theme="dark"):
         """Main app container for Tickd."""
 
-        #import_packages(["customtkinter","pillow"])
-
-        # NOTE: Debugging purposes, profiler used.
-        """with cProfile.Profile() as profile:"""
-
         # Initialise CTk instance
         super().__init__()
+
+        deactivate_automatic_dpi_awareness()
         
         # Define size of window and minsize.
         self.geometry(f"{self.winfo_screenwidth()}x{self.winfo_screenheight()}")
@@ -104,18 +102,16 @@ class App(CTk):
             
         self.mainloop()
         
-        """
-        NOTE: To be placed before mainloop statement
-        results = pstats.Stats(profile)
-        results.sort_stats(pstats.SortKey.TIME)
-        results.print_stats()"""
 
 
     #------------------------# Widgets and placing #-------------------------#    
     def widgets(self):
         globalFontName = self.globalFontName
         
-        self.imgWallpaper = CTkImage(Image.open("wallpapers//dark6.png"),size=(1920,1080))
+        # Checks wallpaper
+        lightBGNum,darkBGNum = getWallpapersNum(self.userEmail)
+              
+        self.imgWallpaper = getFromNum(lightBGNum,darkBGNum)
         self.panelWallpaper = CTkLabel(self,text="",image=self.imgWallpaper)
 
         frameX,frameY = self.frameDimensions()
@@ -264,8 +260,8 @@ class App(CTk):
 
     def resizeFrame(self):
         # Frame size calculated based on size of window at that time.
-        frameX = 0.95*self.winfo_width()
-        frameY = 0.95*self.winfo_height()
+        frameX = 0.95*self.winfo_width() # Usually 0.95
+        frameY = 0.95*self.winfo_height() # Usually 0.95
 
         # Changes currentFrame width and height to calculated values.
         self.currentFrame.configure(width=frameX,height=frameY)            
@@ -385,4 +381,4 @@ class App(CTk):
 
 
 #app = App(email="omar@gmail.com",userPath="users//omar@gmail.com")
-app = App(email="amoghg75@yahoo.com",userPath="users//amoghg75@yahoo.com")
+#app = App(email="amoghg75@yahoo.com",userPath="users//amoghg75@yahoo.com")

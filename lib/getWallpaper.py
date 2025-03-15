@@ -22,6 +22,25 @@ def getFromPath(path,dimensions:tuple):
 
     return wallpaperImg
 
+def getFromNum(lightNum="none",darkNum="none",dimensions=(1920,1080)):
+    """Both nums should be strings""" 
+
+    if lightNum == "none":
+        lightImg = Image.open(f"wallpapers//nonelight.png").resize(dimensions)
+    else:
+        lightImg = Image.open(f"wallpapers//light{lightNum}.png").resize(dimensions)
+
+    if darkNum == "none":
+        darkImg = Image.open(f"wallpapers//nonedark.png").resize(dimensions)
+    else:
+        darkImg = Image.open(f"wallpapers//dark{darkNum}.png").resize(dimensions)
+    
+
+    img = CTkImage(light_image=lightImg,
+                   dark_image=darkImg,
+                   size=dimensions)
+
+    return img
 
 
 

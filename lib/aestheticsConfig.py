@@ -90,11 +90,13 @@ def getWallpapersNum(email):
     return foundWallpapers["lightBG"],foundWallpapers["darkBG"]
 
 def setWallpapers(email,light=None,dark=None):
+    # Validation to make sure that at least one wallpaper has been passed in to be changed.
     if light == None and dark == None:
         raise Exception("You have not entered any parameters, please try again.")
 
     wallpapersToSet = {"lightBG":light,"darkBG":dark}
 
+    # Removes unset wallpapers
     for each in wallpapersToSet.copy():
         if wallpapersToSet[each] == None:
             wallpapersToSet.pop(each)

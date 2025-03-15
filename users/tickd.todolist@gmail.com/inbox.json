@@ -1,6 +1,18 @@
 {
     "shared": "no",
-    "tasks": {},
+    "tasks": {
+        "YdosfS": {
+            "title": "Brush teeth",
+            "date": "27/02/2025",
+            "taskID": "YdosfS",
+            "completed": "False",
+            "time": "",
+            "priority": "",
+            "description": "Make sure that you brush for at least two minutes",
+            "listName": "inbox",
+            "starred": "False"
+        }
+    },
     "completed": {
         "welcome": {
             "title": "Welcome to Tickd!",

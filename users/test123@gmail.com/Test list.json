@@ -1,0 +1,20 @@
+{
+    "listID": "9gjYlD",
+    "shared": [
+        "omar@gmail.com"
+    ],
+    "tasks": {
+        "EiYXdf": {
+            "title": "This is a test",
+            "date": "27/02/2025",
+            "taskID": "EiYXdf",
+            "completed": "False",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "Test list",
+            "starred": "False"
+        }
+    },
+    "requestsSent": []
+}

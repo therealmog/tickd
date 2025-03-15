@@ -1,0 +1,46 @@
+{
+    "listID": "u0SFwt",
+    "shared": [
+        "amoghg75@yahoo.com"
+    ],
+    "tasks": {
+        "tHtpDa": {
+            "title": "Plan trip",
+            "date": "3/3/2025",
+            "taskID": "tHtpDa",
+            "completed": "False",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "Holiday",
+            "starred": "False"
+        }
+    },
+    "requestsSent": [
+        "test123@gmail.com"
+    ],
+    "completed": {
+        "FTeEkZ": {
+            "title": "Book hotel",
+            "date": "28/02/2025",
+            "taskID": "FTeEkZ",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "Holiday",
+            "starred": "False"
+        },
+        "eYuzPE": {
+            "title": "hello there",
+            "date": "",
+            "taskID": "eYuzPE",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "Holiday",
+            "starred": "False"
+        }
+    }
+}

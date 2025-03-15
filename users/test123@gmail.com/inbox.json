@@ -1,0 +1,49 @@
+{
+    "tasks": {
+        "welcome": {
+            "title": "Welcome to Tickd!",
+            "date": "25/02/2025",
+            "description": "Welcome to a simpler life with Tickd.\nSimply add tasks with the 'Add a task' box at the top, and use keywords such as 'today' and 'tomorrow' in the date, or for other dates simply add the date using the DD/MM/YY format.\ne.g. for the 31st December 2025, you would put 31/12/25.",
+            "completed": "False",
+            "time": "",
+            "priority": "",
+            "taskID": "welcome",
+            "listName": "inbox"
+        },
+        "okwbCs": {
+            "title": "Do maths homework",
+            "date": "",
+            "taskID": "okwbCs",
+            "completed": "False",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "inbox",
+            "starred": "False"
+        },
+        "caSLEB": {
+            "title": "Do coursework",
+            "date": "28/2/2025",
+            "taskID": "caSLEB",
+            "completed": "False",
+            "time": "",
+            "priority": "P1",
+            "description": "",
+            "listName": "inbox",
+            "starred": "False"
+        }
+    },
+    "completed": {
+        "QHLGPc": {
+            "title": "Do homework",
+            "date": "26/02/2025",
+            "taskID": "QHLGPc",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "inbox",
+            "starred": "False"
+        }
+    }
+}

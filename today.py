@@ -4,8 +4,7 @@ from datetime import date,timedelta,datetime
 from lib.getDetails import getAllDetails,getDetailsIndividual,writeToAuthDetails
 from lib.submitBtn import SubmitButton
 from lib.createTaskDict import createTaskDict
-from lib.checkDate import checkDate
-from lib.checkTime import checkTime
+from lib.checkParameters import checkDate,checkTime
 from lib.task import Task
 from lib.loadTaskList import loadTaskList
 from lib.getTasks import getTasks,getTasksAllLists
@@ -85,7 +84,6 @@ class Today(CTkFrame):
     def widgets(self):
         globalFontName = self.globalFontName
         
-        print("Bonjour.")
         self.lblListName = CTkLabel(self,text=self.listName.capitalize(),font=(globalFontName,40),cursor="pencil")
 
         self.lblListName.bind("<Button-1>",lambda event:self.checkRenameList())
@@ -346,55 +344,72 @@ class Today(CTkFrame):
         if title == "":
             messagebox.showinfo("Cannot create task","Please enter a task title before submitting.")
         else: # Start to interpret attributes
-            
-            # Adding date to the task attributes dict.
-            attributes["date"] = date.today().strftime("%d/%m/%Y")
-
-            # Getting the input from the time entry box.
-            timeInput = self.entryTime.get()
-            if timeInput == "":
-                time = ""
+            dateInput = self.entryDate.get()
+            dateInput = dateInput.strip()
+            if dateInput == "":
+                # No date has been entered.
+                date = "" 
             else:
-                # Validates time input.
-                time,message = checkTime(userInput=timeInput)
+                date,message = checkDate(userInput=dateInput)
 
-            if time == False:
-                # Displays error message for time.
+            if date == False: # Date is set as False by checkDate function
+                # Displays error message
+                messagebox.showerror("Invalid date",message)
+                self.entryDate.select_range(0,END)
+                self.entryDate.focus()
                 #self.messageVar.set(message)
-                messagebox.showerror("Invalid time",message)
             else:
-                # Adds time to the attributes dict.
-                attributes["time"] = time                
-            
-                
-                if self.dropdownPriority.get() != "priority":
-                    # Since priority comes from option menu, it can be added straight
-                    # to the attributes dict.
-                    attributes["priority"] = self.dropdownPriority.get()
+                # Adding date to the task attributes dict.
+                attributes["date"] = date
+
+                # Getting the input from the time entry box.
+                timeInput = self.entryTime.get()
+                if timeInput == "":
+                    time = ""
                 else:
-                    attributes["priority"] = ""
+                    # Validates time input.
+                    time,message = checkTime(userInput=timeInput)
+
+                if time == False:
+                    # Displays error message for time.
+                    #self.messageVar.set(message)
+                    messagebox.showerror("Invalid time",message)
+                else:
+                    # Adds time to the attributes dict.
+                    attributes["time"] = time                
                 
+                    
+                    if self.dropdownPriority.get() != "priority":
+                        # Since priority comes from option menu, it can be added straight
+                        # to the attributes dict.
+                        attributes["priority"] = self.dropdownPriority.get()
+                    else:
+                        attributes["priority"] = ""
+                    
 
-                # Adds extra attributes to be altered later if desired.
-                attributes["description"] = ""
-                attributes["listName"] = "inbox"
-                attributes["starred"] = "False"
-                
-                # All the attributes are brought together to create a task dictionary
-                # to be written to the task list JSON file.
-                taskDict = createTaskDict(title,date,attributes)
-                
+                    # Adds extra attributes to be altered later if desired.
+                    attributes["description"] = ""
+                    attributes["listName"] = "inbox"
+                    attributes["starred"] = "False"
+                    
+                    # All the attributes are brought together to create a task dictionary
+                    # to be written to the task list JSON file.
+                    taskDict = createTaskDict(title,date,attributes)
+                    self.resetEntry(["entryTask","entryDate","entryTime","dropdownPriority"])
 
-                # Task is written to the specified list.
-                uploadTask(self.userPath,taskDict,listName="inbox")
+                    # Task is written to the specified list.
+                    uploadTask(self.userPath,taskDict,listName="inbox")
 
 
-                
-                # Task is placed onto the screen.
-                self.placeNewTask(taskDict)
+                    if self.checkDateToday(date):
+                        # Task is placed onto the screen.
+                        self.placeNewTask(taskDict)
+                    else:
+                        messagebox.showinfo("Task created","Task created and placed into the Inbox.")
 
-                self.mainWindow.checkNewTasksAll()
-                self.resetEntry(["entryTask","entryDate","entryTime","dropdownPriority"])
+
+                    # Checks all screens for any new tasks added.
+                    self.mainWindow.checkNewTasksAll()
 
 
     
@@ -661,7 +676,6 @@ class Today(CTkFrame):
                 for each in updatedList:
                     if each.attributes["taskID"] == taskID and self.checkDateToday(each.attributes["date"]):
                         newTaskDict = each.attributes
-                        print(newTaskDict)
                         self.placeNewTask(newTaskDict,displayListName=True)
      
 

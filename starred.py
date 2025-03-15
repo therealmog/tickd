@@ -4,8 +4,7 @@ from datetime import date,timedelta
 from lib.getDetails import getAllDetails,getDetailsIndividual,writeToAuthDetails
 from lib.submitBtn import SubmitButton
 from lib.createTaskDict import createTaskDict
-from lib.checkDate import checkDate
-from lib.checkTime import checkTime
+from lib.checkParameters import checkDate,checkTime
 from lib.task import Task
 from lib.loadTaskList import loadTaskList
 from lib.getTasks import getTasks,getTasksAllLists

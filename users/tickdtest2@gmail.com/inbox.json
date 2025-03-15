@@ -1,0 +1,14 @@
+{
+    "tasks": {
+        "welcome": {
+            "title": "Welcome to Tickd!",
+            "date": "23/02/2025",
+            "description": "Welcome to a simpler life with Tickd.\nSimply add tasks with the 'Add a task' box at the top, and use keywords such as 'today' and 'tomorrow' in the date, or for other dates simply add the date using the DD/MM/YY format.\ne.g. for the 31st December 2025, you would put 31/12/25.",
+            "completed": "False",
+            "time": "",
+            "priority": "",
+            "taskID": "welcome",
+            "listName": "inbox"
+        }
+    }
+}

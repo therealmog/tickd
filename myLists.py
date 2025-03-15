@@ -10,6 +10,10 @@ from lib.aestheticsConfig import getAccent,setAccent
 from lib.getValueWindow import GetValueWin
 from tkinter import messagebox
 from lib.checkListName import checkListName
+from sharinglists import RequestsMenu,SharedListContainer
+import textwrap
+import json
+from lib.checkListID import checkListID
 
 
 from PIL import Image
@@ -48,9 +52,10 @@ class MyLists(CTkFrame):
 
         self.widgets()
         self.placeWidgets()
-        self.topButtonCallback("ownedByMe")
+        #self.topButtonCallback("ownedByMe")
 
         self.creatingNewList = False
+        self.getSharedLists()
 
     #------------------------# Widgets and placing #-------------------------#    
     def widgets(self):
@@ -65,8 +70,8 @@ class MyLists(CTkFrame):
         self.logoPanel = CTkLabel(self,text="",image=self.imgLogo)
         
         
-        self.btnOwnedByMe = CTkButton(self,text="Owned by me",font=(globalFontName,35),command=lambda btn="ownedByMe":self.topButtonCallback(btn),fg_color="grey28",hover=False,border_width=5,border_color="grey5",corner_radius=60)
-        self.btnSharedWithMe = CTkButton(self,text="Shared with me",font=(globalFontName,35),command=lambda btn="sharedWithMe":self.topButtonCallback(btn),fg_color="grey28",hover=False,border_width=5,border_color="grey5",corner_radius=60)
+        #self.btnOwnedByMe = CTkButton(self,text="Owned by me",font=(globalFontName,35),command=lambda btn="ownedByMe":self.topButtonCallback(btn),fg_color="grey28",hover=False,border_width=5,border_color="grey5",corner_radius=60)
+        #self.btnSharedWithMe = CTkButton(self,text="Shared with me",font=(globalFontName,35),command=lambda btn="sharedWithMe":self.topButtonCallback(btn),fg_color="grey28",hover=False,border_width=5,border_color="grey5",corner_radius=60)
 
         #---------# System lists #---------#
 
@@ -100,6 +105,19 @@ class MyLists(CTkFrame):
                                     width=180,fg_color=self.accent,hover_color="green",border_width=3,\
                                     border_color="grey5",corner_radius=60,image=self.listImgs["Add"],
                                     compound="left",cursor="hand2",command=self.createList)
+        
+        
+        # Creates scrollable frame to store shared lists.
+        self.frameSharedLists = CTkScrollableFrame(self,width=350,height=400,fg_color=("white","gray9"))
+        self.sharedLists = []
+
+        # Creates requests menu frame to appear when requests button clicked. 
+        self.requestsMenu = RequestsMenu(self,self.email,self.globalFontName,self.accent)
+
+        self.btnRequests = CTkButton(self,text="Requests",font=(globalFontName,28),
+                                    width=180,fg_color=self.accent,hover_color="grey24",border_width=3,\
+                                    border_color="grey5",corner_radius=60,image=self.listImgs["My lists"],
+                                    compound="left",cursor="hand2",command=self.placeRequestsMenu)
 
     def placeWidgets(self):
         #self.place(relx=0.5,rely=0.5,anchor="center")
@@ -109,8 +127,8 @@ class MyLists(CTkFrame):
         #self.lblDate.place(in_=self.lblListName,x=0,y=-25)
         self.logoPanel.place(relx=0.98,y=40,anchor=E)
 
-        self.btnOwnedByMe.place(in_=self.lblListName,x=300)
-        self.btnSharedWithMe.place(in_=self.btnOwnedByMe,x=260)
+        #self.btnOwnedByMe.place(in_=self.lblListName,x=300)
+        #self.btnSharedWithMe.place(in_=self.btnOwnedByMe,x=260)
 
         #self.sampleDetailsPanel.place(in_=self.entryTask,x=50,y=100)
 
@@ -118,7 +136,7 @@ class MyLists(CTkFrame):
         self.lblYourCustomLists.place(in_=self.lblDefaultLists,x=450)
         self.lblYourSharedLists.place(in_=self.lblYourCustomLists,x=450)
         
-        
+        self.frameSharedLists.place(in_=self.btnRequests,y=40)
 
         self.tickdDefaults[0].place(in_=self.lblDefaultLists,y=50)
         for each in range(1,len(self.tickdDefaults)):
@@ -130,6 +148,10 @@ class MyLists(CTkFrame):
             if len(self.customListsBtnsArray)>1:
                 for each in range(1,len(self.customListsBtnsArray)):
                     self.customListsBtnsArray[each].place(in_=self.customListsBtnsArray[each-1],y=50)
+        
+        self.btnRequests.place(in_=self.lblYourSharedLists,y=50)
+
+        
         
 
         
@@ -145,6 +167,12 @@ class MyLists(CTkFrame):
             if len(self.customListsBtnsArray) > 1:
                 for each in range(1,len(self.customListsBtnsArray)):
                     self.customListsBtnsArray[each].place(in_=self.customListsBtnsArray[each-1],y=50)
+
+    def placeRequestsMenu(self):
+        if self.requestsMenu.winfo_ismapped():
+            self.requestsMenu.place_forget()
+        else:
+            self.requestsMenu.place(in_=self.btnRequests,y=50)
 
 
     def frameDimensions(self):
@@ -169,13 +197,12 @@ class MyLists(CTkFrame):
         # key should be name of list, followed by a list with frame object and button object.
 
         paths = glob.glob(f"{self.userPath}//*.json")
-        toRemove = ["inbox.json"]
-        for each in paths:
+        toRemove = ["inbox.json","shared.json"]
+        for each in paths.copy():
             for disallowedPhrase in toRemove:
                 if disallowedPhrase in each:
                     paths.remove(each)
         
-        print(paths)
         for each in paths:
             listName = each.replace(f"{self.userPath}\\","")
             listName = listName.replace(".json","")
@@ -183,14 +210,58 @@ class MyLists(CTkFrame):
             listFrame = List(self.mainWindow,self.email,self.userPath,self.todaysDate,getAccent(self.email),listName=listName,
                              fontName=self.globalFontName)
             self.mainWindow.frames[listName] = listFrame
-            print(self.mainWindow.frames)
-            listBtn = CTkButton(self,text=f"{listName}",font=(globalFontName,30),width=280,fg_color="grey28",hover_color="grey24",border_width=3,border_color="grey5",corner_radius=60,compound="left",cursor="hand2",command=lambda listName=listName:self.mainWindow.loadFrame(listName))
+            
+            listBtnText = textwrap.fill(listName,18)
+
+            listBtn = CTkButton(self,text=listBtnText,font=(globalFontName,30),width=280,fg_color="grey28",hover_color="grey24",border_width=3,border_color="grey5",corner_radius=60,compound="left",cursor="hand2",command=lambda listName=listName:self.mainWindow.loadFrame(listName))
 
             self.customLists[listName] = [listFrame,listBtn]
         
         self.customListsBtnsArray = []
         for each in self.customLists:
             self.customListsBtnsArray.append(self.customLists[each][1])
+
+    def getSharedLists(self):
+        # Loads in shared JSON file.
+        with open(f"{self.userPath}//shared.json","r") as f:
+            sharedFile = json.load(f)
+
+        # Removes requests section from shared JSON file
+        sharedFile.pop("requests")
+
+        # Iterates through users who have shared lists.
+        for user in sharedFile:
+            # Iterates through all of the shared listIDs.
+            for listID in sharedFile[user]:
+                listOwner = user
+
+                # Uses the same procedure used in the RequestsMenu class to get the list name.
+                listName = checkListID(user,listID)
+
+                # Creates item in frames dictionary in main app.
+                self.mainWindow.frames[listName] = List(self.mainWindow,listOwner,userPath=f"users//{listOwner}",todaysDate=self.todaysDate,
+                                                userAccent=self.accent,listName=listName,fontName=self.globalFontName,shared=True)
+                
+                # Creates new button for the My lists page.
+                sharedlist = SharedListContainer(self.frameSharedLists,listName,listOwner,self.mainWindow.loadFrame,{"frameName":listName},
+                                                 self.globalFontName,self.accent)
+                
+                # Places list into shared lists frame and adds it to a list.
+                sharedlist.grid(row=len(self.sharedLists),column=0,pady=(5,2))
+                self.sharedLists.append(sharedlist)
+
+
+    def placeSharedList(self,listName,listOwner):
+        # Adds to frames dictionary
+        self.mainWindow.frames[listName] = List(self.mainWindow,listOwner,userPath=f"users//{listOwner}",todaysDate=self.todaysDate,
+                                                userAccent=self.accent,listName=listName,fontName=self.globalFontName,shared=True)
+        
+        # Creates new shared list object and adds it to the requests frame.
+        sharedListObj = SharedListContainer(self.frameSharedLists,listName,listOwner,command=self.mainWindow.loadFrame,
+                                            commandArgs={"frameName":listName},font=self.globalFontName,accent=self.accent)
+
+        sharedListObj.grid(row=len(self.sharedLists),column=0,pady=(5,2))
+        self.sharedLists.append(sharedListObj)
 
     def changeNewListFlag(self):
         self.creatingNewList = not self.creatingNewList
@@ -207,9 +278,12 @@ class MyLists(CTkFrame):
         # Adds to frames dictionary in main window.
         self.mainWindow.frames[listName] = listFrame
 
+        # Creates button text, but shortens it down to fit within 19 characters
+        listBtnText = textwrap.fill(listName,18)
+
         # Creates new list button for "My lists" page
         # The command for this button is to use the "loadFrame" procedure.
-        listBtn = CTkButton(self,text=f"{listName}",font=(globalFontName,30),width=280,fg_color="grey28",hover_color="grey24",
+        listBtn = CTkButton(self,text=listBtnText,font=(globalFontName,30),width=280,fg_color="grey28",hover_color="grey24",
                             border_width=3,border_color="grey5",corner_radius=60,compound="left",cursor="hand2",
                             command=lambda listName=listName:self.mainWindow.loadFrame(listName))
 
@@ -240,7 +314,7 @@ class MyLists(CTkFrame):
             validationKwargs = {"userPath":self.userPath}
             getValueWin = GetValueWin("list name",assigningFunc=self.createNewCustomListBtn,
                                       validationFunc=checkListName,validationFuncArgs=validationKwargs,
-                                      customTitle="Enter name of new list.",accent=self.accent,flagFunc=self.changeNewListFlag)
+                                      customTitle="Enter name of new list.",accent=self.accent,flagFunc=self.changeNewListFlag,fontName=self.globalFontName)
 
             
 

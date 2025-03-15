@@ -1,7 +1,7 @@
 # Amogh NG
 # Tickd main
-"""from install_packages import import_packages
-import_packages(["packaging","customtkinter","pillow"])"""
+
+# Used for running the program.
 
 from authcustomTk import Auth
 from app import App
@@ -15,6 +15,5 @@ except:
 if email == "":
     print("No email. Cannot sign in to main program.")
 else:
-    #today = Today(email,userPath=auth.userPath,theme=auth.theme)
     app = App(email,userPath=auth.userPath,theme=auth.theme)
 

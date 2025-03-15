@@ -1,6 +1,22 @@
 {
-    "shared": "no",
-    "tasks": {},
+    "listID": "CSIdxb",
+    "shared": [
+        "test123@gmail.com",
+        "amoghg75@yahoo.com"
+    ],
+    "tasks": {
+        "kdeADS": {
+            "title": "push session",
+            "date": "15/03/2025",
+            "taskID": "kdeADS",
+            "completed": "False",
+            "time": "",
+            "priority": "P3",
+            "description": "tricep pushdowns - 3x8",
+            "listName": "Gym plan",
+            "starred": "False"
+        }
+    },
     "completed": {
         "DWhQBL": {
             "title": "Extra hard cardio session",
@@ -23,5 +39,6 @@
             "listName": "Gym plan",
             "starred": "False"
         }
-    }
+    },
+    "requestsSent": []
 }

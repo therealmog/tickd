@@ -4,8 +4,7 @@ from datetime import date,timedelta
 from lib.getDetails import getAllDetails,getDetailsIndividual,writeToAuthDetails
 from lib.submitBtn import SubmitButton
 from lib.createTaskDict import createTaskDict
-from lib.checkDate import checkDate
-from lib.checkTime import checkTime
+from lib.checkParameters import checkDate,checkTime
 from lib.task import Task
 from lib.loadTaskList import loadTaskList
 from lib.getTasks import getTasks
@@ -19,12 +18,13 @@ from lib.getValueWindow import GetValueWin
 import os
 import json
 from lib.checkListName import checkListName
+import sharinglists
 
 
 
 class List(CTkFrame):
     textgrey="#9e9f9f"
-    def __init__(self,mainWindow,email,userPath,todaysDate,userAccent="dodgerblue2",listName="inbox",fontName="Bahnschrift"):
+    def __init__(self,mainWindow,email,userPath,todaysDate,userAccent="dodgerblue2",listName="inbox",fontName="Bahnschrift",shared=False):
         """The class for generating frames for individual lists."""
         
         
@@ -36,6 +36,7 @@ class List(CTkFrame):
         self.listName = listName
         self.email = email
         self.globalFontName = fontName
+        self.shared = shared
 
 
         self.accent = userAccent
@@ -57,7 +58,7 @@ class List(CTkFrame):
         # Keeping these as 3 separate variables allows them to be toggled separately.
         # e.g. a list could be renameable and deleteable, but not shareable.
         # However, at the moment I have not made any lists like that so they are all toggled at the same time.
-        if self.listName.lower() == "inbox" or self.listName.lower() == "starred":
+        if self.listName.lower() == "inbox" or self.listName.lower() == "starred" or shared == True:
             # If these are toggled, the respective buttons are made for these.
             self.renameable = False
             self.shareable = False
@@ -90,6 +91,7 @@ class List(CTkFrame):
 
         # Flag for when renaming the list
         self.flagRenaming = False
+        self.flagSharing = False
 
     #------------------------# Widgets and placing #-------------------------#    
     def widgets(self):
@@ -109,7 +111,7 @@ class List(CTkFrame):
                                        fg_color=self.accent)
         
         if self.shareable:
-            self.btnShare = CTkButton(self,text="Share list",font=(self.globalFontName,20),width=130,image=smallerListImgs["Share"],compound="left",
+            self.btnShare = CTkButton(self,text="Share list",font=(self.globalFontName,20),width=130,image=smallerListImgs["Share"],compound="left",command=self.checkShareList,
                                       fg_color=self.accent)
 
         if self.deleteable:
@@ -196,6 +198,8 @@ class List(CTkFrame):
             self.entryTask.place(in_=self.logoPanel,x=-650,y=10)
 
     def renameList(self,newName):
+        self.flagRenaming = False
+
         # Gets previous name and path.
         oldName = self.listName
         oldPath = f"{self.userPath}//{self.listName}.json"
@@ -255,8 +259,11 @@ class List(CTkFrame):
             if self.listName.lower() == each:
                 allowedToRename = False
         
+        # Does not allow user to rename list if it is a default list, or they are a shared user without permissions.
         if not allowedToRename:
             messagebox.showerror("Cannot rename this list","This list cannot be renamed since it is a Tickd default.")
+        elif self.shared == True and not self.renameable:
+            messagebox.showerror("Cannot rename this list","You cannot rename this list since you do not have the correct permissions.")
         else:
             if self.flagRenaming:
                 messagebox.showerror("Window already active",
@@ -267,10 +274,22 @@ class List(CTkFrame):
                 # Calls a GetValueWin object
                 GetValueWin(attributeName="list name",assigningFunc=self.renameList,validationFunc=checkListName,
                             validationFuncArgs={"userPath":self.userPath},accent=self.accent,
-                            flagFunc=self.changeFlagRenaming,customTitle=winTitle,fontName=self.globalFontName)
+                            flagFunc=self.changeFlagRenaming,customTitle=winTitle,fontName=self.globalFontName,previousVal=self.listName)
     
+    def checkShareList(self):
+        if self.flagSharing:
+            messagebox.showerror("Window already active",
+                                     "List sharing window already active. Please close it before opening another one.")
+        else:
+            self.flagSharing = True
+            sharinglists.SharingMenu(self.mainWindow,listTitle=self.listName,userEmail=self.email,userPath=self.userPath,
+                                     font=self.globalFontName,accent=self.accent,flagFunc=self.flagFuncSharing)
+
     def changeFlagRenaming(self):
        self.flagRenaming = not self.flagRenaming
+
+    def flagFuncSharing(self):
+        self.flagSharing = not self.flagSharing
 
     def loadTasks(self): # Should only be run once at the start of the program
 
@@ -463,6 +482,9 @@ class List(CTkFrame):
                     # Task is placed onto the screen.
                     self.placeNewTask(taskDict)
 
+                    # Reorders tasks
+                    self.reorderList()
+
                     # Checks all screens for any new tasks added.
                     self.mainWindow.checkNewTasksAll()
         
@@ -499,6 +521,18 @@ class List(CTkFrame):
             else:
                 messagebox.showinfo("List not deleted.","Your list has not been deleted.")
 
+    def reorderList(self):
+        # Removes all lists.
+        for each in self.taskList:
+            each.grid_forget()
+        
+        # Orders list using procedure
+        self.orderList(self.taskList)
+
+        # Replaces all tasks.
+        for i in range(len(self.taskList)):
+            self.taskList[i].grid(row=i,column=0,pady=(5,10))
+
     def orderList(self,listToSort):
         """Orders list in terms of priority."""
         
@@ -523,11 +557,11 @@ class List(CTkFrame):
             if each.attributes["priority"] == "P1":
                 listToSort.insert(0,each)
             elif each.attributes["priority"] == "P2":
-                listToSort.insert(noOfP1+1,each)
+                listToSort.insert(noOfP1,each)
             elif each.attributes["priority"] == "P3":
-                listToSort.insert(noOfP2+noOfP3+1,each)
+                listToSort.insert(noOfP2+noOfP3,each)
             else:
-                listToSort.insert(len(listToSort)-1,each)
+                listToSort.append(each)
 
 
     def placeNewTask(self,taskDict):

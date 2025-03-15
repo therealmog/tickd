@@ -1,9 +1,9 @@
 {
     "amoghg75@yahoo.com": {
-        "accent": "darkorange2",
-        "font": "Georgia",
+        "accent": "crimson",
+        "font": "Bahnschrift",
         "lightBG": "3",
-        "darkBG": "4"
+        "darkBG": "1"
     },
     "tickd@gmail.com": {
         "accent": "dodgerblue2",
@@ -11,7 +11,9 @@
     },
     "omar@gmail.com": {
         "accent": "crimson",
-        "font": "Bahnschrift"
+        "font": "Bahnschrift",
+        "lightBG": "1",
+        "darkBG": "3"
     },
     "ajayng@tickd.co.uk": {
         "accent": "dodgerblue2",
@@ -55,11 +57,15 @@
     },
     "snehan.biswas2007@gmail.com": {
         "accent": "dodgerblue2",
-        "font": "Bahnschrift"
+        "lightBG": "none",
+        "darkBG": "4",
+        "font": "Century Gothic"
     },
     "test@tickd.com": {
         "accent": "dodgerblue2",
-        "font": "Bahnschrift"
+        "font": "Bahnschrift",
+        "lightBG": "1",
+        "darkBG": "1"
     },
     "test4@gmail.com": {
         "accent": "dodgerblue2",
@@ -72,5 +78,20 @@
     "mytest@testmail.com": {
         "accent": "dodgerblue2",
         "font": "Bahnschrift"
+    },
+    "tickdtest123@gmail.com": {
+        "accent": "dodgerblue2"
+    },
+    "tickdtest2@gmail.com": {
+        "accent": "dodgerblue2"
+    },
+    "test123@gmail.com": {
+        "accent": "lime",
+        "font": "Georgia",
+        "lightBG": "2",
+        "darkBG": "3"
+    },
+    "test@gmail./com": {
+        "accent": "dodgerblue2"
     }
 }

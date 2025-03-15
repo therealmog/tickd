@@ -4,8 +4,7 @@ from lib.checkbox_customTk import Checkbox
 from PIL import Image
 from lib.uploadTask import uploadTask
 from lib.getValueWindow import GetValueWin
-from lib.checkDate import checkDate
-from lib.checkTime import checkTime
+from lib.checkParameters import checkDate,checkTime
 from tkinter import messagebox
 from lib.getTaskDict import getTaskDict
 
@@ -61,6 +60,7 @@ class DetailsPanel(CTkFrame):
         self.taskButton = self.getTaskButton()
         self.lblDate = CTkLabel(self,text=self.taskDate,font=(globalFontName,20),cursor="hand2")
         self.lblTime = CTkLabel(self,text=self.taskTime,font=(globalFontName,20),cursor="hand2")
+        self.lblPriority = CTkLabel(self,text=self.taskPriority,font=(globalFontName,20),cursor="hand2")
         self.lblDescription = CTkLabel(self,text="description:",font=(globalFontName,22))
         self.entryDescription = CTkTextbox(self,width=750,height=250,font=(globalFontName,22),wrap=WORD,\
                                            activate_scrollbars=True,fg_color=("#f0fafe","gray13"))
@@ -74,6 +74,7 @@ class DetailsPanel(CTkFrame):
         self.hoverWidgets = {"lblTaskName":self.lblTaskName,
                         "lblDate":self.lblDate,
                         "lblTime":self.lblTime,
+                        "lblPriority":self.lblPriority
                         }
         self.hoverWidgetFonts = {}
 
@@ -119,6 +120,14 @@ class DetailsPanel(CTkFrame):
                           "previousVal":self.taskName,
                           "flagFunc":self.flagFuncAttrEditing}
         
+        self.changePriorityArgs = {"attributeName":"priority",
+                          "assigningFunc":self.updateTaskInfo,
+                          "assigningFuncArgs":{"attributeName":"priority"},
+                          "validationFunc":self.checkNewPriority,
+                          "accent":self.accent,
+                          "maxChars":8,
+                          "flagFunc":self.flagFuncAttrEditing}
+        
         self.bindAttributeWins()
         
         
@@ -127,10 +136,12 @@ class DetailsPanel(CTkFrame):
         changeDateText = f"Change the date for '{self.taskName}'"
         changeTimeText = f"Change the time for '{self.taskName}'"
         changeNameText = f"Change the name of '{self.taskName}'"
+        changePriorityText = f"Change the priority of '{self.taskName}'"
 
         self.lblTaskName.unbind("<Button-1>")
         self.lblDate.unbind("<Button-1>")
         self.lblTime.unbind("<Button-1>")
+        self.lblPriority.unbind("<Button-1>")
 
         self.lblDate.bind("<Button-1>",lambda event,customTitle=changeDateText,
                           kwargs=self.changeDateArgs:self.checkAttributeEditing(customTitle,kwargs))
@@ -138,6 +149,8 @@ class DetailsPanel(CTkFrame):
                           kwargs=self.changeTimeArgs:self.checkAttributeEditing(customTitle,kwargs))
         self.lblTaskName.bind("<Button-1>",lambda event,customTitle=changeNameText,
                               kwargs=self.changeNameArgs:self.checkAttributeEditing(customTitle,kwargs))
+        self.lblPriority.bind("<Button-1>",lambda event,customTitle=changePriorityText,
+                              kwargs=self.changePriorityArgs:self.checkAttributeEditing(customTitle,kwargs))
 
     def checkAttributeEditing(self,customTitle,kwargs):
         # Checks to see if a previous editing window exists.
@@ -159,13 +172,15 @@ class DetailsPanel(CTkFrame):
         self.lblTaskName.place(x=80,y=20)
         self.lblDate.place(in_=self.lblTaskName,y=45)
         self.lblTime.place(in_=self.lblDate,x=12*(len(self.lblDate.cget("text"))))
-        self.btnSetReminder.place(in_=self.lblTime,x=100)
+        self.lblPriority.place(in_=self.lblTime, x=12*len(self.lblTime.cget("text")))
+        self.btnSetReminder.place(in_=self.lblPriority,x=25*len(self.lblTime.cget("text")))
         self.lblDescription.place(x=25,y=110)
         self.entryDescription.place(in_=self.lblDescription,y=30)
         self.taskButton.placeWidget()
         #self.btnSaveDescription.place(in_=self.entryDescription,x=220,y=190)
 
     def updateTaskInfo(self,newData,attributeName):
+        print(newData)
         if attributeName == "date":
             self.taskDate = newData
             self.lblDate.configure(text=newData)
@@ -178,6 +193,8 @@ class DetailsPanel(CTkFrame):
             self.taskAttributes["time"] = newData
         elif attributeName == "priority":
             self.taskPriority = newData
+            self.taskAttributes["priority"] = newData
+            self.lblPriority.configure(text=newData)
         else:
             self.taskName = newData
             self.lblTaskName.configure(text=newData)
@@ -225,6 +242,15 @@ class DetailsPanel(CTkFrame):
         
         if self.taskTime == "":
             self.lblTime.configure(text="no time")
+        
+        if self.taskPriority == "":
+            self.lblPriority.configure(text="no priority")
+        elif self.taskPriority == "P1":
+            self.lblPriority.configure(text="High priority (P1)")
+        elif self.taskPriority == "P2":
+            self.lblPriority.configure(text="Medium priority (P2)")
+        else:
+            self.lblPriority.configure(text="Low priority (P3)")
     
     def checkNewTitle(self,newTitle):
         if newTitle.strip() == "":
@@ -232,6 +258,19 @@ class DetailsPanel(CTkFrame):
             return False,message
         else:
             return newTitle,None
+    
+    def checkNewPriority(self,newPriority):
+        accepted = ["p1","p2","p3","none"]
+
+        if newPriority.lower() not in accepted:
+            message = "Invalid priority.\nPlease enter P1, P2, P3, or none."
+            return False,message
+        else:
+            if newPriority.lower() == "none":
+                newPriority = ""
+            else:
+                newPriority = newPriority.upper()
+            return newPriority,None
     
     def checkTitleLength(self):
         # Reduces title font size if the title is greater than a certain length

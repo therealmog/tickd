@@ -298,11 +298,11 @@ class ChangeFontWin(CTkToplevel):
     def placeWidgets(self):
         self.frameWin.place(relx=0.5,rely=0.5, anchor="center")
 
-        self.lblTitle.place(x=65,y=55) # Originally x=40
-        self.logoPanel.place(in_=self.lblTitle,x=110,y=-30) # Originally x=130
-        self.lblSubtitle.place(in_=self.lblTitle,x=10,y=70)
+        self.lblTitle.place(relx=0.5,y=60,anchor=CENTER) # Originally x=40
+        self.logoPanel.place(in_=self.lblTitle,relx=0.45,y=-10,anchor=CENTER) # Originally x=130
+        self.lblSubtitle.place(in_=self.lblTitle,relx=0.5,y=75,anchor=CENTER)
         
-        self.fontsMenu.place(in_=self.lblSubtitle,y=35)
+        self.fontsMenu.place(in_=self.lblSubtitle,relx=0.5,y=45,anchor=CENTER)
         self.lblPreview.place(x=35,y=230) # Originally x=15,y=180
     
     def createPreview(self,newFont=None):
@@ -457,9 +457,8 @@ class ChangeWallpaperWin(CTkToplevel):
                            size=(106,34))
         self.logoPanel = CTkLabel(self.frameWin,text="",image=imgLogo)
 
-        self.lblWarning = CTkLabel(self.frameWin,text="Click on an option in the menus to view a preview of what the\
-                                    wallpaper looks like in the app\n(Note: Inbox frame is an example, may not be representative of what your app looks like.)",
-                                 font=(globalFontName,15))
+        self.lblWarning = CTkLabel(self.frameWin,text="Click on an option in the menus to view a preview of what the wallpaper looks like in the app\n(Note: Inbox frame is an example, may not be representative of what your app looks like.)",
+                                   font=(globalFontName,15))
 
         
         # Creates save button
@@ -496,14 +495,15 @@ class ChangeWallpaperWin(CTkToplevel):
                         self.darkOptions.append(each)
         
         # Declares preview frame images (panels declared in preview functions) 
-        self.imgLightFrame = CTkImage(Image.open("light frame.png"),size=(400,225))
-        self.imgDarkFrame = CTkImage(Image.open("dark frame.png"),size=(400,225))
+        self.imgLightFrame = CTkImage(Image.open("wallpapers//light frame.png"),size=(400,225))
+        self.imgDarkFrame = CTkImage(Image.open("wallpapers//dark frame.png"),size=(400,225))
         
 
         # Declares option menu labels
         iconsImgs = getListImgs((30,30))
         self.lblLight = CTkLabel(self.frameWin,text=" Light:",font=(self.font,25),image=iconsImgs["Light mode"],compound="left")
         self.lblDark = CTkLabel(self.frameWin,text=" Dark:",font=(self.font,25),image=iconsImgs["Dark mode"],compound="left")
+
 
         # Creates light and dark menus.
         self.lightChosen = self.lightOptions[0]
@@ -536,45 +536,36 @@ class ChangeWallpaperWin(CTkToplevel):
         
 
         self.lblTitle.place(x=310,y=55)
-        self.logoPanel.place(in_=self.lblTitle,x=110,y=-30)
-        #self.lblSubtitle.place(in_=self.lblTitle,x=10,y=70)
-        
-        #self.lblPreview.place(x=35,y=230) # Originally x=15,y=180
+        self.logoPanel.place(in_=self.lblTitle,x=130,y=-30) # Changed from x=110
 
-        self.lblLight.place(x=60,y=150)
-        self.lightMenu.place(in_=self.lblLight,x=100)
-        self.lblDark.place(in_=self.lblLight,x=550)
-        self.darkMenu.place(in_=self.lblDark,x=100)
+        self.lblLight.place(x=120,y=150) # Change from x=60
+        self.lightMenu.place(in_=self.lblLight,x=110) # Changed from x=100
+        self.lblDark.place(in_=self.lblLight,x=500) # Changed from x=550
+        self.darkMenu.place(in_=self.lblDark,x=110) # Changed from x=100
 
-        self.frameLightPreview.place(in_=self.lblLight,x=-20,y=50)
-        self.frameDarkPreview.place(in_=self.lblDark,x=-60,y=50)
+        self.frameLightPreview.place(in_=self.lblLight,x=-80,y=50) # Changed from x=-20 
+        self.frameDarkPreview.place(in_=self.lblDark,x=-80,y=50) # Changed from x=-60
         
         self.lblWarning.place(in_=self.frameLightPreview,x=140,y=260)
 
     
     def createLightPreview(self,newBG=None):
-        """newFont should be a file name, e.g. light-1, dark-4, etc."""
+        """newBG should be a file name, e.g. light-1, dark-4, etc."""
         # If preview needs to be created (not being called by options menu), a wallpaper can be specified.
-        # Otherwise, if no wallpaper is specified (newBG is None) then font is the current item in the options menu.
+        # Otherwise, if no wallpaper is specified (newBG is None) then newBG is the current item in the options menu.
         
         if newBG==None:
             self.lightChosen=self.lightMenu.get()
             newBG = self.lightChosen.lower()
         
-        
         # Places save button if chosen font is not the same as user's currently set accent font.
-        if newBG[0] != self.currentLightBG.lower():
-            self.btnSave.place(in_=self.lblTitle,x=60,y=460)
+        if self.checkSave():
+            self.btnSave.place(in_=self.lblTitle,x=50,y=460)
         else:
             self.btnSave.place_forget()
-        
 
-        # Change above labels (title, preview and subtitle) with new font.
-        # Title size is stored within the dictionary.
-        
-            
+
         num = 2
-        
         for i in range(num):
             try:
                 widgetsToRemove = [self.panelLightBGPreview,self.panelLightFrame]
@@ -584,14 +575,14 @@ class ChangeWallpaperWin(CTkToplevel):
                 
         # Creates new wallpaper preview image.
         if newBG != "none":
-            imgLightBG = CTkImage(Image.open(f"wallpapers//{newBG.replace(" ","")}.png"),size=(600,432))
+            imgLightBG = CTkImage(Image.open(f"wallpapers//{newBG.replace(" ","")}.png"),size=(450,300))
             self.panelLightBGPreview = CTkLabel(self.frameLightPreview,text="",image=imgLightBG)
             self.panelLightBGPreview.place(x=2,y=2)
         self.panelLightFrame = CTkLabel(self.frameLightPreview,text="",image=self.imgLightFrame)
         self.panelLightFrame.place(x=13,y=12)
 
     def createDarkPreview(self,newBG=None):
-        """newFont should be a file name, e.g. light-1, dark-4, etc."""
+        """newBG should be a file name, e.g. light-1, dark-4, etc."""
         # If preview needs to be created (not being called by options menu), a wallpaper can be specified.
         # Otherwise, if no wallpaper is specified (newBG is None) then font is the current item in the options menu.
         
@@ -599,9 +590,9 @@ class ChangeWallpaperWin(CTkToplevel):
             self.darkChosen=self.darkMenu.get()
             newBG = self.darkChosen.lower()
         
-        # Places save button if chosen font is not the same as user's currently set accent font.
-        if newBG[0] != self.currentDarkBG.lower():
-            self.btnSave.place(in_=self.lblTitle,x=60,y=460)
+        # Uses checkSave function to compare selected options to currently set ones.
+        if self.checkSave():
+            self.btnSave.place(in_=self.lblTitle,x=50,y=460)
         else:
             self.btnSave.place_forget()
         
@@ -627,6 +618,28 @@ class ChangeWallpaperWin(CTkToplevel):
         self.panelDarkFrame = CTkLabel(self.frameDarkPreview,text="",image=self.imgDarkFrame)
         self.panelDarkFrame.place(x=13,y=12)
 
+    def checkSave(self):
+        lightMenuSelected = self.lightMenu.get()
+        darkMenuSelected = self.darkMenu.get()
+
+        changed = False
+        # Checks light menu first
+        if lightMenuSelected == "None" and self.currentLightBG == "none":
+            pass
+        elif lightMenuSelected.replace("Light ","") == self.currentLightBG:
+            pass
+        else:
+            changed = True
+
+        # Then checks dark menu first
+        if darkMenuSelected == "None" and self.currentDarkBG == "none":
+            pass
+        elif darkMenuSelected.replace("Dark ","") == self.currentDarkBG:
+            pass
+        else:
+            changed = True
+        
+        return changed
 
     
     def setNewWallpapers(self):
@@ -638,10 +651,10 @@ class ChangeWallpaperWin(CTkToplevel):
         if self.flagFunc != None:
             self.flagFunc()
 
-        # Creates a message box to notify the user that the font has been set.
+        # Creates a message box to notify the user that the wallpaper has been set.
         messagebox.showinfo("New wallpapers set","Your new app wallpapers have been set.\nClick 'OK' to restart the app.")
         
-        # Restarts the app to recreate all widgets with new accent font.
+        # Restarts the app to apply the new wallpaper.
         self.master.createNewApp()
 
         # Closes this window.
@@ -652,7 +665,6 @@ class ChangeWallpaperWin(CTkToplevel):
 accentWin = ChangeAccentWin(root,email="amoghg75@yahoo.com")
 #accentWin.bind("<Configure>",lambda event:print(f"{accentWin.winfo_width()}x{accentWin.winfo_height()}"))
 root.mainloop()"""
-
 
 
 

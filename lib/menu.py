@@ -94,10 +94,14 @@ class Menu(CTkFrame):
         widget.bind("<Button-1>",lambda event,command=command:self.funcToRun(command))
     
     def funcToRun(self,command):
+        # Removes menu from view when an item has been pressed.
         self.place_forget()
 
+        # Changes the image for the menu button if it exists.
         if self.isOrigin:
             self.origin.panelMenuClose.place_forget()
             self.origin.panelMenuOpen.place(relx=0.5,rely=0.5,anchor="center")
         
+        # Runs the specified command procedure.
         command()
+

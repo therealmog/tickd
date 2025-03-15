@@ -1,6 +1,33 @@
 {
-    "shared": "no",
-    "tasks": {},
+    "listID": "f1DClQ",
+    "shared": [
+        "amoghg75@yahoo.com",
+        "test123@gmail.com"
+    ],
+    "tasks": {
+        "zLPTTF": {
+            "title": "Get groceries",
+            "date": "27/2/2025",
+            "taskID": "zLPTTF",
+            "completed": "False",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "Shopping",
+            "starred": "False"
+        },
+        "fAQpaJ": {
+            "title": "Get bananas",
+            "date": "26/02/2025",
+            "taskID": "fAQpaJ",
+            "completed": "False",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "Shopping",
+            "starred": "False"
+        }
+    },
     "completed": {
         "ZNjKHW": {
             "title": "apples",
@@ -97,5 +124,6 @@
             "listName": "Shopping",
             "starred": "False"
         }
-    }
+    },
+    "requestsSent": []
 }

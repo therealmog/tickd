@@ -1,5 +1,8 @@
 {
-    "shared": "no",
+    "listID": "OrAIO4",
+    "shared": [
+        "omar@gmail.com"
+    ],
     "tasks": {
         "hWJilR": {
             "title": "Token economy and management",
@@ -53,5 +56,9 @@
             "description": "",
             "listName": "Psych blurts"
         }
-    }
+    },
+    "requestsSent": [
+        "tickd.todolist@gmail.com",
+        "test123@gmail.com"
+    ]
 }

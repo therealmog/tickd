@@ -17,6 +17,7 @@ import smtplib,ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from random import randint
+from lib.checkUserDetails import checkEmail
 
 
 class Auth(CTk):
@@ -549,7 +550,7 @@ class Register(CTkToplevel):
         empty = self.checkEmpty()
         
         if not empty:
-            emailValid = self.checkEmail(email)
+            emailValid = checkEmail(email)
             found,self.userDetails = self.checkDetailsFound(email,details)
             if emailValid and found:
                 # Message box used instead of calling setMessage procedure
@@ -617,19 +618,6 @@ class Register(CTkToplevel):
                 return True
         return False
     
-
-    def checkEmail(self,email):
-        if "@" in email:
-            splitEmail = email.split("@")
-            if "." in splitEmail[1]:
-                return True
-            else:
-                return False
-        else:
-            #self.setMessage("Invalid email entered.","red")
-            messagebox.showinfo("Cannot create new account","Invalid email entered. Please try again.")
-            self.grabWin()
-            return False
     
     def setMessage(self,message,colour = "white"):
         length = len(message)

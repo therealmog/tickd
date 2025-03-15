@@ -95,9 +95,15 @@ class GetValueWin(CTkToplevel):
 
         # textwrap.fill() adjusts the line lengths of the characters
         if self.customTitle == None:
-            self.titleText = textwrap.fill(f"Change the {self.attributeName}",40)
+            titleText = f"Change the {self.attributeName}"
         else:
-            self.titleText = textwrap.fill(f"{self.customTitle}",40)
+            titleText = f"{self.customTitle}"
+        
+        titleWrapped = textwrap.wrap(titleText,40)[0]
+        if len(titleWrapped) < len(titleText):
+            self.titleText = titleWrapped +"..."
+        else:
+            self.titleText = titleWrapped
 
         self.lblTitle = CTkLabel(self,text=self.titleText,font=(globalFontName,20),anchor=W,justify="left")
 
