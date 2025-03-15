@@ -17,10 +17,12 @@
 
 <p>There are 3 main components to the application</p>
 <ol>
-  <li>App window</li>
-    - Essentially the 'master' window of the app, acts as a container for the content frames of the app.
-    - Also contains a few functions used to refresh data, since this object will contain all of the frames of the app, allowing it to call any methods for any of those frames.
+  <h3><li>App window</li></h3>
+  <ul>
+    <li>Essentially the 'master' window of the app, acts as a container for the content frames of the app.</li>
+    <li>Also contains a few functions used to refresh data, since this object will contain all of the frames of the app, allowing it to call any methods for any of those frames.</li>
+  </ul>
   <img src="sample_imgs//appwindow.png" width=700>
-  <li>List frames</li>
-  <li>Task objects</li>
+  <h3><li>List frames</li></h3>
+  <h3><li>Task objects</li></h3>
 </ol>
