@@ -3,7 +3,7 @@
 
 <h3>To see stuff that could be added, see <a href="ideas.md">here</a>.</h3>
 
-<p>This is the repository for all the stuff to do with my A2 Project, Tickd.</p>
+<p>This is the repository for all the stuff to do with my A Level Project, Tickd.</p>
 <br>
 
 <h2>The <b>lib</b> folder</h2>
