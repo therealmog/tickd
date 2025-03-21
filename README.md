@@ -2,6 +2,7 @@
 <h1>tickd. task management made easy.</h1>
 
 <h3>To see stuff that could be added, see <a href="ideas.md">here</a>.</h3>
+<h3>The project has been submitted, please see <a href="ideas.md">here</a> to see the version of the code that was submitted to OCR.</h3>
 
 <p>This is the repository for all the stuff to do with my A Level Project, Tickd.</p>
 <br>
