@@ -1,4 +1,7 @@
-<h1>Stuff that could be added:</h1>
+<img src="logo//blackBGLogo.png" width=300>
+<h1>Stuff that could be added to Tickd.</h1>
+
+
 <br>
 
 <!--View on GitHub: -->
