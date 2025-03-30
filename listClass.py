@@ -607,9 +607,11 @@ class List(CTkFrame):
             # If another details panel is currently being displayed, it is removed from the screen.
             if self.currentDisplayed != "":
                 self.detailPanels[self.currentDisplayed].place_forget() # Removes current display panel.
+                self.detailPanels[self.currentDisplayed].taskObj.removeTitleColour() # Changes colour of title.
 
             # Retrieves details panel to be displayed by its taskID
             taskDetailsPanel = self.detailPanels[taskID]
+            taskDetailsPanel.taskObj.setTitleColour()
             self.currentDisplayed = taskID
 
             taskDetailsPanel.place(in_=self.entryTask,y=150)

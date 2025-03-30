@@ -1,40 +1,6 @@
 {
     "shared": "no",
-    "tasks": {
-        "SzOQCd": {
-            "title": "Go to gym",
-            "date": "24/02/2025",
-            "taskID": "SzOQCd",
-            "completed": "False",
-            "time": "",
-            "priority": "",
-            "description": "",
-            "listName": "inbox",
-            "starred": "False"
-        },
-        "XuEdGs": {
-            "title": "important task",
-            "date": "25/02/2025",
-            "taskID": "XuEdGs",
-            "completed": "False",
-            "time": "",
-            "priority": "P1",
-            "description": "",
-            "listName": "inbox",
-            "starred": "False"
-        },
-        "BlhmEl": {
-            "title": "Go to bed",
-            "date": "27/02/2025",
-            "taskID": "BlhmEl",
-            "completed": "False",
-            "time": "",
-            "priority": "",
-            "description": "",
-            "listName": "inbox",
-            "starred": "False"
-        }
-    },
+    "tasks": {},
     "completed": {
         "NoZnxA": {
             "title": "Hows your day?",
@@ -2899,6 +2865,39 @@
             "title": "Finish maths practice",
             "date": "26/02/2025",
             "taskID": "JASoFI",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "inbox",
+            "starred": "False"
+        },
+        "SzOQCd": {
+            "title": "Go to gym",
+            "date": "24/02/2025",
+            "taskID": "SzOQCd",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "inbox",
+            "starred": "False"
+        },
+        "XuEdGs": {
+            "title": "important task",
+            "date": "25/02/2025",
+            "taskID": "XuEdGs",
+            "completed": "True",
+            "time": "",
+            "priority": "P1",
+            "description": "",
+            "listName": "inbox",
+            "starred": "False"
+        },
+        "BlhmEl": {
+            "title": "Go to bed",
+            "date": "27/02/2025",
+            "taskID": "BlhmEl",
             "completed": "True",
             "time": "",
             "priority": "",

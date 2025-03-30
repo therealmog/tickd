@@ -215,11 +215,27 @@ class Task(CTkFrame):
     
     def setTitleColour(self):
         """Sets colour of title to accent colour to display that it is being viewed (display panel)"""
+        self.lblTitle.configure(text_color=self.accent)
 
-        if self.lblTitle._text_color == self.accent:
-            self.lblTitle.configure(text_colour=("black","white"))
-        else:
-            self.lblTitle.configure(text_colour=self.accent)
+        self.unbind("<Enter>")
+        self.unbind("<Leave>")
+        self.lblTitle.unbind("<Enter>")
+        self.lblTitle.unbind("<Leave>")
+        self.lblDate.unbind("<Enter>")
+        self.lblDate.unbind("<Leave>")
+
+    def removeTitleColour(self):
+        """Sets colour of title back to white/black"""
+
+        self.lblTitle.configure(text_color=("black","white"))
+
+        # Rebinds previously removed title binds
+        self.bind("<Enter>",lambda event:self.onmouseEnter())
+        self.bind("<Leave>",lambda event:self.onmouseLeave())
+        self.lblTitle.bind("<Enter>",lambda event:self.onmouseEnter())
+        self.lblTitle.bind("<Leave>",lambda event:self.onmouseLeave())
+        self.lblDate.bind("<Enter>",lambda event:self.onmouseEnter())
+        self.lblDate.bind("<Leave>",lambda event:self.onmouseLeave())
     
     
     def getTimeDifference(self):

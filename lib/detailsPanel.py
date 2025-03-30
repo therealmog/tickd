@@ -56,7 +56,7 @@ class DetailsPanel(CTkFrame):
         # Declares rest of interface elements.
         self.imgClose = CTkImage(Image.open("icons//cancel.png"),size=(20,20))
         self.btnClose = CTkButton(self,image=self.imgClose,text="",width=20,fg_color="grey12",hover_color="red",\
-                                  border_color="grey5",border_width=2,command=self.place_forget)
+                                  border_color="grey5",border_width=2,command=self.closePanel)
         self.taskButton = self.getTaskButton()
         self.lblDate = CTkLabel(self,text=self.taskDate,font=(globalFontName,20),cursor="hand2")
         self.lblTime = CTkLabel(self,text=self.taskTime,font=(globalFontName,20),cursor="hand2")
@@ -209,6 +209,7 @@ class DetailsPanel(CTkFrame):
         self.bindAttributeWins()
         self.flagFuncAttrEditing()
 
+
     def refreshTaskDetails(self):
         # Gets latest task details.
         taskDict = getTaskDict(self.taskID,self.userPath,self.taskAttributes["listName"])
@@ -230,6 +231,9 @@ class DetailsPanel(CTkFrame):
     def flagFuncAttrEditing(self):
         self.flagAttributeEditing = not self.flagAttributeEditing
 
+    def closePanel(self):
+        self.place_forget()
+        self.taskObj.removeTitleColour()
 
     def getTaskButton(self):
         taskButton = Checkbox(self,x=20,y=20,size=(50,50),command=self.taskButtonCommand,\

@@ -1,0 +1,60 @@
+{
+    "tasks": {
+        "welcome": {
+            "title": "Welcome to Tickd!",
+            "date": "30/03/2025",
+            "description": "Welcome to a simpler life with Tickd.\nSimply add tasks with the 'Add a task' box at the top, and use keywords such as 'today' and 'tomorrow' in the date, or for other dates simply add the date using the DD/MM/YY format.\ne.g. for the 31st December 2025, you would put 31/12/25.",
+            "completed": "False",
+            "time": "",
+            "priority": "",
+            "taskID": "welcome",
+            "listName": "inbox"
+        },
+        "ysxKSX": {
+            "title": "Sz questions",
+            "date": "29/03/2025",
+            "taskID": "ysxKSX",
+            "completed": "False",
+            "time": "",
+            "priority": "",
+            "description": "2x25 mins\n\n25m - Therapy qs\n25m - Biological expl. 16m",
+            "listName": "inbox",
+            "starred": "False"
+        }
+    },
+    "completed": {
+        "sfDAnr": {
+            "title": "Bosh",
+            "date": "30/3/2025",
+            "taskID": "sfDAnr",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "inbox",
+            "starred": "False"
+        },
+        "YRGjvE": {
+            "title": "a task",
+            "date": "30/03/2025",
+            "taskID": "YRGjvE",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "inbox",
+            "starred": "False"
+        },
+        "oubNAk": {
+            "title": "9aosdkajsd",
+            "date": "29/03/2025",
+            "taskID": "oubNAk",
+            "completed": "True",
+            "time": "",
+            "priority": "",
+            "description": "",
+            "listName": "inbox",
+            "starred": "False"
+        }
+    }
+}

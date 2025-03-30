@@ -1,9 +1,9 @@
 {
     "amoghg75@yahoo.com": {
         "accent": "crimson",
-        "font": "Bahnschrift",
+        "font": "Century Gothic",
         "lightBG": "1",
-        "darkBG": "6"
+        "darkBG": "4"
     },
     "tickd@gmail.com": {
         "accent": "dodgerblue2",
@@ -93,5 +93,12 @@
     },
     "test@gmail./com": {
         "accent": "dodgerblue2"
+    },
+    "daniel@gmail.com": {
+        "accent": "lime"
+    },
+    "18naikgaunekar@shsb.org.uk": {
+        "accent": "dodgerblue2",
+        "font": "Franklin Gothic Demi"
     }
 }
