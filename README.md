@@ -1,11 +1,20 @@
 <img src="logo//blackBGLogo.png" width=500>
 <h1>tickd. task management made easy.</h1>
 
-<h3>To see stuff that could be added, see <a href="ideas.md">here</a>.</h3>
-<h3>The project has been submitted, please see <a href="https://github.com/therealmog/A2_Project/tree/335804a6c9aa72e6472663cad339ea22483fd33b" target="_blank">here</a> to see the version of the code that was submitted to OCR, and see the project documentation <a href="https://drive.google.com/file/d/1bncJgfuthEGVeOWDF_zf7tUzepB3hU95/view?usp=sharing" target="_blank">here</a> (it was too big to put on GitHub!)</h3>
+<h3>This is the repository for my OCR A-Level Computer Science Project/Non-Exam Assessment.</h3>
+<br><br>
 
-<h3>See the project document that was sent to OCR, complete with screenshots and description (<a href="https://drive.google.com/file/d/1bncJgfuthEGVeOWDF_zf7tUzepB3hU95/preview">Google Drive link</a>)</h3>
-<p>This is the repository for all the stuff to do with my A Level Project, Tickd.</p>
+<h2><u>🌐 QUICK LINKS</u></h2>
+
+<h3>✨ Ideas to be added (<a href="ideas.md" target="_blank">GitHub</a>)
+<br><br>
+👨‍💻 Code submitted to OCR (<a href="https://github.com/therealmog/A2_Project/tree/335804a6c9aa72e6472663cad339ea22483fd33b" target="_blank">GitHub</a>)
+<br><br>
+📄 Project documentation submitted to OCR (<a href="https://drive.google.com/file/d/1bncJgfuthEGVeOWDF_zf7tUzepB3hU95/preview" target="_blank">Google Drive</a>)
+</h3>
+
+<h2><u></u></h2>
+<br>
 <br>
 
 <h2>The <b>lib</b> folder</h2>
