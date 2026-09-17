@@ -8,7 +8,7 @@
 
 <h3>✨ Ideas to be added (<a href="ideas.md" target="_blank">GitHub</a>)
 <br><br>
-👨‍💻 Code submitted to OCR (<a href="https://github.com/therealmog/A2_Project/tree/335804a6c9aa72e6472663cad339ea22483fd33b" target="_blank">GitHub</a>)
+👨‍💻 Final submission repo (<a href="https://github.com/therealmog/A2_Project/tree/335804a6c9aa72e6472663cad339ea22483fd33b" target="_blank">GitHub</a>)
 <br><br>
 📄 Project documentation submitted to OCR (<a href="https://drive.google.com/file/d/1bncJgfuthEGVeOWDF_zf7tUzepB3hU95/preview" target="_blank">Google Drive</a>)
 </h3>
